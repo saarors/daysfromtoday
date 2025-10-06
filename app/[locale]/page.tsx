@@ -14,14 +14,99 @@
  * 3. 功能特性展示
  * 4. 语言切换
  * 
+ * SEO 优化：
+ * - 完整的 metadata（title, description, OG, Twitter Card）
+ * - 语义化 HTML5 标签
+ * - 结构化数据（WebSite Schema）
+ * - Canonical URLs
+ * - Hreflang 标签
+ * 
  * 符合项目规范：
  * - Next.js 15 + TypeScript
  * - next-intl 多语言
  * - Calendly 设计系统
  * - 响应式设计
  */
+import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
+
+type PageParams = {
+  locale: string;
+};
+
+/**
+ * 生成首页 metadata（SEO 优化）
+ */
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<PageParams>
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.ai';
+  
+  const title = locale === 'zh' 
+    ? 'DaysFromToday - 日期计算器 | 轻松计算任意日期'
+    : 'DaysFromToday - Date Calculator | Calculate Any Date Easily';
+  
+  const description = locale === 'zh'
+    ? '简单、快速、强大的日期计算工具。计算未来或过去的日期，支持工作日、自然日、节假日。一键添加到日历，多语言支持。'
+    : 'Simple, fast, and powerful date calculator. Calculate future or past dates with support for business days, weekends, and holidays. One-click calendar integration and multi-language support.';
+
+  return {
+    title,
+    description,
+    keywords: locale === 'zh'
+      ? ['日期计算器', '天数计算', '日期倒计时', '工作日计算', '日历工具', 'DaysFromToday']
+      : ['date calculator', 'days calculator', 'date counter', 'business days', 'calendar tool', 'DaysFromToday'],
+    authors: [{ name: 'Leon', url: `${baseUrl}/${locale}/faq` }],
+    creator: 'DaysFromToday',
+    publisher: 'DaysFromToday',
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      url: `${baseUrl}/${locale}`,
+      siteName: 'DaysFromToday',
+      locale: locale,
+      images: [{
+        url: `${baseUrl}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: 'DaysFromToday - Date Calculator'
+      }]
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [`${baseUrl}/og-image.png`]
+    },
+    alternates: {
+      canonical: `${baseUrl}/${locale}`,
+      languages: {
+        'en': `${baseUrl}/en`,
+        'zh': `${baseUrl}/zh`,
+        'x-default': `${baseUrl}/en`
+      }
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      }
+    },
+    verification: {
+      google: process.env.NEXT_PUBLIC_GSC_VERIFICATION,
+    }
+  };
+}
 
 export default async function HomePage({ 
   params
@@ -30,6 +115,7 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const t = await getTranslations();
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.ai';
 
   return (
     <div className="min-h-screen bg-white">
@@ -281,6 +367,32 @@ export default async function HomePage({
           </div>
         </div>
       </footer>
+
+      {/* WebSite 结构化数据（JSON-LD）*/}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            'name': 'DaysFromToday',
+            'alternateName': locale === 'zh' ? '日期计算器' : 'Date Calculator',
+            'url': `${baseUrl}/${locale}`,
+            'description': locale === 'zh'
+              ? '简单、快速、强大的日期计算工具'
+              : 'Simple, fast, and powerful date calculator',
+            'inLanguage': locale,
+            'potentialAction': {
+              '@type': 'SearchAction',
+              'target': {
+                '@type': 'EntryPoint',
+                'urlTemplate': `${baseUrl}/${locale}/days/{days}`
+              },
+              'query-input': 'required name=days'
+            }
+          })
+        }}
+      />
     </div>
   );
 }

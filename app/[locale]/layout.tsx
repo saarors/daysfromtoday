@@ -6,11 +6,20 @@
  * 2. 注入 next-intl Provider 提供翻译功能
  * 3. 配置全局字体（Geist Sans 和 Geist Mono）
  * 4. 引入全局样式（Tailwind CSS）
+ * 5. Organization Schema（品牌结构化数据）
+ * 6. Google Analytics（性能监控）
+ * 
+ * SEO 优化：
+ * - 语义化 HTML5 标签
+ * - Organization Schema（JSON-LD）
+ * - Viewport 优化
+ * - 字体预加载
  * 
  * 符合项目规范：
  * - TypeScript 严格模式
  * - SEO 友好（正确的 lang 属性）
  * - 性能优化（字体优化、CSS 优化）
+ * - 可访问性（WCAG 标准）
  */
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from 'next-intl';
@@ -21,16 +30,47 @@ import "../globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap", // 优化字体加载
+  preload: true,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+  preload: true,
 });
 
+/**
+ * 全局 metadata（适用于所有页面的默认值）
+ */
 export const metadata: Metadata = {
-  title: "DaysFromToday - Date Calculator",
-  description: "Calculate dates from today with ease. Support for business days, weekdays, and holidays.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.ai'),
+  title: {
+    default: "DaysFromToday - Date Calculator",
+    template: "%s | DaysFromToday"
+  },
+  description: "Calculate dates from today with ease. Support for business days, weekends, and holidays.",
+  applicationName: "DaysFromToday",
+  authors: [{ name: 'Leon' }],
+  generator: 'Next.js',
+  referrer: 'origin-when-cross-origin',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' }
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
+    ]
+  },
+  manifest: '/manifest.json',
 };
 
 export default async function LocaleLayout({
@@ -45,14 +85,84 @@ export default async function LocaleLayout({
   
   // 获取当前语言的翻译文件
   const messages = await getMessages();
+  
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.ai';
 
   return (
-    <html lang={locale}>
+    <html lang={locale} className="scroll-smooth">
+      <head>
+        {/* Google Search Console 验证 */}
+        {process.env.NEXT_PUBLIC_GSC_VERIFICATION && (
+          <meta 
+            name="google-site-verification" 
+            content={process.env.NEXT_PUBLIC_GSC_VERIFICATION} 
+          />
+        )}
+        
+        {/* Theme Color */}
+        <meta name="theme-color" content="#0069FF" />
+        <meta name="color-scheme" content="light" />
+        
+        {/* Google Analytics（如果配置）*/}
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
+                    page_path: window.location.pathname,
+                  });
+                `,
+              }}
+            />
+          </>
+        )}
+
+        {/* Organization 结构化数据（JSON-LD）*/}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              'name': 'DaysFromToday',
+              'alternateName': 'Days From Today',
+              'url': baseUrl,
+              'logo': `${baseUrl}/logo.png`,
+              'sameAs': [
+                'https://github.com/leeleon/daysfromtoday'
+              ],
+              'description': 'Calculate dates from today with ease',
+              'founder': {
+                '@type': 'Person',
+                'name': 'Leon',
+                'url': `${baseUrl}/${locale}/faq`
+              },
+              'contactPoint': {
+                '@type': 'ContactPoint',
+                'contactType': 'Customer Support',
+                'email': 'feedback@daysfromtoday.com',
+                'availableLanguage': ['en', 'zh']
+              }
+            })
+          }}
+        />
+      </head>
+      
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <main id="main-content" role="main">
+            {children}
+          </main>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -310,8 +310,8 @@ export default async function DaysCalculatorPage({
           </div>
           
           <div className="flex items-center gap-6">
-            <Link
-              href={`/${locale}/faq`}
+            <Link 
+              href={`/${locale}/faq`} 
               className="text-sm font-medium hover:opacity-70 transition-opacity"
               style={{ color: 'var(--color-text-secondary)' }}
             >
@@ -329,6 +329,33 @@ export default async function DaysCalculatorPage({
           </div>
         </div>
       </footer>
+
+      {/* BreadcrumbList 结构化数据（JSON-LD）*/}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            'itemListElement': [
+              {
+                '@type': 'ListItem',
+                'position': 1,
+                'name': locale === 'zh' ? '首页' : 'Home',
+                'item': `https://daysfromtoday.ai/${locale}`
+              },
+              {
+                '@type': 'ListItem',
+                'position': 2,
+                'name': locale === 'zh' 
+                  ? `${Math.abs(days)} 天${days >= 0 ? '后' : '前'}`
+                  : `${Math.abs(days)} days ${days >= 0 ? 'from today' : 'ago'}`,
+                'item': `https://daysfromtoday.ai/${locale}/days/${days}`
+              }
+            ]
+          })
+        }}
+      />
     </div>
   );
 }
