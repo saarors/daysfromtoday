@@ -76,116 +76,213 @@ export default async function FAQPage({
   const content = locale === 'zh' ? chineseContent : englishContent;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
-        {/* 返回首页链接 */}
-        <div className="mb-8">
+    <div className="min-h-screen bg-white">
+      {/* 导航栏 */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href={`/${locale}`} className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
+            DaysFromToday
+          </Link>
+          
+          <div className="flex items-center gap-8">
+            <Link 
+              href={`/${locale}/faq`} 
+              className="text-sm font-medium"
+              style={{ color: 'var(--color-primary)' }}
+            >
+              {t('faq')}
+            </Link>
+            
+            <div className="flex gap-2">
+              <Link 
+                href="/en/faq"
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  locale === 'en' 
+                    ? 'bg-[var(--color-primary)] text-white' 
+                    : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)]'
+                }`}
+              >
+                EN
+              </Link>
+              <Link 
+                href="/zh/faq"
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  locale === 'zh' 
+                    ? 'bg-[var(--color-primary)] text-white' 
+                    : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)]'
+                }`}
+              >
+                中文
+              </Link>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+      {/* 主内容区 */}
+      <div className="pt-24 pb-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          {/* 返回链接 */}
           <Link
             href={`/${locale}`}
-            className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2"
+            className="inline-flex items-center gap-2 mb-8 text-sm font-medium hover:opacity-70 transition-opacity"
+            style={{ color: 'var(--color-text-secondary)' }}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             {t('calculateAnother')}
           </Link>
-        </div>
 
-        {/* 页面标题 */}
-        <header className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            {content.title}
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
-            {content.subtitle}
-          </p>
-        </header>
+          {/* 页面标题 */}
+          <header className="text-center mb-16">
+            <h1 
+              className="text-5xl font-bold mb-4"
+              style={{ color: 'var(--color-text-primary)' }}
+            >
+              {content.title}
+            </h1>
+            <p 
+              className="text-2xl"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              {content.subtitle}
+            </p>
+          </header>
 
-        {/* Leon 的信 */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-12">
-          <div className="prose prose-lg dark:prose-invert max-w-none">
+          {/* Leon 的信 */}
+          <div className="card-glass p-12 mb-12">
             {/* 作者信息 */}
-            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+            <div className="flex items-center gap-4 mb-8 pb-8" style={{ borderBottom: '1px solid var(--color-border-light)' }}>
+              <div 
+                className="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold"
+                style={{ background: 'linear-gradient(135deg, var(--color-gradient-mid), var(--color-gradient-end))' }}
+              >
                 L
               </div>
               <div>
-                <div className="font-bold text-xl text-gray-900 dark:text-white">
+                <div 
+                  className="font-bold text-2xl mb-1"
+                  style={{ color: 'var(--color-text-primary)' }}
+                >
                   Leon
                 </div>
-                <div className="text-gray-600 dark:text-gray-400">
+                <div style={{ color: 'var(--color-text-secondary)' }}>
                   {content.authorTitle}
                 </div>
               </div>
             </div>
 
             {/* 信件内容 */}
-            <div className="space-y-6 text-gray-700 dark:text-gray-300 leading-relaxed">
+            <div className="space-y-4 leading-relaxed text-lg" style={{ color: 'var(--color-text-secondary)' }}>
               {content.letterContent.map((paragraph, index) => (
-                <p key={index} className="text-base">
+                <p key={index}>
                   {paragraph}
                 </p>
               ))}
             </div>
 
             {/* 签名 */}
-            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-gray-600 dark:text-gray-400 italic">
+            <div className="mt-8 pt-8" style={{ borderTop: '1px solid var(--color-border-light)' }}>
+              <p className="italic whitespace-pre-line" style={{ color: 'var(--color-text-secondary)' }}>
                 {content.signature}
               </p>
             </div>
           </div>
-        </div>
 
-        {/* 产品功能列表 */}
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            {content.featuresTitle}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {content.features.map((feature, index) => (
-              <div 
-                key={index}
-                className="flex items-start gap-3 bg-white dark:bg-gray-800 rounded-lg p-4"
-              >
-                <svg 
-                  className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
+          {/* 产品功能列表 */}
+          <div className="mb-12">
+            <h2 
+              className="text-3xl font-bold mb-8 text-center"
+              style={{ color: 'var(--color-text-primary)' }}
+            >
+              {content.featuresTitle}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {content.features.map((feature, index) => (
+                <div 
+                  key={index}
+                  className="flex items-start gap-3 p-6 rounded-xl bg-white border-2 transition-all hover:border-[var(--color-primary)] hover:shadow-md"
+                  style={{ borderColor: 'var(--color-border-light)' }}
                 >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M5 13l4 4L19 7" 
-                  />
-                </svg>
-                <span className="text-gray-700 dark:text-gray-300">{feature}</span>
-              </div>
-            ))}
+                  <div 
+                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                    style={{ background: 'var(--color-success)' }}
+                  >
+                    <svg 
+                      className="w-4 h-4 text-white" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M5 13l4 4L19 7" 
+                      />
+                    </svg>
+                  </div>
+                  <span style={{ color: 'var(--color-text-primary)' }}>{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 反馈征集 */}
+          <div className="card-glass p-12 text-center">
+            <h2 
+              className="text-3xl font-bold mb-4"
+              style={{ color: 'var(--color-text-primary)' }}
+            >
+              {content.feedbackTitle}
+            </h2>
+            <p 
+              className="text-lg mb-8 max-w-2xl mx-auto"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              {content.feedbackText}
+            </p>
+            <a
+              href={`mailto:feedback@daysfromtoday.com?subject=${encodeURIComponent(content.emailSubject)}`}
+              className="btn-primary inline-flex items-center justify-center gap-2 px-8 py-4 text-lg"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              {content.feedbackButton}
+            </a>
           </div>
         </div>
-
-        {/* 反馈征集 */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            {content.feedbackTitle}
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            {content.feedbackText}
-          </p>
-          <a
-            href={`mailto:feedback@daysfromtoday.com?subject=${encodeURIComponent(content.emailSubject)}`}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            {content.feedbackButton}
-          </a>
-        </div>
       </div>
+
+      {/* 页脚 */}
+      <footer className="py-12 px-6 border-t border-gray-100 bg-[var(--color-bg-secondary)]">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+            © 2025 DaysFromToday. All rights reserved.
+          </div>
+          
+          <div className="flex items-center gap-6">
+            <Link
+              href={`/${locale}/faq`}
+              className="text-sm font-medium hover:opacity-70 transition-opacity"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              {t('faq')}
+            </Link>
+            <a
+              href="https://github.com/leeleon/daysfromtoday"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium hover:opacity-70 transition-opacity"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              GitHub
+            </a>
+          </div>
+        </div>
+      </footer>
 
       {/* JSON-LD 结构化数据（SEO）*/}
       <script

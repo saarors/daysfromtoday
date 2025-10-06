@@ -1,6 +1,11 @@
 {
   "hello": "你好，DaysFromToday",
   "description": "轻松计算未来或过去的日期",
+  "heroTitle": "轻松计算任意日期",
+  "heroSubtitle": "从今天开始计算任意日期。支持自然日、工作日和节假日。",
+  "getStarted": "立即开始",
+  "learnMore": "了解更多",
+  "tryIt": "现在试试",
   "daysFromToday": "距今天数",
   "result": "计算结果",
   "targetDate": "目标日期",

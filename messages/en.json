@@ -1,6 +1,11 @@
 {
   "hello": "Hello DaysFromToday",
   "description": "Calculate dates from today with ease",
+  "heroTitle": "Easy scheduling ahead",
+  "heroSubtitle": "Calculate any date from today. Support for business days, weekdays, and holidays.",
+  "getStarted": "Get Started",
+  "learnMore": "Learn More",
+  "tryIt": "Try it now",
   "daysFromToday": "Days from Today",
   "result": "Result",
   "targetDate": "Target Date",
