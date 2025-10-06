@@ -55,7 +55,7 @@ export async function generateMetadata({
   }
   
   const result = calculateDaysFromToday(days, locale as SupportedLocale);
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.ai';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
   
   return {
     title: result.title,
@@ -107,6 +107,9 @@ export default async function DaysCalculatorPage({
   
   // 获取相关日期推荐
   const relatedDays = getRelatedDays(days);
+  
+  // Base URL（用于 Schema）
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
   
   // ICS 下载 URL
   const downloadUrl = `/api/ics?days=${days}&locale=${locale}`;
@@ -342,7 +345,7 @@ export default async function DaysCalculatorPage({
                 '@type': 'ListItem',
                 'position': 1,
                 'name': locale === 'zh' ? '首页' : 'Home',
-                'item': `https://daysfromtoday.ai/${locale}`
+                'item': `${baseUrl}/${locale}`
               },
               {
                 '@type': 'ListItem',
@@ -350,7 +353,7 @@ export default async function DaysCalculatorPage({
                 'name': locale === 'zh' 
                   ? `${Math.abs(days)} 天${days >= 0 ? '后' : '前'}`
                   : `${Math.abs(days)} days ${days >= 0 ? 'from today' : 'ago'}`,
-                'item': `https://daysfromtoday.ai/${locale}/days/${days}`
+                'item': `${baseUrl}/${locale}/days/${days}`
               }
             ]
           })

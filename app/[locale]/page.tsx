@@ -44,7 +44,7 @@ export async function generateMetadata({
   params: Promise<PageParams>
 }): Promise<Metadata> {
   const { locale } = await params;
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.ai';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
   
   const title = locale === 'zh' 
     ? 'DaysFromToday - 日期计算器 | 轻松计算任意日期'
@@ -115,7 +115,7 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const t = await getTranslations();
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.ai';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
 
   return (
     <div className="min-h-screen bg-white">

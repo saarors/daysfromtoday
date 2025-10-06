@@ -45,7 +45,7 @@ const geistMono = Geist_Mono({
  * 全局 metadata（适用于所有页面的默认值）
  */
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.ai'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai'),
   title: {
     default: "DaysFromToday - Date Calculator",
     template: "%s | DaysFromToday"
@@ -86,7 +86,7 @@ export default async function LocaleLayout({
   // 获取当前语言的翻译文件
   const messages = await getMessages();
   
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.ai';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
 
   return (
     <html lang={locale} className="scroll-smooth">

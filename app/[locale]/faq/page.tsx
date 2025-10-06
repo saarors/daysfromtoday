@@ -43,7 +43,7 @@ export async function generateMetadata({
     ? '了解 DaysFromToday 的诞生故事。一个父亲为儿子创建的日期计算工具，帮助你掌握时间，掌握命运。'
     : 'Learn about the story behind DaysFromToday. A date calculator created by a father for his son, helping you master time and destiny.';
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.ai';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
 
   return {
     title,
