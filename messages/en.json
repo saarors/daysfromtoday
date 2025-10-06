@@ -1,5 +1,17 @@
 {
   "hello": "Hello DaysFromToday",
-  "description": "Calculate dates from today with ease"
+  "description": "Calculate dates from today with ease",
+  "daysFromToday": "Days from Today",
+  "result": "Result",
+  "targetDate": "Target Date",
+  "dayOfWeek": "Day of Week",
+  "daysAway": "Days Away",
+  "downloadCalendar": "Download to Calendar",
+  "addToCalendar": "Add to Calendar",
+  "relatedCalculations": "Related Calculations",
+  "calculateAnother": "Calculate Another Date",
+  "past": "past",
+  "future": "future",
+  "today": "today"
 }
 

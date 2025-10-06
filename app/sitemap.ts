@@ -23,17 +23,36 @@ import { MetadataRoute } from 'next';
 import { locales } from '@/i18n/config';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // TODO: 从环境变量读取，当前使用占位符
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.com';
+  const sitemapEntries: MetadataRoute.Sitemap = [];
 
-  // 为每个语言生成首页 URL
-  const homepages = locales.map(locale => ({
-    url: `${baseUrl}/${locale}`,
-    lastModified: new Date(),
-    changeFrequency: 'daily' as const,
-    priority: 1.0,
-  }));
+  // 1. 首页（所有语言）
+  locales.forEach(locale => {
+    sitemapEntries.push({
+      url: `${baseUrl}/${locale}`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 1.0,
+    });
+  });
 
-  return homepages;
+  // 2. 常用日期计算页面（优化 SEO）
+  const commonDays = [
+    1, 2, 3, 4, 5, 6, 7, 10, 14, 15, 20, 21, 28, 30, 
+    45, 60, 90, 100, 120, 180, 365
+  ];
+
+  locales.forEach(locale => {
+    commonDays.forEach(days => {
+      sitemapEntries.push({
+        url: `${baseUrl}/${locale}/days/${days}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.8,
+      });
+    });
+  });
+
+  return sitemapEntries;
 }
 

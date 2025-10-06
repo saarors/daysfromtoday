@@ -1,5 +1,17 @@
 {
   "hello": "你好，DaysFromToday",
-  "description": "轻松计算未来或过去的日期"
+  "description": "轻松计算未来或过去的日期",
+  "daysFromToday": "距今天数",
+  "result": "计算结果",
+  "targetDate": "目标日期",
+  "dayOfWeek": "星期",
+  "daysAway": "距离天数",
+  "downloadCalendar": "下载到日历",
+  "addToCalendar": "添加到日历",
+  "relatedCalculations": "相关计算",
+  "calculateAnother": "计算其他日期",
+  "past": "过去",
+  "future": "未来",
+  "today": "今天"
 }
 
