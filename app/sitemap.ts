@@ -36,7 +36,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   });
 
-  // 2. 常用日期计算页面（优化 SEO）
+  // 2. FAQ 页面（所有语言）
+  locales.forEach(locale => {
+    sitemapEntries.push({
+      url: `${baseUrl}/${locale}/faq`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    });
+  });
+
+  // 3. 常用日期计算页面（优化 SEO）
   const commonDays = [
     1, 2, 3, 4, 5, 6, 7, 10, 14, 15, 20, 21, 28, 30, 
     45, 60, 90, 100, 120, 180, 365

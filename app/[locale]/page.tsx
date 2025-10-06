@@ -87,6 +87,13 @@ export default async function HomePage({
 
       {/* 页脚 */}
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center text-sm">
+        <Link
+          href={`/${locale}/faq`}
+          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+        >
+          {t('faq')}
+        </Link>
+        <span className="text-gray-400">•</span>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
           href="https://github.com/leeleon/daysfromtoday"
