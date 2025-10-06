@@ -19,8 +19,7 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  // TODO: 从环境变量读取，当前使用占位符
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.ai';
   
   return {
     rules: {

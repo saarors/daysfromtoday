@@ -17,7 +17,20 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./i18n/config.ts');
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // SEO 优化配置
+  compress: true, // 启用 gzip 压缩
+  
+  // 生产环境优化
+  reactStrictMode: true,
+  
+  // 图片优化配置
+  images: {
+    formats: ['image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+  },
+  
+  // 国际化配置（由 next-intl 处理，这里保持默认）
+  // i18n 配置已由 next-intl 中间件处理
 };
 
 // 导出包装后的配置

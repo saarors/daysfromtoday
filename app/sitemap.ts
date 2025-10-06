@@ -23,7 +23,7 @@ import { MetadataRoute } from 'next';
 import { locales } from '@/i18n/config';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.ai';
   const sitemapEntries: MetadataRoute.Sitemap = [];
 
   // 1. 首页（所有语言）

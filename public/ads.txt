@@ -1,0 +1,7 @@
+# Google AdSense
+# 请在获得 AdSense 账号后替换为您的发布商 ID
+# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
+
+# 当前状态：待配置
+# 配置说明：https://support.google.com/adsense/answer/7532444
+

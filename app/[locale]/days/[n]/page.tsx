@@ -55,6 +55,7 @@ export async function generateMetadata({
   }
   
   const result = calculateDaysFromToday(days, locale as SupportedLocale);
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.ai';
   
   return {
     title: result.title,
@@ -64,7 +65,8 @@ export async function generateMetadata({
       description: result.description,
       type: 'website',
       locale: locale,
-      siteName: 'DaysFromToday'
+      siteName: 'DaysFromToday',
+      url: `${baseUrl}/${locale}/days/${days}`
     },
     twitter: {
       card: 'summary_large_image',
@@ -72,10 +74,11 @@ export async function generateMetadata({
       description: result.description
     },
     alternates: {
-      canonical: `/${locale}/days/${days}`,
+      canonical: `${baseUrl}/${locale}/days/${days}`,
       languages: {
-        'en': `/en/days/${days}`,
-        'zh': `/zh/days/${days}`
+        'en': `${baseUrl}/en/days/${days}`,
+        'zh': `${baseUrl}/zh/days/${days}`,
+        'x-default': `${baseUrl}/en/days/${days}`
       }
     }
   };

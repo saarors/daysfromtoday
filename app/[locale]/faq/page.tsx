@@ -43,19 +43,30 @@ export async function generateMetadata({
     ? '了解 DaysFromToday 的诞生故事。一个父亲为儿子创建的日期计算工具，帮助你掌握时间，掌握命运。'
     : 'Learn about the story behind DaysFromToday. A date calculator created by a father for his son, helping you master time and destiny.';
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://daysfromtoday.ai';
+
   return {
     title,
     description,
     openGraph: {
       title,
       description,
-      type: 'website'
+      type: 'website',
+      url: `${baseUrl}/${locale}/faq`,
+      siteName: 'DaysFromToday',
+      locale: locale
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description
     },
     alternates: {
-      canonical: `/${locale}/faq`,
+      canonical: `${baseUrl}/${locale}/faq`,
       languages: {
-        'en': '/en/faq',
-        'zh': '/zh/faq'
+        'en': `${baseUrl}/en/faq`,
+        'zh': `${baseUrl}/zh/faq`,
+        'x-default': `${baseUrl}/en/faq`
       }
     }
   };
