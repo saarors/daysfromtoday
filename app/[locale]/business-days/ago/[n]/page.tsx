@@ -1,10 +1,6 @@
-import { subBusinessDays } from '@/lib/bizdays';
-import { format } from 'date-fns';
-import { zhCN, enUS } from 'date-fns/locale';
 import type { Metadata } from 'next';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import DateCalculator from '@/components/DateCalculator';
 
 interface PageProps {
   params: Promise<{
@@ -17,7 +13,7 @@ interface PageProps {
 export async function generateStaticParams() {
   const popularDays = [
     1, 2, 3, 5, 7, 10, 14, 15, 20, 21, 28, 30, 
-    45, 60, 90
+    45, 60, 90, 100, 180, 365
   ];
   
   return popularDays.map(n => ({ n: n.toString() }));
@@ -29,12 +25,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const days = Number(n);
   
   const title = `${days} Business Days Ago from Today - Date Calculator`;
-  const description = `Calculate ${days} business days ago from today, excluding weekends and holidays. Find the exact past date for reporting and analysis.`;
+  const description = `Calculate ${days} business days ago from today, excluding weekends and holidays. Get the exact date for project planning and deadline management.`;
   
   return {
     title,
     description,
-    keywords: ['business days ago', 'working days calculator', 'past business days', 'historical date'],
+    keywords: ['business days ago calculator', 'working days ago', 'weekday calculator', 'past project deadline'],
     alternates: {
       canonical: `https://www.daysfromtoday.ai/${locale}/business-days/ago/${n}`,
       languages: {
@@ -46,14 +42,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
       url: `https://www.daysfromtoday.ai/${locale}/business-days/ago/${n}`,
-      type: 'website',
       siteName: 'DaysFromToday',
+      locale: locale === 'zh' ? 'zh_CN' : 'en_US',
+      type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-    }
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
   };
 }
 
@@ -61,167 +69,35 @@ export default async function BusinessDaysAgoPage({ params }: PageProps) {
   const { locale, n } = await params;
   const days = Number(n);
   
-  // 计算工作日（默认 US）
-  const today = new Date();
-  const country = 'US'; // TODO: 从用户偏好获取
-  const result = await subBusinessDays(today, days, country);
-  
-  const weekends = result.excludedDates.filter(d => d.reason === 'weekend');
-  const holidays = result.excludedDates.filter(d => d.reason === 'holiday');
-  
-  // 多语言内容
-  const text = {
-    en: {
-      title: (d: number) => `${d} Business ${d === 1 ? 'Day' : 'Days'} Ago from Today`,
-      subtitle: 'Excluding weekends and holidays',
-      targetDate: 'Target Date',
-      businessDaysPast: 'Business Days (Past)',
-      businessDay: 'business day',
-      businessDaysPlural: 'business days',
-      before: 'before',
-      startDate: 'Start Date',
-      businessDays: 'Business Days',
-      calendarDays: 'Calendar Days',
-      excluded: 'Excluded',
-      weekends: 'Weekends',
-      holidaysLabel: 'Holidays',
-      excludesText: (w: number, h: number) => 
-        `This calculation excluded ${w} weekend days${h > 0 ? ` and ${h} ${h === 1 ? 'holiday' : 'holidays'}` : ''}.`
-    },
-    zh: {
-      title: (d: number) => `从今天起 ${d} 个工作日前`,
-      subtitle: '排除周末和节假日',
-      targetDate: '目标日期',
-      businessDaysPast: '工作日（过去）',
-      businessDay: '个工作日',
-      businessDaysPlural: '个工作日',
-      before: '之前',
-      startDate: '起始日期',
-      businessDays: '工作日',
-      calendarDays: '自然日',
-      excluded: '排除天数',
-      weekends: '周末',
-      holidaysLabel: '节假日',
-      excludesText: (w: number, h: number) => 
-        `此计算排除了 ${w} 个周末${h > 0 ? `和 ${h} 个节假日` : ''}。`
-    }
-  };
-  
-  const t = text[locale as keyof typeof text] || text.en;
-  const dateLocale = locale === 'zh' ? zhCN : enUS;
-  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-cyan-50">
       {/* Language Switcher */}
       <LanguageSwitcher currentLocale={locale} />
       
       <div className="container mx-auto px-4 py-12 max-w-4xl">
-      {/* Hero Section */}
-      <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-600 to-purple-600 bg-clip-text text-transparent">
-          {t.title(days)}
-        </h1>
-        <p className="text-xl text-gray-600">
-          {t.subtitle}
-        </p>
-      </div>
-      
-      {/* Answer Card */}
-      <Card variant="elevated" className="mb-8">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>{t.targetDate}</CardTitle>
-            <Badge variant="secondary">{t.businessDaysPast}</Badge>
-          </div>
-          <CardDescription>
-            {days} {days === 1 ? t.businessDay : t.businessDaysPlural} {t.before} {format(today, locale === 'zh' ? 'yyyy年M月d日' : 'MMMM d, yyyy', { locale: dateLocale })}
-          </CardDescription>
-        </CardHeader>
+        <DateCalculator 
+          days={days} 
+          locale={locale} 
+          type="past" 
+          mode="business" 
+        />
         
-        <CardContent>
-          <div className="text-center py-8">
-            <div className="text-6xl font-bold text-purple-600 mb-4" suppressHydrationWarning>
-              {format(result.targetDate, locale === 'zh' ? 'yyyy年M月d日' : 'MMM d, yyyy', { locale: dateLocale })}
-            </div>
-            <div className="text-2xl text-gray-600" suppressHydrationWarning>
-              {format(result.targetDate, 'EEEE', { locale: dateLocale })}
-            </div>
-          </div>
-          
-          {/* Details Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-8 border-t border-gray-200">
-            <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">{t.startDate}</div>
-              <div className="font-semibold text-gray-900">
-                {format(today, locale === 'zh' ? 'M月d日' : 'MMM d, yyyy', { locale: dateLocale })}
-              </div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">{t.businessDays}</div>
-              <div className="font-semibold text-gray-900">
-                {days}
-              </div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">{t.calendarDays}</div>
-              <div className="font-semibold text-gray-900">
-                {result.totalCalendarDays}
-              </div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">{t.excluded}</div>
-              <div className="font-semibold text-gray-900">
-                {result.excludedDates.length}
-              </div>
-            </div>
-          </div>
-          
-          {/* Excluded Dates Summary */}
-          {result.excludedDates.length > 0 && (
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Badge variant="secondary" size="sm">
-                  {weekends.length} {t.weekends}
-                </Badge>
-                {holidays.length > 0 && (
-                  <Badge variant="warning" size="sm">
-                    {holidays.length} {t.holidaysLabel}
-                  </Badge>
-                )}
-              </div>
-              <p className="text-sm text-gray-600">
-                {t.excludesText(weekends.length, holidays.length)}
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-      
-      {/* FAQ Schema for SEO */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            'mainEntity': [
-              {
-                '@type': 'Question',
-                'name': `What date was ${days} business days ago from today?`,
-                'acceptedAnswer': {
-                  '@type': 'Answer',
-                  'text': `${days} business days ago from today was ${format(result.targetDate, 'EEEE, MMMM d, yyyy')} (excluding weekends and holidays).`
-                }
-              }
-            ]
-          })
-        }}
-      />
+        {/* Navigation */}
+        <div className="text-center space-x-4 mt-8">
+          <a 
+            href={`/${locale}`}
+            className="inline-block px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            {locale === 'zh' ? '返回首页' : 'Back to Homepage'}
+          </a>
+          <a 
+            href={`/${locale}`}
+            className="inline-block px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+          >
+            {locale === 'zh' ? '计算其他日期' : 'Calculate Another Date'}
+          </a>
+        </div>
       </div>
     </div>
   );
 }
-

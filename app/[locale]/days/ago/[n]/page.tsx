@@ -1,10 +1,6 @@
-import { subDaysSafe } from '@/lib/date-utils';
-import { format } from 'date-fns';
-import { zhCN, enUS } from 'date-fns/locale';
 import type { Metadata } from 'next';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import DateCalculator from '@/components/DateCalculator';
 
 interface PageProps {
   params: Promise<{
@@ -28,10 +24,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale, n } = await params;
   const days = Number(n);
   
-  // 使用固定的基准日期避免 hydration mismatch
-  const baseDate = new Date('2024-01-01T00:00:00Z');
-  const targetDate = subDaysSafe(baseDate, days);
-  
   const title = `${days} Days Ago from Today - Date Calculator`;
   const description = `Calculate ${days} days ago from today. Get accurate date calculations with our free online tool.`;
   
@@ -49,14 +41,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
       url: `https://www.daysfromtoday.ai/${locale}/days/ago/${n}`,
-      type: 'website',
       siteName: 'DaysFromToday',
+      locale: locale === 'zh' ? 'zh_CN' : 'en_US',
+      type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-    }
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
   };
 }
 
@@ -64,123 +68,35 @@ export default async function DaysAgoPage({ params }: PageProps) {
   const { locale, n } = await params;
   const days = Number(n);
   
-  // 计算目标日期
-  const today = new Date();
-  const targetDate = subDaysSafe(today, days);
-  
-  // 多语言内容
-  const text = {
-    en: {
-      title: (d: number) => `${d} ${d === 1 ? 'Day' : 'Days'} Ago from Today`,
-      subtitle: 'Calculate dates in the past with precision',
-      targetDate: 'Target Date',
-      past: 'Past',
-      before: 'before',
-      startDate: 'Start Date (Today)',
-      daysAgo: 'Days Ago',
-      resultDate: 'Result Date'
-    },
-    zh: {
-      title: (d: number) => `从今天起 ${d} 天前`,
-      subtitle: '精确计算过去日期',
-      targetDate: '目标日期',
-      past: '过去',
-      before: '之前',
-      startDate: '起始日期（今天）',
-      daysAgo: '天数',
-      resultDate: '结果日期'
-    }
-  };
-  
-  const t = text[locale as keyof typeof text] || text.en;
-  const dateLocale = locale === 'zh' ? zhCN : enUS;
-  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
       {/* Language Switcher */}
       <LanguageSwitcher currentLocale={locale} />
       
       <div className="container mx-auto px-4 py-12 max-w-4xl">
-      {/* Hero Section */}
-      <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-          {t.title(days)}
-        </h1>
-        <p className="text-xl text-gray-600">
-          {t.subtitle}
-        </p>
-      </div>
-      
-      {/* Answer Card */}
-      <Card variant="elevated" className="mb-8">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>{t.targetDate}</CardTitle>
-            <Badge variant="secondary">{t.past}</Badge>
-          </div>
-          <CardDescription>
-            {days} {locale === 'zh' ? '天' : (days === 1 ? 'day' : 'days')} {t.before} {format(today, locale === 'zh' ? 'yyyy年M月d日' : 'MMMM d, yyyy', { locale: dateLocale })}
-          </CardDescription>
-        </CardHeader>
+        <DateCalculator 
+          days={days} 
+          locale={locale} 
+          type="past" 
+          mode="calendar" 
+        />
         
-        <CardContent>
-          <div className="text-center py-8">
-            <div className="text-6xl font-bold text-purple-600 mb-4" suppressHydrationWarning>
-              {format(targetDate, locale === 'zh' ? 'yyyy年M月d日' : 'MMM d, yyyy', { locale: dateLocale })}
-            </div>
-            <div className="text-2xl text-gray-600" suppressHydrationWarning>
-              {format(targetDate, 'EEEE', { locale: dateLocale })}
-            </div>
-          </div>
-          
-          {/* Details Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 pt-8 border-t border-gray-200">
-            <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">{t.startDate}</div>
-              <div className="font-semibold text-gray-900">
-                {format(today, locale === 'zh' ? 'M月d日' : 'MMM d, yyyy', { locale: dateLocale })}
-              </div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">{t.daysAgo}</div>
-              <div className="font-semibold text-gray-900">
-                {days} {locale === 'zh' ? '天' : (days === 1 ? 'day' : 'days')}
-              </div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">{t.resultDate}</div>
-              <div className="font-semibold text-gray-900">
-                {format(targetDate, locale === 'zh' ? 'M月d日' : 'MMM d, yyyy', { locale: dateLocale })}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* FAQ Schema for SEO */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            'mainEntity': [
-              {
-                '@type': 'Question',
-                'name': `What date was ${days} days ago from today?`,
-                'acceptedAnswer': {
-                  '@type': 'Answer',
-                  'text': `${days} days ago from today was ${format(targetDate, 'EEEE, MMMM d, yyyy')}.`
-                }
-              }
-            ]
-          })
-        }}
-      />
+        {/* Navigation */}
+        <div className="text-center space-x-4 mt-8">
+          <a 
+            href={`/${locale}`}
+            className="inline-block px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            {locale === 'zh' ? '返回首页' : 'Back to Homepage'}
+          </a>
+          <a 
+            href={`/${locale}`}
+            className="inline-block px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+          >
+            {locale === 'zh' ? '计算其他日期' : 'Calculate Another Date'}
+          </a>
+        </div>
       </div>
     </div>
   );
 }
-
