@@ -17,6 +17,14 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
+// 扩展 Window 类型以包含 gtag
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
+  }
+}
+
 export default function GATracker() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -37,8 +45,7 @@ export default function GATracker() {
     const url = pathname + (searchParams?.toString() ? `?${searchParams}` : '');
     
     // 发送页面浏览事件
-    // @ts-expect-error - gtag is added by Google Analytics script
-    window.gtag('config', gaId, {
+    window.gtag?.('config', gaId, {
       page_path: url,
     });
 
