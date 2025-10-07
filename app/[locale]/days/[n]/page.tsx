@@ -179,6 +179,7 @@ export default async function DaysFromTodayPage({ params }: PageProps) {
           })
         }}
       />
+      </div>
     </div>
   );
 }

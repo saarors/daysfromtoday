@@ -220,6 +220,7 @@ export default async function BusinessDaysAgoPage({ params }: PageProps) {
           })
         }}
       />
+      </div>
     </div>
   );
 }
