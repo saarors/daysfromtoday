@@ -24,6 +24,8 @@
 
 | 工具 | 版本 | 路径 | 用途 |
 |------|------|------|------|
+| **Claude Code CLI** | 2.0.9 | `/Users/leonmini/.n/bin/claude` | AI 代码助手 |
+| **OpenAI Codex CLI** | 0.42.0 | `/Users/leonmini/.local/npm-global/bin/codex` | AI 代码生成 |
 | **Vercel CLI** | 48.2.3 | `/Users/leonmini/.n/bin/vercel` | 部署到 Vercel |
 | **Git** | 2.50.1 | `/usr/bin/git` | 版本控制 |
 | **Node.js** | 22.20.0 | `/Users/leonmini/.n/bin/node` | JavaScript 运行时 |
@@ -36,7 +38,167 @@
 
 ## 🛠 核心工具详解
 
-### 1. Vercel CLI
+### 1. Claude Code CLI
+
+**用途：** Anthropic 官方的 AI 代码助手命令行工具，直接在终端中使用 Claude 进行代码生成、重构、解释等操作
+
+**安装：**
+```bash
+npm i -g @anthropic-ai/claude-code
+```
+
+**核心命令：**
+
+#### 代码生成
+```bash
+# 生成代码
+claude "创建一个 React 组件用于显示用户列表"
+
+# 从文件生成
+claude --file component.tsx "优化这个组件的性能"
+
+# 生成并保存到文件
+claude "创建一个日期计算函数" --output utils/date.ts
+```
+
+#### 代码审查和重构
+```bash
+# 审查代码
+claude review ./src/components/Header.tsx
+
+# 重构代码
+claude refactor ./src/utils/helpers.ts --style functional
+
+# 添加注释
+claude "为这个函数添加 JSDoc 注释" --file utils.ts
+```
+
+#### 代码解释
+```bash
+# 解释代码
+claude explain ./app/[locale]/layout.tsx
+
+# 解释特定部分
+claude "解释这段代码的工作原理" --file layout.tsx --lines 50-100
+```
+
+#### 交互模式
+```bash
+# 启动交互式对话
+claude chat
+
+# 在交互模式下可以：
+# - 连续提问
+# - 查看上下文
+# - 迭代优化代码
+```
+
+**优势：**
+- ✅ **AI 增强开发**：直接在终端获得 Claude 的帮助
+- ✅ **上下文感知**：理解项目结构和代码上下文
+- ✅ **批量操作**：可以处理多个文件
+- ✅ **集成工作流**：与 Git、编辑器无缝集成
+
+**本项目中的应用：**
+- ✅ 代码重构和优化建议
+- ✅ 快速生成工具函数
+- ✅ 代码审查和质量检查
+- ✅ 文档和注释生成
+
+**示例工作流：**
+```bash
+# 1. 生成新组件
+claude "创建一个日期选择器组件" --output components/DatePicker.tsx
+
+# 2. 审查生成的代码
+claude review components/DatePicker.tsx
+
+# 3. 优化
+claude "优化性能并添加 TypeScript 类型" --file components/DatePicker.tsx
+
+# 4. 生成测试
+claude "为这个组件生成测试用例" --file components/DatePicker.tsx --output __tests__/DatePicker.test.tsx
+```
+
+---
+
+### 2. OpenAI Codex CLI
+
+**用途：** OpenAI 的代码生成和补全工具，专注于快速生成高质量代码片段
+
+**安装：**
+```bash
+npm i -g codex-cli
+```
+
+**核心命令：**
+
+#### 代码生成
+```bash
+# 生成函数
+codex "写一个函数计算两个日期之间的天数"
+
+# 生成 React 组件
+codex "创建一个带有加载状态的按钮组件"
+
+# 生成 TypeScript 接口
+codex "为用户数据创建 TypeScript 接口"
+```
+
+#### 代码补全
+```bash
+# 基于上下文补全
+codex complete --file app.ts
+
+# 交互式补全
+codex interactive
+```
+
+#### 代码转换
+```bash
+# JavaScript 转 TypeScript
+codex convert --from js --to ts --file script.js
+
+# Python 转 JavaScript
+codex convert --from python --to javascript --file script.py
+```
+
+#### 代码优化
+```bash
+# 优化性能
+codex optimize --file slow-function.ts
+
+# 重构代码
+codex refactor --file legacy-code.js --style modern
+```
+
+**优势：**
+- ✅ **快速生成**：秒级生成代码片段
+- ✅ **多语言支持**：支持几十种编程语言
+- ✅ **智能补全**：基于上下文的精准建议
+- ✅ **代码转换**：跨语言代码迁移
+
+**本项目中的应用：**
+- ✅ 快速生成工具函数
+- ✅ TypeScript 类型定义
+- ✅ 代码片段补全
+- ✅ 算法实现
+
+**示例工作流：**
+```bash
+# 1. 生成日期计算函数
+codex "创建一个函数，计算 N 天后的日期，考虑工作日" --output utils/calculate-date.ts
+
+# 2. 生成测试
+codex "为 calculate-date.ts 生成单元测试" --output __tests__/calculate-date.test.ts
+
+# 3. 优化性能
+codex optimize --file utils/calculate-date.ts
+```
+
+---
+
+### 3. Vercel CLI
 
 **用途：** 直接从命令行部署和管理 Vercel 项目
 
@@ -108,7 +270,7 @@ vercel env rm NEXT_PUBLIC_GA_ID
 
 ---
 
-### 2. Git
+### 4. Git
 
 **用途：** 版本控制和代码协作
 
@@ -171,7 +333,7 @@ git rev-parse --short HEAD
 
 ---
 
-### 3. npm / npx
+### 5. npm / npx
 
 **用途：** Node.js 包管理和执行
 
@@ -231,7 +393,7 @@ npx <package-name>
 
 ---
 
-### 4. curl
+### 6. curl
 
 **用途：** HTTP 请求测试和网站验证
 
@@ -286,7 +448,7 @@ curl -s https://www.daysfromtoday.ai/en | grep -o 'layout-[a-f0-9]\+\.js'
 
 ---
 
-### 5. grep
+### 7. grep
 
 **用途：** 文本搜索和过滤
 
@@ -625,6 +787,8 @@ vercel logs --follow
 ## 📚 相关资源
 
 ### **官方文档**
+- [Claude Code CLI 文档](https://docs.anthropic.com/claude/docs/cli)
+- [OpenAI Codex 文档](https://platform.openai.com/docs/guides/code)
 - [Vercel CLI 文档](https://vercel.com/docs/cli)
 - [Git 文档](https://git-scm.com/doc)
 - [npm 文档](https://docs.npmjs.com/)
@@ -639,6 +803,19 @@ vercel logs --follow
 
 ## 🎯 总结
 
+### **当前环境 CLI 工具生态（9 个核心工具）**
+
+| 类别 | 工具 | 版本 | 核心用途 |
+|------|------|------|----------|
+| **AI 助手** | Claude Code CLI | 2.0.9 | AI 代码生成、审查、重构 |
+| **AI 助手** | OpenAI Codex CLI | 0.42.0 | 快速代码生成和补全 |
+| **部署** | Vercel CLI | 48.2.3 | 生产部署和管理 |
+| **版本控制** | Git | 2.50.1 | 代码版本管理 |
+| **开发环境** | Node.js | 22.20.0 | JavaScript 运行时 |
+| **包管理** | npm / npx | 11.6.1 | 依赖管理和执行 |
+| **测试验证** | curl | 系统自带 | HTTP 请求测试 |
+| **文本处理** | grep | 系统自带 | 文本搜索过滤 |
+
 ### **核心优势**
 
 CLI 相比 Web UI 的主要优势：
@@ -648,37 +825,59 @@ CLI 相比 Web UI 的主要优势：
 3. ✅ **可自动化** - 编写脚本，批量操作
 4. ✅ **易于调试** - 实时日志，精确控制
 5. ✅ **可重复性** - 命令可保存和分享
+6. ✅ **AI 增强** - Claude 和 Codex 提供智能辅助
 
-### **推荐工作流**
+### **推荐工作流（AI 增强）**
 
 ```bash
-# 日常开发
-npm run dev              # 本地开发
+# AI 辅助开发
+claude "创建一个日期计算组件" --output components/DateCalc.tsx
+codex "为这个组件生成 TypeScript 类型" --file components/DateCalc.tsx
 
-# 提交前
-npm run build            # 构建验证
-git status               # 检查状态
-git add -A               # 暂存更改
-git commit -m "..."      # 提交
-git push origin main     # 推送
+# 代码审查
+claude review components/DateCalc.tsx
 
-# 部署
-vercel --prod --force    # CLI 部署（推荐）
+# 本地开发
+npm run dev              # 本地开发（热重载）
 
-# 验证
-curl -I https://...      # 检查部署
-curl -s https://... | grep ...  # 验证配置
+# 提交前验证
+npm run build            # ✅ 构建验证（捕获 linter 错误）
+git status               # ✅ 检查状态
+git add -A               # ✅ 暂存更改
+git commit -m "..."      # ✅ 提交（Conventional Commits）
+git push origin main     # ✅ 推送
+
+# 部署（推荐使用 CLI）
+vercel --prod --force    # ✅ 可靠、快速、可控
+
+# 验证部署
+curl -I https://...      # ✅ 检查状态码和重定向
+curl -s https://... | grep canonical  # ✅ 验证 SEO 配置
+curl -s https://... | grep gtag  # ✅ 验证 GA 脚本
 ```
 
 ### **关键教训**
 
 在本项目中，CLI 工具帮助我们：
+
+**传统 CLI 工具：**
 - ✅ 解决了 Vercel Web UI 部署同步问题
 - ✅ 快速验证了所有 SEO 配置
 - ✅ 精确定位了部署版本（chunk hash）
 - ✅ 节省了大量调试时间
 
-**记住：重要的部署和验证，优先使用 CLI！**
+**AI CLI 工具：**
+- ✅ 快速生成代码组件和工具函数
+- ✅ 自动化代码审查和优化建议
+- ✅ 智能生成 TypeScript 类型定义
+- ✅ 提供代码解释和重构方案
+
+**核心理念：**
+> **传统 CLI** 解决效率问题（速度、可靠性）  
+> **AI CLI** 解决生产力问题（代码质量、开发速度）  
+> **两者结合** 实现最佳开发体验
+
+**记住：重要的部署和验证，优先使用 CLI！复杂的代码任务，优先使用 AI CLI！**
 
 ---
 
