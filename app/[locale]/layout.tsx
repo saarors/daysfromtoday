@@ -143,8 +143,8 @@ export default async function LocaleLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* 强制调试标记（确认布局已渲染）*/}
-        <div style={{ display: 'none' }} data-layout-version="2025-01-07-v2" data-ga-id={gaId || 'undefined'}>Layout Active</div>
+        {/* GA_PROBE_LOCALE: 如果你能在 view-source 搜到这个词，说明多语言布局生效 */}
+        <div data-ga-probe="locale" style={{ display: 'none' }}>GA_PROBE_LOCALE</div>
 
         <NextIntlClientProvider messages={messages}>
           <main id="main-content" role="main">
@@ -152,11 +152,11 @@ export default async function LocaleLayout({
           </main>
         </NextIntlClientProvider>
 
-        {/* Google Analytics（官方 @next/third-parties 组件）*/}
-        {gaId && <GoogleAnalytics gaId={gaId} />}
+        {/* 强制硬编码 GA ID —— 仅用于定位，确定生效后会删除 */}
+        <GoogleAnalytics gaId="G-9D2SZK734G" />
 
         {/* GA 路由追踪（追踪 SPA 导航）*/}
-        {gaId && <GATracker />}
+        <GATracker />
 
         {/* 调试组件（部署验证后可删除）*/}
         <GADebug />
