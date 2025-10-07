@@ -8,7 +8,6 @@
  * - 完整的多语言支持
  */
 import { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -96,7 +95,6 @@ export default async function HomePage({
   params: Promise<PageParams>
 }) {
   const { locale } = await params;
-  const t = await getTranslations('HomePage');
 
   // 文本内容（支持中英文）
   const content = {
@@ -244,7 +242,6 @@ export default async function HomePage({
                       key={days}
                       href={`/${locale}/days/${days}`}
                       className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition-colors"
-                      onClick={(e) => e.stopPropagation()}
                     >
                       {days} {text.quickLinks.days}
                     </Link>
@@ -276,7 +273,6 @@ export default async function HomePage({
                       key={days}
                       href={`/${locale}/business-days/${days}`}
                       className="px-3 py-1 bg-cyan-100 text-cyan-700 rounded-full text-sm hover:bg-cyan-200 transition-colors"
-                      onClick={(e) => e.stopPropagation()}
                     >
                       {days} {text.quickLinks.days}
                     </Link>
@@ -308,7 +304,6 @@ export default async function HomePage({
                       key={days}
                       href={`/${locale}/days/ago/${days}`}
                       className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm hover:bg-purple-200 transition-colors"
-                      onClick={(e) => e.stopPropagation()}
                     >
                       {days} {text.quickLinks.days}
                     </Link>
@@ -340,7 +335,6 @@ export default async function HomePage({
                       key={days}
                       href={`/${locale}/business-days/ago/${days}`}
                       className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm hover:bg-indigo-200 transition-colors"
-                      onClick={(e) => e.stopPropagation()}
                     >
                       {days} {text.quickLinks.days}
                     </Link>
