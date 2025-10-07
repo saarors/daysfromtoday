@@ -26,6 +26,7 @@ import Script from "next/script";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { Geist, Geist_Mono } from "next/font/google";
+import GATracker from '@/app/ga-tracker';
 import "../globals.css";
 
 const geistSans = Geist({
@@ -160,6 +161,9 @@ export default async function LocaleLayout({
             })
           }}
         />
+
+        {/* GA 路由追踪（追踪 SPA 导航）*/}
+        {gaId && <GATracker />}
 
         <NextIntlClientProvider messages={messages}>
           <main id="main-content" role="main">
