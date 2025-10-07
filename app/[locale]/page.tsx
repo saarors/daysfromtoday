@@ -1,35 +1,17 @@
 /**
- * 多语言首页组件
+ * 多语言首页组件 - 重新设计
  * 
- * 设计风格：Calendly-inspired
- * - 大标题 + 清晰副标题
- * - 鲜艳蓝色 CTA 按钮
- * - 渐变装饰元素
- * - 卡片化功能展示
- * - 充足留白
- * 
- * 功能：
- * 1. Hero Section（英雄区）
- * 2. 快速计算入口
- * 3. 功能特性展示
- * 4. 语言切换
- * 
- * SEO 优化：
- * - 完整的 metadata（title, description, OG, Twitter Card）
- * - 语义化 HTML5 标签
- * - 结构化数据（WebSite Schema）
- * - Canonical URLs
- * - Hreflang 标签
- * 
- * 符合项目规范：
- * - Next.js 15 + TypeScript
- * - next-intl 多语言
- * - Calendly 设计系统
- * - 响应式设计
+ * 设计目标：
+ * - 提供所有计算类型的入口（未来/过去、自然日/工作日）
+ * - 模块化卡片设计（参考 Calendly）
+ * - 清晰的视觉层级
+ * - 完整的多语言支持
  */
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 
 type PageParams = {
   locale: string;
@@ -99,301 +81,346 @@ export async function generateMetadata({
         follow: true,
         'max-video-preview': -1,
         'max-image-preview': 'large',
-        'max-snippet': -1,
+        'max-snippet': -1
       }
-    },
-    verification: {
-      google: process.env.NEXT_PUBLIC_GSC_VERIFICATION,
     }
   };
 }
 
-export default async function HomePage({ 
+/**
+ * 首页主组件
+ */
+export default async function HomePage({
   params
-}: { 
-  params: Promise<{ locale: string }> 
+}: {
+  params: Promise<PageParams>
 }) {
   const { locale } = await params;
-  const t = await getTranslations();
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
+  const t = await getTranslations('HomePage');
+
+  // 文本内容（支持中英文）
+  const content = {
+    en: {
+      hero: {
+        title: 'Easy Date Calculation Ahead',
+        subtitle: 'Calculate future or past dates with precision',
+        description: 'Simple, fast, and powerful date calculator supporting business days, natural days, and holidays.'
+      },
+      sections: {
+        future: {
+          title: 'Future Dates',
+          description: 'Calculate dates in the future'
+        },
+        past: {
+          title: 'Past Dates',
+          description: 'Calculate dates in the past'
+        },
+        calendar: {
+          title: 'Calendar Days',
+          description: 'Including all days'
+        },
+        business: {
+          title: 'Business Days',
+          description: 'Excluding weekends & holidays'
+        }
+      },
+      quickLinks: {
+        title: 'Popular Calculations',
+        days: 'days'
+      },
+      features: {
+        title: 'Why Choose DaysFromToday?',
+        items: [
+          {
+            title: 'Business Days',
+            description: 'Automatically exclude weekends and holidays based on your country'
+          },
+          {
+            title: 'Multi-language',
+            description: 'Full support for English and Chinese with more coming soon'
+          },
+          {
+            title: 'Calendar Export',
+            description: 'One-click export to your calendar app (.ics format)'
+          },
+          {
+            title: 'SEO Optimized',
+            description: 'Lightning-fast loading with excellent search engine visibility'
+          }
+        ]
+      }
+    },
+    zh: {
+      hero: {
+        title: '轻松计算任意日期',
+        subtitle: '精确计算未来或过去的日期',
+        description: '简单、快速、强大的日期计算工具，支持工作日、自然日和节假日。'
+      },
+      sections: {
+        future: {
+          title: '未来日期',
+          description: '计算未来的日期'
+        },
+        past: {
+          title: '过去日期',
+          description: '计算过去的日期'
+        },
+        calendar: {
+          title: '自然日',
+          description: '包含所有日期'
+        },
+        business: {
+          title: '工作日',
+          description: '排除周末和节假日'
+        }
+      },
+      quickLinks: {
+        title: '热门计算',
+        days: '天'
+      },
+      features: {
+        title: '为什么选择 DaysFromToday？',
+        items: [
+          {
+            title: '工作日计算',
+            description: '根据您的国家自动排除周末和节假日'
+          },
+          {
+            title: '多语言支持',
+            description: '完整支持中英文，更多语言即将推出'
+          },
+          {
+            title: '日历导出',
+            description: '一键导出到您的日历应用（.ics 格式）'
+          },
+          {
+            title: 'SEO 优化',
+            description: '闪电般的加载速度和优秀的搜索引擎可见性'
+          }
+        ]
+      }
+    }
+  };
+
+  const text = content[locale as keyof typeof content] || content.en;
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* 导航栏 */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          {/* Logo */}
-          <Link href={`/${locale}`} className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
-            DaysFromToday
-          </Link>
-          
-          {/* 导航链接 */}
-          <div className="flex items-center gap-8">
-            <Link 
-              href={`/${locale}/faq`} 
-              className="text-sm font-medium hover:opacity-70 transition-opacity"
-              style={{ color: 'var(--color-text-secondary)' }}
-            >
-              {t('faq')}
-            </Link>
-            
-            {/* 语言切换 */}
-            <div className="flex gap-2">
-              <Link 
-                href="/en" 
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                  locale === 'en' 
-                    ? 'bg-[var(--color-primary)] text-white' 
-                    : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)]'
-                }`}
-              >
-                EN
-              </Link>
-              <Link 
-                href="/zh" 
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                  locale === 'zh' 
-                    ? 'bg-[var(--color-primary)] text-white' 
-                    : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)]'
-                }`}
-              >
-                中文
-              </Link>
-            </div>
-          </div>
-        </nav>
-      </header>
-
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
-        {/* 渐变装饰背景 */}
-        <div className="decoration-blob decoration-blob-purple" 
-             style={{ width: '400px', height: '400px', top: '-100px', right: '-100px' }} 
-        />
-        <div className="decoration-blob decoration-blob-blue" 
-             style={{ width: '300px', height: '300px', bottom: '-50px', left: '-50px' }} 
-        />
-        
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* 左侧文字 */}
-            <div className="relative z-10">
-              <h1 
-                className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
-                style={{ color: 'var(--color-text-primary)' }}
-              >
-                {t('heroTitle')}
-              </h1>
-              
-              <p 
-                className="text-xl sm:text-2xl mb-8 leading-relaxed"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
-                {t('heroSubtitle')}
-              </p>
-              
-              {/* CTA 按钮组 */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link 
-                  href={`/${locale}/days/7`}
-                  className="btn-primary inline-flex items-center justify-center px-8 py-4 text-lg"
-                >
-                  {t('getStarted')}
-                  <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </Link>
-                
-                <Link 
-                  href={`/${locale}/faq`}
-                  className="btn-secondary inline-flex items-center justify-center px-8 py-4 text-lg"
-                >
-                  {t('learnMore')}
-                </Link>
-              </div>
-            </div>
-            
-            {/* 右侧演示卡片 */}
-            <div className="relative z-10">
-              <div className="card-glass p-8 max-w-md mx-auto">
-                <h3 
-                  className="text-lg font-semibold mb-4"
-                  style={{ color: 'var(--color-text-primary)' }}
-                >
-                  {t('tryIt')}
-                </h3>
-                
-                {/* 快速计算示例 */}
-                <div className="space-y-3">
-                  {[7, 14, 30, 90].map((days) => (
+      <section className="container mx-auto px-4 py-16 md:py-24">
+        <div className="text-center max-w-4xl mx-auto">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            {text.hero.title}
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-600 mb-4">
+            {text.hero.subtitle}
+          </p>
+          <p className="text-gray-500 mb-8">
+            {text.hero.description}
+          </p>
+        </div>
+
+        {/* 主计算入口 - 2x2 网格 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mt-12">
+          {/* 未来日期 - 自然日 */}
+          <Card variant="elevated" className="hover:shadow-xl transition-shadow cursor-pointer group">
+            <Link href={`/${locale}/days/14`}>
+              <CardHeader>
+                <div className="flex items-center justify-between mb-2">
+                  <Badge variant="primary">🔮 {text.sections.future.title}</Badge>
+                  <Badge variant="default">{text.sections.calendar.title}</Badge>
+                </div>
+                <CardTitle className="group-hover:text-blue-600 transition-colors">
+                  {text.sections.future.title} - {text.sections.calendar.title}
+                </CardTitle>
+                <CardDescription>
+                  {text.sections.future.description} ({text.sections.calendar.description})
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {[7, 14, 30, 90].map(days => (
                     <Link
                       key={days}
                       href={`/${locale}/days/${days}`}
-                      className="block p-4 rounded-lg border-2 border-transparent hover:border-[var(--color-primary)] transition-all bg-[var(--color-bg-secondary)] hover:bg-white hover:shadow-md"
+                      className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition-colors"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <div className="flex items-center justify-between">
-                        <span 
-                          className="font-medium"
-                          style={{ color: 'var(--color-text-primary)' }}
-                        >
-                          {days} {locale === 'en' ? 'days from today' : '天后'}
-                        </span>
-                        <svg className="w-5 h-5" style={{ color: 'var(--color-primary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
+                      {days} {text.quickLinks.days}
                     </Link>
                   ))}
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 功能特性区 */}
-      <section className="py-20 px-6 bg-[var(--color-bg-secondary)]">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 
-              className="text-4xl font-bold mb-4"
-              style={{ color: 'var(--color-text-primary)' }}
-            >
-              {locale === 'en' ? 'Why DaysFromToday?' : '为什么选择 DaysFromToday？'}
-            </h2>
-            <p 
-              className="text-xl max-w-2xl mx-auto"
-              style={{ color: 'var(--color-text-secondary)' }}
-            >
-              {locale === 'en' 
-                ? 'Simple, fast, and powerful date calculation tool' 
-                : '简单、快速、强大的日期计算工具'
-              }
-            </p>
-          </div>
-          
-          {/* 特性卡片网格 */}
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* 特性 1 */}
-            <div className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-              <div 
-                className="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
-                style={{ background: 'linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-mid))' }}
-              >
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                {locale === 'en' ? 'Lightning Fast' : '闪电般快速'}
-              </h3>
-              <p style={{ color: 'var(--color-text-secondary)' }}>
-                {locale === 'en' 
-                  ? 'Calculate any date instantly, no waiting required' 
-                  : '瞬间计算任意日期，无需等待'
-                }
-              </p>
-            </div>
-            
-            {/* 特性 2 */}
-            <div className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-              <div 
-                className="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
-                style={{ background: 'linear-gradient(135deg, var(--color-gradient-mid), var(--color-gradient-end))' }}
-              >
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                {locale === 'en' ? 'Multi-Language' : '多语言支持'}
-              </h3>
-              <p style={{ color: 'var(--color-text-secondary)' }}>
-                {locale === 'en' 
-                  ? 'Support for English and Chinese, more coming soon' 
-                  : '支持中英文，更多语言即将推出'
-                }
-              </p>
-            </div>
-            
-            {/* 特性 3 */}
-            <div className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-              <div 
-                className="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
-                style={{ background: 'var(--color-primary)' }}
-              >
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                {locale === 'en' ? 'Business Days' : '工作日计算'}
-              </h3>
-              <p style={{ color: 'var(--color-text-secondary)' }}>
-                {locale === 'en' 
-                  ? 'Calculate business days excluding weekends and holidays' 
-                  : '计算工作日，自动排除周末和节假日'
-                }
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 页脚 */}
-      <footer className="py-12 px-6 border-t border-gray-100">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-            © 2025 DaysFromToday. All rights reserved.
-          </div>
-          
-          <div className="flex items-center gap-6">
-            <Link
-              href={`/${locale}/faq`}
-              className="text-sm font-medium hover:opacity-70 transition-opacity"
-              style={{ color: 'var(--color-text-secondary)' }}
-            >
-              {t('faq')}
+              </CardContent>
             </Link>
-            <a
-              href="https://github.com/leeleon/daysfromtoday"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium hover:opacity-70 transition-opacity"
-              style={{ color: 'var(--color-text-secondary)' }}
-            >
-              GitHub
-            </a>
+          </Card>
+
+          {/* 未来日期 - 工作日 */}
+          <Card variant="elevated" className="hover:shadow-xl transition-shadow cursor-pointer group">
+            <Link href={`/${locale}/business-days/14`}>
+              <CardHeader>
+                <div className="flex items-center justify-between mb-2">
+                  <Badge variant="primary">🔮 {text.sections.future.title}</Badge>
+                  <Badge variant="success">{text.sections.business.title}</Badge>
+                </div>
+                <CardTitle className="group-hover:text-cyan-600 transition-colors">
+                  {text.sections.future.title} - {text.sections.business.title}
+                </CardTitle>
+                <CardDescription>
+                  {text.sections.future.description} ({text.sections.business.description})
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {[5, 10, 14, 30].map(days => (
+                    <Link
+                      key={days}
+                      href={`/${locale}/business-days/${days}`}
+                      className="px-3 py-1 bg-cyan-100 text-cyan-700 rounded-full text-sm hover:bg-cyan-200 transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {days} {text.quickLinks.days}
+                    </Link>
+                  ))}
+                </div>
+              </CardContent>
+            </Link>
+          </Card>
+
+          {/* 过去日期 - 自然日 */}
+          <Card variant="elevated" className="hover:shadow-xl transition-shadow cursor-pointer group">
+            <Link href={`/${locale}/days/ago/14`}>
+              <CardHeader>
+                <div className="flex items-center justify-between mb-2">
+                  <Badge variant="secondary">⏮️ {text.sections.past.title}</Badge>
+                  <Badge variant="default">{text.sections.calendar.title}</Badge>
+                </div>
+                <CardTitle className="group-hover:text-purple-600 transition-colors">
+                  {text.sections.past.title} - {text.sections.calendar.title}
+                </CardTitle>
+                <CardDescription>
+                  {text.sections.past.description} ({text.sections.calendar.description})
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {[7, 14, 30, 90].map(days => (
+                    <Link
+                      key={days}
+                      href={`/${locale}/days/ago/${days}`}
+                      className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm hover:bg-purple-200 transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {days} {text.quickLinks.days}
+                    </Link>
+                  ))}
+                </div>
+              </CardContent>
+            </Link>
+          </Card>
+
+          {/* 过去日期 - 工作日 */}
+          <Card variant="elevated" className="hover:shadow-xl transition-shadow cursor-pointer group">
+            <Link href={`/${locale}/business-days/ago/14`}>
+              <CardHeader>
+                <div className="flex items-center justify-between mb-2">
+                  <Badge variant="secondary">⏮️ {text.sections.past.title}</Badge>
+                  <Badge variant="success">{text.sections.business.title}</Badge>
+                </div>
+                <CardTitle className="group-hover:text-indigo-600 transition-colors">
+                  {text.sections.past.title} - {text.sections.business.title}
+                </CardTitle>
+                <CardDescription>
+                  {text.sections.past.description} ({text.sections.business.description})
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {[5, 10, 14, 30].map(days => (
+                    <Link
+                      key={days}
+                      href={`/${locale}/business-days/ago/${days}`}
+                      className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm hover:bg-indigo-200 transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {days} {text.quickLinks.days}
+                    </Link>
+                  ))}
+                </div>
+              </CardContent>
+            </Link>
+          </Card>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="container mx-auto px-4 py-16 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            {text.features.title}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {text.features.items.map((feature, index) => (
+              <div key={index} className="p-6 rounded-xl border border-gray-200 hover:border-blue-300 transition-colors">
+                <h3 className="text-xl font-semibold mb-3 text-gray-900">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
-      </footer>
+      </section>
 
-      {/* WebSite 结构化数据（JSON-LD）*/}
+      {/* Language Switcher */}
+      <section className="container mx-auto px-4 py-8 text-center">
+        <div className="flex items-center justify-center gap-4">
+          <Link
+            href="/en"
+            className={`px-4 py-2 rounded-lg transition-colors ${
+              locale === 'en' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            English
+          </Link>
+          <Link
+            href="/zh"
+            className={`px-4 py-2 rounded-lg transition-colors ${
+              locale === 'zh' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            中文
+          </Link>
+        </div>
+      </section>
+
+      {/* JSON-LD Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
-            '@type': 'WebSite',
+            '@type': 'WebApplication',
             'name': 'DaysFromToday',
-            'alternateName': locale === 'zh' ? '日期计算器' : 'Date Calculator',
-            'url': `${baseUrl}/${locale}`,
-            'description': locale === 'zh'
-              ? '简单、快速、强大的日期计算工具'
-              : 'Simple, fast, and powerful date calculator',
-            'inLanguage': locale,
-            'potentialAction': {
-              '@type': 'SearchAction',
-              'target': {
-                '@type': 'EntryPoint',
-                'urlTemplate': `${baseUrl}/${locale}/days/{days}`
-              },
-              'query-input': 'required name=days'
-            }
+            'alternateName': 'Days From Today',
+            'url': `https://www.daysfromtoday.ai/${locale}`,
+            'applicationCategory': 'UtilitiesApplication',
+            'operatingSystem': 'Any',
+            'offers': {
+              '@type': 'Offer',
+              'price': '0',
+              'priceCurrency': 'USD'
+            },
+            'description': text.hero.description,
+            'featureList': text.features.items.map(f => f.title).join(', ')
           })
         }}
       />
     </div>
   );
 }
-
