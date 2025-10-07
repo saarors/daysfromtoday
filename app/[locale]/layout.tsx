@@ -143,6 +143,9 @@ export default async function LocaleLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* 强制调试标记（确认布局已渲染）*/}
+        <div style={{ display: 'none' }} data-layout-version="2025-01-07-v2" data-ga-id={gaId || 'undefined'}>Layout Active</div>
+
         <NextIntlClientProvider messages={messages}>
           <main id="main-content" role="main">
             {children}
