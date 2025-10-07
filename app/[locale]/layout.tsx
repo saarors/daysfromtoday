@@ -102,8 +102,12 @@ export default async function LocaleLayout({
         {/* Theme Color */}
         <meta name="theme-color" content="#0069FF" />
         <meta name="color-scheme" content="light" />
-        
-        {/* Google Analytics（如果配置）*/}
+      </head>
+      
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {/* Google Analytics（移到 body 内，Next.js 15 兼容）*/}
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
             <script
@@ -154,11 +158,7 @@ export default async function LocaleLayout({
             })
           }}
         />
-      </head>
-      
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+
         <NextIntlClientProvider messages={messages}>
           <main id="main-content" role="main">
             {children}
