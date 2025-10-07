@@ -20,6 +20,11 @@
   "today": "today",
   "faq": "FAQ",
   "about": "About",
-  "aboutThisProject": "About This Project"
+  "aboutThisProject": "About This Project",
+  "NotFound": {
+    "title": "Page Not Found",
+    "description": "The page you are looking for does not exist.",
+    "goHome": "Go to Homepage"
+  }
 }
 

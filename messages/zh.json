@@ -20,6 +20,11 @@
   "today": "今天",
   "faq": "常见问题",
   "about": "关于",
-  "aboutThisProject": "关于这个项目"
+  "aboutThisProject": "关于这个项目",
+  "NotFound": {
+    "title": "页面未找到",
+    "description": "您要查找的页面不存在。",
+    "goHome": "返回首页"
+  }
 }
 

@@ -1,8 +1,8 @@
 # DaysFromToday 功能增强计划
 
-**文档版本：** v1.0  
-**创建日期：** 2025-01-07  
-**设计参考：** [Calendly UI 设计](https://calendly.com/)  
+**文档版本：** v1.0
+**创建日期：** 2025-10-07
+**设计参考：** [Calendly UI 设计](https://calendly.com/)
 **目标：** 从简单工具 → 专业日期计算平台
 
 ---
@@ -23,14 +23,14 @@
 
 ### **当前状态 vs 目标状态**
 
-| 功能模块 | 当前 | 目标 |
-|---------|------|------|
+| 功能模块               | 当前            | 目标                      |
+| ---------------------- | --------------- | ------------------------- |
 | **日期计算方向** | 仅未来（+N 天） | 未来 + 过去（±N 天）分离 |
-| **日期类型** | 仅自然日 | 自然日 + 工作日 |
-| **节假日感知** | 无 | 多国节假日支持 |
-| **个性化功能** | 无 | 纪念日/倒计时 |
-| **国家/地区** | 无区分 | 自动识别 + 手动选择 |
-| **内容模块** | 简单 FAQ | 完整博客系统 |
+| **日期类型**     | 仅自然日        | 自然日 + 工作日           |
+| **节假日感知**   | 无              | 多国节假日支持            |
+| **个性化功能**   | 无              | 纪念日/倒计时             |
+| **国家/地区**    | 无区分          | 自动识别 + 手动选择       |
+| **内容模块**     | 简单 FAQ        | 完整博客系统              |
 
 ---
 
@@ -41,6 +41,7 @@
 基于 [Calendly 的模块化设计](https://calendly.com/)，我们采用：
 
 **核心设计元素：**
+
 1. **卡片化布局** - 每个功能模块独立卡片
 2. **渐变背景** - 柔和的蓝紫色渐变
 3. **大字体标题** - 清晰的层级结构
@@ -101,7 +102,7 @@
   <div className="container">
     <h1>Easy Date Calculation Ahead</h1>
     <p>Calculate future or past dates with precision</p>
-    
+  
     {/* 双选项卡 */}
     <Tabs defaultValue="future">
       <TabsList>
@@ -114,7 +115,7 @@
           Past Dates
         </TabsTrigger>
       </TabsList>
-      
+    
       {/* 未来日期计算 */}
       <TabsContent value="future">
         <CalculatorCard>
@@ -127,7 +128,7 @@
           <Button>Calculate Future Date</Button>
         </CalculatorCard>
       </TabsContent>
-      
+    
       {/* 过去日期计算 */}
       <TabsContent value="past">
         <CalculatorCard>
@@ -173,7 +174,7 @@ export default function DateCalculationPage({ params }) {
   const targetDate = isFuture 
     ? addDays(new Date(), Number(days))
     : subDays(new Date(), Number(days));
-    
+  
   return (
     <ResultPage
       title={`${days} Days ${isFuture ? 'from' : 'before'} Today`}
@@ -203,7 +204,7 @@ export function ResultPage({ title, targetDate, direction, days }) {
           <span className="day">{format(targetDate, 'EEEE')}</span>
         </div>
       </div>
-      
+    
       {/* 详细信息 */}
       <div className="details-grid">
         <InfoCard title="Start Date" value={format(new Date(), 'MMM d, yyyy')} />
@@ -211,7 +212,7 @@ export function ResultPage({ title, targetDate, direction, days }) {
         <InfoCard title="Direction" value={direction === 'future' ? 'Forward' : 'Backward'} />
         <InfoCard title="Result Date" value={format(targetDate, 'MMM d, yyyy')} />
       </div>
-      
+    
       {/* 时间线可视化 */}
       <Timeline
         startDate={new Date()}
@@ -266,7 +267,7 @@ export function BusinessDaysCalculator() {
               <Description>Including weekends and holidays</Description>
             </div>
           </RadioOption>
-          
+        
           <RadioOption value="business">
             <Briefcase className="icon" />
             <div>
@@ -276,12 +277,12 @@ export function BusinessDaysCalculator() {
           </RadioOption>
         </RadioGroup>
       </div>
-      
+    
       {/* 国家选择（仅工作日模式显示）*/}
       {calculationType === 'business' && (
         <CountrySelector value={country} onChange={setCountry} />
       )}
-      
+    
       {/* 天数输入 */}
       <Input 
         type="number" 
@@ -289,14 +290,14 @@ export function BusinessDaysCalculator() {
         onChange={(e) => setDays(Number(e.target.value))}
         label={`Number of ${calculationType === 'business' ? 'Business' : 'Calendar'} Days`}
       />
-      
+    
       {/* 结果展示 */}
       <ResultCard>
         <div className="result-header">
           <h3>{result.type} Calculation</h3>
           <Badge>{format(result.targetDate, 'MMM d, yyyy')}</Badge>
         </div>
-        
+      
         {/* 排除的日期展示（工作日模式）*/}
         {calculationType === 'business' && result.excludedDates.length > 0 && (
           <ExcludedDatesList dates={result.excludedDates} />
@@ -342,9 +343,9 @@ export function addBusinessDays(
   while (remainingDays > 0) {
     currentDate = addDays(currentDate, 1);
     totalDays++;
-    
+  
     const dateKey = format(currentDate, 'yyyy-MM-dd');
-    
+  
     // 检查是否是周末
     if (isWeekend(currentDate)) {
       excluded.push({
@@ -353,7 +354,7 @@ export function addBusinessDays(
       });
       continue;
     }
-    
+  
     // 检查是否是节假日
     if (holidayDates.has(dateKey)) {
       const holiday = holidays.find(h => format(h.date, 'yyyy-MM-dd') === dateKey);
@@ -364,7 +365,7 @@ export function addBusinessDays(
       });
       continue;
     }
-    
+  
     // 是工作日，计数减一
     remainingDays--;
   }
@@ -389,7 +390,7 @@ export function ExcludedDatesList({ dates }) {
   return (
     <div className="excluded-dates">
       <h4>Excluded Dates</h4>
-      
+    
       <div className="summary">
         <Badge variant="secondary">
           {weekends.length} Weekends
@@ -398,7 +399,7 @@ export function ExcludedDatesList({ dates }) {
           {holidays.length} Holidays
         </Badge>
       </div>
-      
+    
       {/* 节假日详细列表 */}
       {holidays.length > 0 && (
         <div className="holidays-list">
@@ -416,7 +417,7 @@ export function ExcludedDatesList({ dates }) {
           </ul>
         </div>
       )}
-      
+    
       {/* 完整日历视图（可选）*/}
       <CalendarView
         highlightedDates={dates.map(d => ({
@@ -446,17 +447,17 @@ export default function HolidayCalculatorPage() {
     <div className="holiday-page">
       <h1>Holiday Countdown Calculator</h1>
       <p>Find out how many days until your next holiday</p>
-      
+    
       {/* 国家选择 */}
       <CountrySelector value={country} onChange={setCountry} />
-      
+    
       {/* 即将到来的节假日 */}
       <div className="holidays-grid">
         {upcomingHolidays.map((holiday, index) => (
           <HolidayCard key={index} holiday={holiday} />
         ))}
       </div>
-      
+    
       {/* 全年节假日日历 */}
       <YearlyHolidayCalendar country={country} />
     </div>
@@ -478,20 +479,20 @@ export function HolidayCard({ holiday }) {
       <div className="holiday-icon">
         {getHolidayEmoji(holiday.name)}
       </div>
-      
+    
       {/* 节假日信息 */}
       <div className="holiday-info">
         <h3>{holiday.name}</h3>
         <p className="date">{format(holiday.date, 'MMMM d, yyyy')}</p>
         <p className="day">{format(holiday.date, 'EEEE')}</p>
       </div>
-      
+    
       {/* 倒计时 */}
       <div className="countdown">
         <div className="days-number">{daysUntil}</div>
         <div className="days-label">days until</div>
       </div>
-      
+    
       {/* 进度条 */}
       <div className="progress-bar">
         <div 
@@ -499,7 +500,7 @@ export function HolidayCard({ holiday }) {
           style={{ width: `${100 - percentage}%` }}
         />
       </div>
-      
+    
       {/* 操作按钮 */}
       <div className="actions">
         <Button variant="outline" size="sm">
@@ -592,7 +593,7 @@ export default function AnniversaryCalculatorPage() {
           Add Anniversary
         </Button>
       </div>
-      
+    
       {/* 添加纪念日表单 */}
       {showAddForm && (
         <AddAnniversaryForm
@@ -603,7 +604,7 @@ export default function AnniversaryCalculatorPage() {
           onCancel={() => setShowAddForm(false)}
         />
       )}
-      
+    
       {/* 纪念日列表 */}
       <div className="anniversaries-grid">
         {anniversaries.map((anniversary, index) => (
@@ -616,7 +617,7 @@ export default function AnniversaryCalculatorPage() {
           />
         ))}
       </div>
-      
+    
       {/* 空状态 */}
       {anniversaries.length === 0 && !showAddForm && (
         <EmptyState
@@ -667,7 +668,7 @@ export function AddAnniversaryForm({ onAdd, onCancel }) {
           </TypeCard>
         ))}
       </div>
-      
+    
       {/* 标题 */}
       <Input
         label="Title"
@@ -676,7 +677,7 @@ export function AddAnniversaryForm({ onAdd, onCancel }) {
         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
         required
       />
-      
+    
       {/* 日期 */}
       <DatePicker
         label="Date"
@@ -684,20 +685,20 @@ export function AddAnniversaryForm({ onAdd, onCancel }) {
         onChange={(date) => setFormData({ ...formData, date })}
         required
       />
-      
+    
       {/* 是否每年重复 */}
       <Checkbox
         label="Repeat annually"
         checked={formData.recurring}
         onChange={(checked) => setFormData({ ...formData, recurring: checked })}
       />
-      
+    
       {/* Emoji 选择器（可选）*/}
       <EmojiPicker
         value={formData.emoji}
         onChange={(emoji) => setFormData({ ...formData, emoji })}
       />
-      
+    
       {/* 操作按钮 */}
       <div className="form-actions">
         <Button type="button" variant="outline" onClick={onCancel}>
@@ -720,7 +721,7 @@ export function AnniversaryCard({ anniversary, onDelete }) {
   const targetDate = anniversary.recurring
     ? getNextAnniversary(anniversary.date)
     : new Date(anniversary.date);
-    
+  
   const daysUntil = differenceInDays(targetDate, new Date());
   const isPast = daysUntil < 0;
   
@@ -740,18 +741,18 @@ export function AnniversaryCard({ anniversary, onDelete }) {
           </DropdownMenuItem>
         </DropdownMenu>
       </div>
-      
+    
       <div className="card-content">
         <h3>{anniversary.title}</h3>
         <p className="date">{format(targetDate, 'MMMM d, yyyy')}</p>
-        
+      
         {anniversary.recurring && yearsSince > 0 && (
           <Badge variant="secondary">
             {yearsSince + 1} years
           </Badge>
         )}
       </div>
-      
+    
       <div className="countdown-section">
         {isPast ? (
           <div className="past-event">
@@ -764,7 +765,7 @@ export function AnniversaryCard({ anniversary, onDelete }) {
               <span className="number">{daysUntil}</span>
               <span className="label">days to go</span>
             </div>
-            
+          
             <CircularProgress 
               value={(daysUntil / 365) * 100}
               max={100}
@@ -772,7 +773,7 @@ export function AnniversaryCard({ anniversary, onDelete }) {
           </>
         )}
       </div>
-      
+    
       <div className="card-actions">
         <Button variant="outline" size="sm">
           <Download className="icon" />
@@ -816,11 +817,11 @@ export const anniversaryStorage = {
       id: generateId(),
       createdAt: new Date().toISOString()
     };
-    
+  
     const all = this.getAll();
     all.push(newAnniversary);
     localStorage.setItem('anniversaries', JSON.stringify(all));
-    
+  
     return newAnniversary;
   },
   
@@ -856,12 +857,12 @@ export function CountryDetector({ onDetect }) {
         const response = await fetch('/api/geo');
         const data = await response.json();
         setCountry(data.country);
-        
+      
         // 方案 2: 使用第三方 API（备选）
         // const response = await fetch('https://ipapi.co/json/');
         // const data = await response.json();
         // setCountry(data.country_code);
-        
+      
         onDetect(data.country);
       } catch (error) {
         console.error('Failed to detect country:', error);
@@ -872,7 +873,7 @@ export function CountryDetector({ onDetect }) {
         setLoading(false);
       }
     }
-    
+  
     detectCountry();
   }, [onDetect]);
   
@@ -927,7 +928,7 @@ export function CountrySelector({ value, onChange }) {
   return (
     <div className="country-selector">
       <CountryDetector onDetect={setDetected} />
-      
+    
       <div className="selector-header">
         <Label>Select Country/Region</Label>
         {detected && detected !== value && (
@@ -944,7 +945,7 @@ export function CountrySelector({ value, onChange }) {
           </Badge>
         )}
       </div>
-      
+    
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger>
           <SelectValue>
@@ -952,7 +953,7 @@ export function CountrySelector({ value, onChange }) {
             {supportedCountries.find(c => c.code === value)?.name}
           </SelectValue>
         </SelectTrigger>
-        
+      
         <SelectContent>
           {supportedCountries.map(country => (
             <SelectItem key={country.code} value={country.code}>
@@ -989,17 +990,17 @@ export default function BlogPage() {
         <h1>Date Calculation Insights & Guides</h1>
         <p>Learn everything about date calculations, planning, and productivity</p>
       </div>
-      
+    
       {/* Featured Post（第一篇：从 FAQ 迁移）*/}
       <FeaturedPost post={posts[0]} />
-      
+    
       {/* Blog Grid */}
       <div className="blog-grid">
         {posts.slice(1).map(post => (
           <BlogCard key={post.slug} post={post} />
         ))}
       </div>
-      
+    
       {/* Categories */}
       <BlogCategories />
     </div>
@@ -1095,18 +1096,18 @@ export function BlogCard({ post }) {
         />
         <div className="category-badge">{post.category}</div>
       </div>
-      
+    
       {/* 内容 */}
       <div className="blog-content">
         <h3>{post.title}</h3>
         <p className="excerpt">{post.description}</p>
-        
+      
         <div className="blog-meta">
           <div className="author">
             <Avatar src="/leon-avatar.jpg" alt="Leon" size="sm" />
             <span>{post.author}</span>
           </div>
-          
+        
           <div className="meta-info">
             <span className="date">{format(new Date(post.publishDate), 'MMM d, yyyy')}</span>
             <span className="separator">·</span>
@@ -1114,7 +1115,7 @@ export function BlogCard({ post }) {
           </div>
         </div>
       </div>
-      
+    
       {/* Hover 效果 */}
       <div className="blog-hover-overlay">
         <ArrowRight className="icon" />
@@ -1138,19 +1139,19 @@ export function BlogCard({ post }) {
     // 日期处理
     "date-fns": "^3.0.0",
     "date-fns-tz": "^2.0.0",
-    
+  
     // UI 组件
     "@radix-ui/react-tabs": "^1.0.0",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-dialog": "^1.0.0",
-    
+  
     // MDX（博客）
     "@next/mdx": "^15.0.0",
     "gray-matter": "^4.0.3",
-    
+  
     // 图表/可视化
     "recharts": "^2.10.0",
-    
+  
     // 节假日 API
     "@nager/date": "^1.0.0" // 或使用 API
   }
@@ -1230,16 +1231,16 @@ content/
 
 支持 8 个主要国家：
 
-| 国家 | 代码 | 节假日数 | 优先级 |
-|------|------|---------|--------|
-| 美国 | US | 11 | 🔴 高 |
-| 中国 | CN | 7 | 🔴 高 |
-| 英国 | UK | 8 | 🟡 中 |
-| 日本 | JP | 16 | 🟡 中 |
-| 德国 | DE | 9 | 🟡 中 |
-| 法国 | FR | 11 | 🟡 中 |
-| 加拿大 | CA | 10 | 🟢 低 |
-| 澳大利亚 | AU | 9 | 🟢 低 |
+| 国家     | 代码 | 节假日数 | 优先级 |
+| -------- | ---- | -------- | ------ |
+| 美国     | US   | 11       | 🔴 高  |
+| 中国     | CN   | 7        | 🔴 高  |
+| 英国     | UK   | 8        | 🟡 中  |
+| 日本     | JP   | 16       | 🟡 中  |
+| 德国     | DE   | 9        | 🟡 中  |
+| 法国     | FR   | 11       | 🟡 中  |
+| 加拿大   | CA   | 10       | 🟢 低  |
+| 澳大利亚 | AU   | 9        | 🟢 低  |
 
 ### **节假日数据源**
 
@@ -1365,22 +1366,22 @@ export function getHolidaysLocal(country: string, year: number) {
 **我建议按以下顺序执行：**
 
 1. ✅ **Week 1: 核心功能（未来/过去 + 工作日）**
+
    - 这是最重要的功能增强
    - 直接提升用户价值
-
 2. ✅ **Week 2: 国家支持**
+
    - 工作日计算的基础
    - 全球化准备
-
 3. ✅ **Week 3: 节假日 + 纪念日**
+
    - 差异化竞争优势
    - 提升用户粘性
-
 4. ✅ **Week 4: 博客系统**
+
    - SEO 长期投资
    - 内容营销基础
 
 ---
 
 **您想从哪个功能开始？我可以立即帮您实现！** 🚀
-
