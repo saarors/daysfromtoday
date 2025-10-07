@@ -124,17 +124,24 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
+      {/* 装饰性背景元素 */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="decoration-blob decoration-blob-pink w-96 h-96 -top-48 -right-48"></div>
+        <div className="decoration-blob decoration-blob-purple w-80 h-80 -bottom-40 -left-40"></div>
+        <div className="decoration-blob decoration-blob-blue w-64 h-64 top-1/2 right-1/4"></div>
+      </div>
+
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
+      <section className="container mx-auto px-4 py-16 md:py-24 relative z-10">
         <div className="text-center max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gradient-calendly">
             {t.slogan}
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-4">
+          <p className="text-xl md:text-2xl text-gray-600 mb-4 font-medium">
             {t.subtitle}
           </p>
-          <p className="text-gray-500 mb-8">
+          <p className="text-gray-500 mb-8 leading-relaxed">
             {t.description}
           </p>
         </div>
@@ -143,7 +150,7 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto mt-12">
           
           {/* 未来日期卡片 */}
-          <Card variant="elevated" className="hover:shadow-2xl transition-all">
+          <Card variant="elevated" className="card-glass hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between mb-2">
                 <Badge variant="primary" className="text-lg px-4 py-1">🔮 {t.future.title}</Badge>
@@ -188,7 +195,7 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
                   />
                   <button
                     onClick={() => handleCustomCalculate(futureDays, 'future', 'calendar')}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                    className="btn-primary text-sm font-medium"
                   >
                     {t.custom.button}
                   </button>
@@ -231,7 +238,7 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
                       const input = e.currentTarget.previousElementSibling as HTMLInputElement;
                       handleCustomCalculate(input.value, 'future', 'business');
                     }}
-                    className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors text-sm font-medium"
+                    className="btn-primary text-sm font-medium"
                   >
                     {t.custom.button}
                   </button>
@@ -241,7 +248,7 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
           </Card>
           
           {/* 过去日期卡片 */}
-          <Card variant="elevated" className="hover:shadow-2xl transition-all">
+          <Card variant="elevated" className="card-glass hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between mb-2">
                 <Badge variant="secondary" className="text-lg px-4 py-1">⏮️ {t.past.title}</Badge>
@@ -286,7 +293,7 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
                   />
                   <button
                     onClick={() => handleCustomCalculate(pastDays, 'past', 'calendar')}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                    className="btn-primary text-sm font-medium"
                   >
                     {t.custom.button}
                   </button>
@@ -329,7 +336,7 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
                       const input = e.currentTarget.previousElementSibling as HTMLInputElement;
                       handleCustomCalculate(input.value, 'past', 'business');
                     }}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+                    className="btn-primary text-sm font-medium"
                   >
                     {t.custom.button}
                   </button>
@@ -348,7 +355,7 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
           </h2>
           
           <Link href={`/${locale}/faq`} className="block">
-            <Card className="hover:shadow-xl transition-all cursor-pointer overflow-hidden">
+            <Card className="card-glass hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden">
               <div className="md:flex">
                 {/* 博客配图 */}
                 <div className="md:w-2/5 bg-gradient-to-br from-blue-500 to-purple-600 p-8 flex items-center justify-center">
@@ -396,8 +403,8 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
             href="/en"
             className={`px-6 py-3 rounded-full font-medium transition-all ${
               locale === 'en'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'btn-primary shadow-lg'
+                : 'btn-secondary'
             }`}
           >
             English
@@ -406,8 +413,8 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
             href="/zh"
             className={`px-6 py-3 rounded-full font-medium transition-all ${
               locale === 'zh'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'btn-primary shadow-lg'
+                : 'btn-secondary'
             }`}
           >
             中文
