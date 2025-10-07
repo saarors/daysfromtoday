@@ -27,7 +27,6 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { Geist, Geist_Mono } from "next/font/google";
 import GATracker from '@/app/ga-tracker';
-import GADebug from '@/app/ga-debug';
 import "../globals.css";
 
 const geistSans = Geist({
@@ -140,23 +139,19 @@ export default async function LocaleLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* GA_PROBE_LOCALE: 如果你能在 view-source 搜到这个词，说明多语言布局生效 */}
-        <div data-ga-probe="locale" style={{ display: 'none' }}>GA_PROBE_LOCALE</div>
-
         <NextIntlClientProvider messages={messages}>
           <main id="main-content" role="main">
             {children}
           </main>
         </NextIntlClientProvider>
 
-        {/* 强制硬编码 GA ID —— 仅用于定位，确定生效后会删除 */}
-        <GoogleAnalytics gaId="G-9D2SZK734G" />
+        {/* Google Analytics（性能监控与用户分析）*/}
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
 
         {/* GA 路由追踪（追踪 SPA 导航）*/}
         <GATracker />
-
-        {/* 调试组件（部署验证后可删除）*/}
-        <GADebug />
       </body>
     </html>
   );
