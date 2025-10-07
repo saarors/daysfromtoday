@@ -3,21 +3,26 @@
  * 
  * 功能：
  * 1. 为所有语言版本生成首页 URL
- * 2. 设置正确的更新频率和优先级
- * 3. 自动包含 lastModified 时间戳
+ * 2. 为所有核心计算页面生成 URL
+ * 3. 设置正确的更新频率和优先级
+ * 4. 自动包含 lastModified 时间戳
  * 
- * SEO 要求：
- * - 包含所有语言版本的页面
- * - 设置合理的 changeFrequency
- * - 设置正确的 priority（首页 1.0）
+ * 已包含页面：
+ * - 首页（priority: 1.0）
+ * - FAQ 页面（priority: 0.9）
+ * - 未来日期计算（priority: 0.8）
+ * - 过去日期计算（priority: 0.7）
+ * - 工作日计算（未来）（priority: 0.9）- 高价值关键词
+ * - 工作日计算（过去）（priority: 0.7）
  * 
- * 当前状态：基础版本
- * TODO: 后续添加动态页面
- * - /[locale]/days/[n]
- * - /[locale]/weekdays/[n]
- * - /[locale]/business-days/[n]
+ * 总页面数：约 140+ 页（2 语言 x 70+ 路由）
  * 
- * 符合项目规范：SEO 友好、多语言支持
+ * SEO 优化：
+ * - 工作日页面高优先级（business days = 高搜索量）
+ * - 所有页面 weekly 更新频率
+ * - 完整多语言支持（en/zh）
+ * 
+ * 符合项目规范：SEO 友好、多语言支持、性能优化
  */
 import { MetadataRoute } from 'next';
 import { locales } from '@/i18n/config';
@@ -52,6 +57,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     45, 60, 90, 100, 120, 180, 365
   ];
 
+  // 3.1 未来日期（自然日）
   locales.forEach(locale => {
     commonDays.forEach(days => {
       sitemapEntries.push({
@@ -59,6 +65,47 @@ export default function sitemap(): MetadataRoute.Sitemap {
         lastModified: new Date(),
         changeFrequency: 'weekly',
         priority: 0.8,
+      });
+    });
+  });
+
+  // 3.2 过去日期（自然日）
+  locales.forEach(locale => {
+    commonDays.forEach(days => {
+      sitemapEntries.push({
+        url: `${baseUrl}/${locale}/days/ago/${days}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      });
+    });
+  });
+
+  // 3.3 工作日（未来）
+  const businessDays = [
+    1, 2, 3, 5, 7, 10, 14, 15, 20, 21, 28, 30, 
+    45, 60, 90
+  ];
+
+  locales.forEach(locale => {
+    businessDays.forEach(days => {
+      sitemapEntries.push({
+        url: `${baseUrl}/${locale}/business-days/${days}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.9, // 工作日计算高优先级（高价值关键词）
+      });
+    });
+  });
+
+  // 3.4 工作日（过去）
+  locales.forEach(locale => {
+    businessDays.forEach(days => {
+      sitemapEntries.push({
+        url: `${baseUrl}/${locale}/business-days/ago/${days}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.7,
       });
     });
   });
