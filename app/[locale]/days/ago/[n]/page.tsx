@@ -56,22 +56,48 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function DaysAgoPage({ params }: PageProps) {
-  const { n } = await params;
+  const { locale, n } = await params;
   const days = Number(n);
   
   // 计算目标日期
   const today = new Date();
   const targetDate = subDaysSafe(today, days);
   
+  // 多语言内容
+  const text = {
+    en: {
+      title: (d: number) => `${d} ${d === 1 ? 'Day' : 'Days'} Ago from Today`,
+      subtitle: 'Calculate dates in the past with precision',
+      targetDate: 'Target Date',
+      past: 'Past',
+      before: 'before',
+      startDate: 'Start Date (Today)',
+      daysAgo: 'Days Ago',
+      resultDate: 'Result Date'
+    },
+    zh: {
+      title: (d: number) => `从今天起 ${d} 天前`,
+      subtitle: '精确计算过去日期',
+      targetDate: '目标日期',
+      past: '过去',
+      before: '之前',
+      startDate: '起始日期（今天）',
+      daysAgo: '天数',
+      resultDate: '结果日期'
+    }
+  };
+  
+  const t = text[locale as keyof typeof text] || text.en;
+  
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       {/* Hero Section */}
       <div className="text-center mb-12">
         <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-          {days} {days === 1 ? 'Day' : 'Days'} Ago from Today
+          {t.title(days)}
         </h1>
         <p className="text-xl text-gray-600">
-          Calculate dates in the past with precision
+          {t.subtitle}
         </p>
       </div>
       
@@ -79,11 +105,11 @@ export default async function DaysAgoPage({ params }: PageProps) {
       <Card variant="elevated" className="mb-8">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Target Date</CardTitle>
-            <Badge variant="secondary">Past</Badge>
+            <CardTitle>{t.targetDate}</CardTitle>
+            <Badge variant="secondary">{t.past}</Badge>
           </div>
           <CardDescription>
-            {days} {days === 1 ? 'day' : 'days'} before {format(today, 'MMMM d, yyyy')}
+            {days} {locale === 'zh' ? '天' : (days === 1 ? 'day' : 'days')} {t.before} {format(today, 'MMMM d, yyyy')}
           </CardDescription>
         </CardHeader>
         
@@ -100,21 +126,21 @@ export default async function DaysAgoPage({ params }: PageProps) {
           {/* Details Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 pt-8 border-t border-gray-200">
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Start Date</div>
+              <div className="text-sm text-gray-500 mb-1">{t.startDate}</div>
               <div className="font-semibold text-gray-900">
                 {format(today, 'MMM d, yyyy')}
               </div>
             </div>
             
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Days Ago</div>
+              <div className="text-sm text-gray-500 mb-1">{t.daysAgo}</div>
               <div className="font-semibold text-gray-900">
-                {days} {days === 1 ? 'day' : 'days'}
+                {days} {locale === 'zh' ? '天' : (days === 1 ? 'day' : 'days')}
               </div>
             </div>
             
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Result Date</div>
+              <div className="text-sm text-gray-500 mb-1">{t.resultDate}</div>
               <div className="font-semibold text-gray-900">
                 {format(targetDate, 'MMM d, yyyy')}
               </div>

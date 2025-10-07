@@ -56,22 +56,48 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function DaysFromTodayPage({ params }: PageProps) {
-  const { n } = await params;
+  const { locale, n } = await params;
   const days = Number(n);
   
   // 计算目标日期
   const today = new Date();
   const targetDate = addDaysSafe(today, days);
   
+  // 多语言内容
+  const text = {
+    en: {
+      title: (days: number) => `${days} ${days === 1 ? 'Day' : 'Days'} from Today`,
+      subtitle: 'Calculate dates in the future with precision',
+      result: 'Result Date',
+      calculation: 'Calculation Details',
+      startDate: 'Start Date (Today)',
+      daysToAdd: 'Days to Add',
+      targetDate: 'Target Date',
+      dayOfWeek: 'Day of the Week'
+    },
+    zh: {
+      title: (days: number) => `从今天起 ${days} 天后`,
+      subtitle: '精确计算未来日期',
+      result: '结果日期',
+      calculation: '计算详情',
+      startDate: '起始日期（今天）',
+      daysToAdd: '要加的天数',
+      targetDate: '目标日期',
+      dayOfWeek: '星期'
+    }
+  };
+  
+  const t = text[locale as keyof typeof text] || text.en;
+  
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       {/* Hero Section */}
       <div className="text-center mb-12">
         <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          {days} {days === 1 ? 'Day' : 'Days'} from Today
+          {t.title(days)}
         </h1>
         <p className="text-xl text-gray-600">
-          Calculate dates in the future with precision
+          {t.subtitle}
         </p>
       </div>
       
@@ -79,11 +105,11 @@ export default async function DaysFromTodayPage({ params }: PageProps) {
       <Card variant="elevated" className="mb-8">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Target Date</CardTitle>
-            <Badge variant="primary">Future</Badge>
+            <CardTitle>{t.targetDate}</CardTitle>
+            <Badge variant="primary">{locale === 'zh' ? '未来' : 'Future'}</Badge>
           </div>
           <CardDescription>
-            {days} {days === 1 ? 'day' : 'days'} from {format(today, 'MMMM d, yyyy')}
+            {days} {locale === 'zh' ? '天后' : (days === 1 ? 'day' : 'days')} {locale === 'zh' ? '从' : 'from'} {format(today, 'MMMM d, yyyy')}
           </CardDescription>
         </CardHeader>
         
@@ -100,21 +126,21 @@ export default async function DaysFromTodayPage({ params }: PageProps) {
           {/* Details Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 pt-8 border-t border-gray-200">
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Start Date</div>
+              <div className="text-sm text-gray-500 mb-1">{t.startDate}</div>
               <div className="font-semibold text-gray-900">
                 {format(today, 'MMM d, yyyy')}
               </div>
             </div>
             
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Days</div>
+              <div className="text-sm text-gray-500 mb-1">{t.daysToAdd}</div>
               <div className="font-semibold text-gray-900">
-                {days} {days === 1 ? 'day' : 'days'}
+                {days} {locale === 'zh' ? '天' : (days === 1 ? 'day' : 'days')}
               </div>
             </div>
             
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Result Date</div>
+              <div className="text-sm text-gray-500 mb-1">{t.result}</div>
               <div className="font-semibold text-gray-900">
                 {format(targetDate, 'MMM d, yyyy')}
               </div>

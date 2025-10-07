@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function BusinessDaysAgoPage({ params }: PageProps) {
-  const { n } = await params;
+  const { locale, n } = await params;
   const days = Number(n);
   
   // 计算工作日（默认 US）
@@ -67,15 +67,55 @@ export default async function BusinessDaysAgoPage({ params }: PageProps) {
   const weekends = result.excludedDates.filter(d => d.reason === 'weekend');
   const holidays = result.excludedDates.filter(d => d.reason === 'holiday');
   
+  // 多语言内容
+  const text = {
+    en: {
+      title: (d: number) => `${d} Business ${d === 1 ? 'Day' : 'Days'} Ago from Today`,
+      subtitle: 'Excluding weekends and holidays',
+      targetDate: 'Target Date',
+      businessDaysPast: 'Business Days (Past)',
+      businessDay: 'business day',
+      businessDaysPlural: 'business days',
+      before: 'before',
+      startDate: 'Start Date',
+      businessDays: 'Business Days',
+      calendarDays: 'Calendar Days',
+      excluded: 'Excluded',
+      weekends: 'Weekends',
+      holidaysLabel: 'Holidays',
+      excludesText: (w: number, h: number) => 
+        `This calculation excluded ${w} weekend days${h > 0 ? ` and ${h} ${h === 1 ? 'holiday' : 'holidays'}` : ''}.`
+    },
+    zh: {
+      title: (d: number) => `从今天起 ${d} 个工作日前`,
+      subtitle: '排除周末和节假日',
+      targetDate: '目标日期',
+      businessDaysPast: '工作日（过去）',
+      businessDay: '个工作日',
+      businessDaysPlural: '个工作日',
+      before: '之前',
+      startDate: '起始日期',
+      businessDays: '工作日',
+      calendarDays: '自然日',
+      excluded: '排除天数',
+      weekends: '周末',
+      holidaysLabel: '节假日',
+      excludesText: (w: number, h: number) => 
+        `此计算排除了 ${w} 个周末${h > 0 ? `和 ${h} 个节假日` : ''}。`
+    }
+  };
+  
+  const t = text[locale as keyof typeof text] || text.en;
+  
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       {/* Hero Section */}
       <div className="text-center mb-12">
         <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-600 to-purple-600 bg-clip-text text-transparent">
-          {days} Business {days === 1 ? 'Day' : 'Days'} Ago from Today
+          {t.title(days)}
         </h1>
         <p className="text-xl text-gray-600">
-          Excluding weekends and holidays
+          {t.subtitle}
         </p>
       </div>
       
@@ -83,11 +123,11 @@ export default async function BusinessDaysAgoPage({ params }: PageProps) {
       <Card variant="elevated" className="mb-8">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Target Date</CardTitle>
-            <Badge variant="secondary">Business Days (Past)</Badge>
+            <CardTitle>{t.targetDate}</CardTitle>
+            <Badge variant="secondary">{t.businessDaysPast}</Badge>
           </div>
           <CardDescription>
-            {days} business {days === 1 ? 'day' : 'days'} before {format(today, 'MMMM d, yyyy')}
+            {days} {days === 1 ? t.businessDay : t.businessDaysPlural} {t.before} {format(today, 'MMMM d, yyyy')}
           </CardDescription>
         </CardHeader>
         
@@ -104,28 +144,28 @@ export default async function BusinessDaysAgoPage({ params }: PageProps) {
           {/* Details Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-8 border-t border-gray-200">
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Start Date</div>
+              <div className="text-sm text-gray-500 mb-1">{t.startDate}</div>
               <div className="font-semibold text-gray-900">
                 {format(today, 'MMM d, yyyy')}
               </div>
             </div>
             
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Business Days</div>
+              <div className="text-sm text-gray-500 mb-1">{t.businessDays}</div>
               <div className="font-semibold text-gray-900">
                 {days}
               </div>
             </div>
             
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Calendar Days</div>
+              <div className="text-sm text-gray-500 mb-1">{t.calendarDays}</div>
               <div className="font-semibold text-gray-900">
                 {result.totalCalendarDays}
               </div>
             </div>
             
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Excluded</div>
+              <div className="text-sm text-gray-500 mb-1">{t.excluded}</div>
               <div className="font-semibold text-gray-900">
                 {result.excludedDates.length}
               </div>
@@ -137,17 +177,16 @@ export default async function BusinessDaysAgoPage({ params }: PageProps) {
             <div className="mt-6 p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <Badge variant="secondary" size="sm">
-                  {weekends.length} Weekends
+                  {weekends.length} {t.weekends}
                 </Badge>
                 {holidays.length > 0 && (
                   <Badge variant="warning" size="sm">
-                    {holidays.length} Holidays
+                    {holidays.length} {t.holidaysLabel}
                   </Badge>
                 )}
               </div>
               <p className="text-sm text-gray-600">
-                This calculation excludes {weekends.length} weekend days
-                {holidays.length > 0 && ` and ${holidays.length} ${holidays.length === 1 ? 'holiday' : 'holidays'}`}.
+                {t.excludesText(weekends.length, holidays.length)}
               </p>
             </div>
           )}
