@@ -1,0 +1,51 @@
+{
+  "US": {
+    "days": [0, 6],
+    "names": ["Sunday", "Saturday"]
+  },
+  "CN": {
+    "days": [0, 6],
+    "names": ["Sunday", "Saturday"]
+  },
+  "UK": {
+    "days": [0, 6],
+    "names": ["Sunday", "Saturday"]
+  },
+  "DE": {
+    "days": [0, 6],
+    "names": ["Sunday", "Saturday"]
+  },
+  "FR": {
+    "days": [0, 6],
+    "names": ["Sunday", "Saturday"]
+  },
+  "JP": {
+    "days": [0, 6],
+    "names": ["Sunday", "Saturday"]
+  },
+  "CA": {
+    "days": [0, 6],
+    "names": ["Sunday", "Saturday"]
+  },
+  "AU": {
+    "days": [0, 6],
+    "names": ["Sunday", "Saturday"]
+  },
+  "AE": {
+    "days": [5, 6],
+    "names": ["Friday", "Saturday"]
+  },
+  "SA": {
+    "days": [5, 6],
+    "names": ["Friday", "Saturday"]
+  },
+  "IL": {
+    "days": [5, 6],
+    "names": ["Friday", "Saturday"]
+  },
+  "IR": {
+    "days": [4, 5],
+    "names": ["Thursday", "Friday"]
+  }
+}
+
