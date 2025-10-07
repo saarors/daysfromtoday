@@ -1,5 +1,6 @@
 import { addBusinessDays } from '@/lib/bizdays';
 import { format } from 'date-fns';
+import { zhCN, enUS } from 'date-fns/locale';
 import type { Metadata } from 'next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -104,6 +105,7 @@ export default async function BusinessDaysPage({ params }: PageProps) {
   };
   
   const t = text[locale as keyof typeof text] || text.en;
+  const dateLocale = locale === 'zh' ? zhCN : enUS;
   
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
@@ -125,17 +127,17 @@ export default async function BusinessDaysPage({ params }: PageProps) {
             <Badge variant="success">{t.businessDays}</Badge>
           </div>
           <CardDescription>
-            {days} {days === 1 ? t.businessDay : t.businessDaysPlural} {t.from} {format(today, 'MMMM d, yyyy')}
+            {days} {days === 1 ? t.businessDay : t.businessDaysPlural} {t.from} {format(today, locale === 'zh' ? 'yyyy年M月d日' : 'MMMM d, yyyy', { locale: dateLocale })}
           </CardDescription>
         </CardHeader>
         
         <CardContent>
           <div className="text-center py-8">
             <div className="text-6xl font-bold text-cyan-600 mb-4">
-              {format(result.targetDate, 'MMM d, yyyy')}
+              {format(result.targetDate, locale === 'zh' ? 'yyyy年M月d日' : 'MMM d, yyyy', { locale: dateLocale })}
             </div>
             <div className="text-2xl text-gray-600">
-              {format(result.targetDate, 'EEEE')}
+              {format(result.targetDate, 'EEEE', { locale: dateLocale })}
             </div>
           </div>
           
@@ -144,7 +146,7 @@ export default async function BusinessDaysPage({ params }: PageProps) {
             <div className="text-center">
               <div className="text-sm text-gray-500 mb-1">{t.startDate}</div>
               <div className="font-semibold text-gray-900">
-                {format(today, 'MMM d, yyyy')}
+                {format(today, locale === 'zh' ? 'M月d日' : 'MMM d, yyyy', { locale: dateLocale })}
               </div>
             </div>
             
