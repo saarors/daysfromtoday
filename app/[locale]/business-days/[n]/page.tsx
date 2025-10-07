@@ -61,6 +61,8 @@ export default async function BusinessDaysPage({ params }: PageProps) {
   const days = Number(n);
   
   // 计算工作日（默认 US）
+  // 注意：这里使用 new Date() 会在服务器端和客户端产生不同结果
+  // 但这是预期的，因为用户需要看到当前时间的计算结果
   const today = new Date();
   const country = 'US'; // TODO: 从用户偏好获取
   const result = await addBusinessDays(today, days, country);
@@ -133,10 +135,10 @@ export default async function BusinessDaysPage({ params }: PageProps) {
         
         <CardContent>
           <div className="text-center py-8">
-            <div className="text-6xl font-bold text-cyan-600 mb-4">
+            <div className="text-6xl font-bold text-cyan-600 mb-4" suppressHydrationWarning>
               {format(result.targetDate, locale === 'zh' ? 'yyyy年M月d日' : 'MMM d, yyyy', { locale: dateLocale })}
             </div>
-            <div className="text-2xl text-gray-600">
+            <div className="text-2xl text-gray-600" suppressHydrationWarning>
               {format(result.targetDate, 'EEEE', { locale: dateLocale })}
             </div>
           </div>

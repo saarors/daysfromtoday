@@ -26,10 +26,13 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, n } = await params;
   const days = Number(n);
-  const targetDate = addDaysSafe(new Date(), days);
   
-  const title = `${days} Days from Today - ${format(targetDate, 'MMMM d, yyyy')}`;
-  const description = `Calculate ${days} days from today. The date will be ${format(targetDate, 'EEEE, MMMM d, yyyy')}.`;
+  // 使用固定的基准日期避免 hydration mismatch
+  const baseDate = new Date('2024-01-01T00:00:00Z');
+  const targetDate = addDaysSafe(baseDate, days);
+  
+  const title = `${days} Days from Today - Date Calculator`;
+  const description = `Calculate ${days} days from today. Get accurate date calculations with our free online tool.`;
   
   return {
     title,
@@ -117,10 +120,10 @@ export default async function DaysFromTodayPage({ params }: PageProps) {
         
         <CardContent>
           <div className="text-center py-8">
-            <div className="text-6xl font-bold text-blue-600 mb-4">
+            <div className="text-6xl font-bold text-blue-600 mb-4" suppressHydrationWarning>
               {format(targetDate, locale === 'zh' ? 'yyyy年M月d日' : 'MMM d, yyyy', { locale: dateLocale })}
             </div>
-            <div className="text-2xl text-gray-600">
+            <div className="text-2xl text-gray-600" suppressHydrationWarning>
               {format(targetDate, locale === 'zh' ? 'EEEE' : 'EEEE', { locale: dateLocale })}
             </div>
           </div>

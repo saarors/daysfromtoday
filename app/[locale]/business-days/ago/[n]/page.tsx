@@ -135,10 +135,10 @@ export default async function BusinessDaysAgoPage({ params }: PageProps) {
         
         <CardContent>
           <div className="text-center py-8">
-            <div className="text-6xl font-bold text-purple-600 mb-4">
+            <div className="text-6xl font-bold text-purple-600 mb-4" suppressHydrationWarning>
               {format(result.targetDate, locale === 'zh' ? 'yyyy年M月d日' : 'MMM d, yyyy', { locale: dateLocale })}
             </div>
-            <div className="text-2xl text-gray-600">
+            <div className="text-2xl text-gray-600" suppressHydrationWarning>
               {format(result.targetDate, 'EEEE', { locale: dateLocale })}
             </div>
           </div>
