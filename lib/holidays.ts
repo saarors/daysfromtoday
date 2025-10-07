@@ -20,13 +20,14 @@ export async function getHolidays(
   year: number
 ): Promise<Holiday[]> {
   try {
-    const response = await fetch(
-      `/api/holidays?country=${country}&year=${year}`,
-      { 
-        next: { revalidate: 86400 }, // 24h 缓存
-        cache: 'force-cache'
-      }
-    );
+    // 在 Server Component 中需要使用完整 URL
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001';
+    const url = `${baseUrl}/api/holidays?country=${country}&year=${year}`;
+    
+    const response = await fetch(url, { 
+      next: { revalidate: 86400 }, // 24h 缓存
+      cache: 'force-cache'
+    });
     
     if (!response.ok) {
       throw new Error(`Failed to fetch holidays: ${response.status}`);

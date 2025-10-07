@@ -221,127 +221,119 @@ export default async function HomePage({
         {/* 主计算入口 - 2x2 网格 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mt-12">
           {/* 未来日期 - 自然日 */}
-          <Card variant="elevated" className="hover:shadow-xl transition-shadow cursor-pointer group">
-            <Link href={`/${locale}/days/14`}>
-              <CardHeader>
-                <div className="flex items-center justify-between mb-2">
-                  <Badge variant="primary">🔮 {text.sections.future.title}</Badge>
-                  <Badge variant="default">{text.sections.calendar.title}</Badge>
-                </div>
-                <CardTitle className="group-hover:text-blue-600 transition-colors">
-                  {text.sections.future.title} - {text.sections.calendar.title}
-                </CardTitle>
-                <CardDescription>
-                  {text.sections.future.description} ({text.sections.calendar.description})
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {[7, 14, 30, 90].map(days => (
-                    <Link
-                      key={days}
-                      href={`/${locale}/days/${days}`}
-                      className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition-colors"
-                    >
-                      {days} {text.quickLinks.days}
-                    </Link>
-                  ))}
-                </div>
-              </CardContent>
-            </Link>
+          <Card variant="elevated" className="hover:shadow-xl transition-shadow">
+            <CardHeader>
+              <div className="flex items-center justify-between mb-2">
+                <Badge variant="primary">🔮 {text.sections.future.title}</Badge>
+                <Badge variant="default">{text.sections.calendar.title}</Badge>
+              </div>
+              <CardTitle className="text-blue-600">
+                {text.sections.future.title} - {text.sections.calendar.title}
+              </CardTitle>
+              <CardDescription>
+                {text.sections.future.description} ({text.sections.calendar.description})
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {[7, 14, 30, 90].map(days => (
+                  <Link
+                    key={days}
+                    href={`/${locale}/days/${days}`}
+                    className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition-colors font-medium"
+                  >
+                    {days} {text.quickLinks.days}
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
           </Card>
 
           {/* 未来日期 - 工作日 */}
-          <Card variant="elevated" className="hover:shadow-xl transition-shadow cursor-pointer group">
-            <Link href={`/${locale}/business-days/14`}>
-              <CardHeader>
-                <div className="flex items-center justify-between mb-2">
-                  <Badge variant="primary">🔮 {text.sections.future.title}</Badge>
-                  <Badge variant="success">{text.sections.business.title}</Badge>
-                </div>
-                <CardTitle className="group-hover:text-cyan-600 transition-colors">
-                  {text.sections.future.title} - {text.sections.business.title}
-                </CardTitle>
-                <CardDescription>
-                  {text.sections.future.description} ({text.sections.business.description})
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {[5, 10, 14, 30].map(days => (
-                    <Link
-                      key={days}
-                      href={`/${locale}/business-days/${days}`}
-                      className="px-3 py-1 bg-cyan-100 text-cyan-700 rounded-full text-sm hover:bg-cyan-200 transition-colors"
-                    >
-                      {days} {text.quickLinks.days}
-                    </Link>
-                  ))}
-                </div>
-              </CardContent>
-            </Link>
+          <Card variant="elevated" className="hover:shadow-xl transition-shadow">
+            <CardHeader>
+              <div className="flex items-center justify-between mb-2">
+                <Badge variant="primary">🔮 {text.sections.future.title}</Badge>
+                <Badge variant="success">{text.sections.business.title}</Badge>
+              </div>
+              <CardTitle className="text-cyan-600">
+                {text.sections.future.title} - {text.sections.business.title}
+              </CardTitle>
+              <CardDescription>
+                {text.sections.future.description} ({text.sections.business.description})
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {[5, 10, 14, 30].map(days => (
+                  <Link
+                    key={days}
+                    href={`/${locale}/business-days/${days}`}
+                    className="px-3 py-1 bg-cyan-100 text-cyan-700 rounded-full text-sm hover:bg-cyan-200 transition-colors font-medium"
+                  >
+                    {days} {text.quickLinks.days}
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
           </Card>
 
           {/* 过去日期 - 自然日 */}
-          <Card variant="elevated" className="hover:shadow-xl transition-shadow cursor-pointer group">
-            <Link href={`/${locale}/days/ago/14`}>
-              <CardHeader>
-                <div className="flex items-center justify-between mb-2">
-                  <Badge variant="secondary">⏮️ {text.sections.past.title}</Badge>
-                  <Badge variant="default">{text.sections.calendar.title}</Badge>
-                </div>
-                <CardTitle className="group-hover:text-purple-600 transition-colors">
-                  {text.sections.past.title} - {text.sections.calendar.title}
-                </CardTitle>
-                <CardDescription>
-                  {text.sections.past.description} ({text.sections.calendar.description})
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {[7, 14, 30, 90].map(days => (
-                    <Link
-                      key={days}
-                      href={`/${locale}/days/ago/${days}`}
-                      className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm hover:bg-purple-200 transition-colors"
-                    >
-                      {days} {text.quickLinks.days}
-                    </Link>
-                  ))}
-                </div>
-              </CardContent>
-            </Link>
+          <Card variant="elevated" className="hover:shadow-xl transition-shadow">
+            <CardHeader>
+              <div className="flex items-center justify-between mb-2">
+                <Badge variant="secondary">⏮️ {text.sections.past.title}</Badge>
+                <Badge variant="default">{text.sections.calendar.title}</Badge>
+              </div>
+              <CardTitle className="text-purple-600">
+                {text.sections.past.title} - {text.sections.calendar.title}
+              </CardTitle>
+              <CardDescription>
+                {text.sections.past.description} ({text.sections.calendar.description})
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {[7, 14, 30, 90].map(days => (
+                  <Link
+                    key={days}
+                    href={`/${locale}/days/ago/${days}`}
+                    className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm hover:bg-purple-200 transition-colors font-medium"
+                  >
+                    {days} {text.quickLinks.days}
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
           </Card>
 
           {/* 过去日期 - 工作日 */}
-          <Card variant="elevated" className="hover:shadow-xl transition-shadow cursor-pointer group">
-            <Link href={`/${locale}/business-days/ago/14`}>
-              <CardHeader>
-                <div className="flex items-center justify-between mb-2">
-                  <Badge variant="secondary">⏮️ {text.sections.past.title}</Badge>
-                  <Badge variant="success">{text.sections.business.title}</Badge>
-                </div>
-                <CardTitle className="group-hover:text-indigo-600 transition-colors">
-                  {text.sections.past.title} - {text.sections.business.title}
-                </CardTitle>
-                <CardDescription>
-                  {text.sections.past.description} ({text.sections.business.description})
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {[5, 10, 14, 30].map(days => (
-                    <Link
-                      key={days}
-                      href={`/${locale}/business-days/ago/${days}`}
-                      className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm hover:bg-indigo-200 transition-colors"
-                    >
-                      {days} {text.quickLinks.days}
-                    </Link>
-                  ))}
-                </div>
-              </CardContent>
-            </Link>
+          <Card variant="elevated" className="hover:shadow-xl transition-shadow">
+            <CardHeader>
+              <div className="flex items-center justify-between mb-2">
+                <Badge variant="secondary">⏮️ {text.sections.past.title}</Badge>
+                <Badge variant="success">{text.sections.business.title}</Badge>
+              </div>
+              <CardTitle className="text-indigo-600">
+                {text.sections.past.title} - {text.sections.business.title}
+              </CardTitle>
+              <CardDescription>
+                {text.sections.past.description} ({text.sections.business.description})
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {[5, 10, 14, 30].map(days => (
+                  <Link
+                    key={days}
+                    href={`/${locale}/business-days/ago/${days}`}
+                    className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm hover:bg-indigo-200 transition-colors font-medium"
+                  >
+                    {days} {text.quickLinks.days}
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
           </Card>
         </div>
       </section>
