@@ -1,4 +1,4 @@
-import { addDaysSafe } from '@/lib/date-utils';
+import { subDaysSafe } from '@/lib/date-utils';
 import { format } from 'date-fns';
 import type { Metadata } from 'next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -25,25 +25,25 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, n } = await params;
   const days = Number(n);
-  const targetDate = addDaysSafe(new Date(), days);
+  const targetDate = subDaysSafe(new Date(), days);
   
-  const title = `${days} Days from Today - ${format(targetDate, 'MMMM d, yyyy')}`;
-  const description = `Calculate ${days} days from today. The date will be ${format(targetDate, 'EEEE, MMMM d, yyyy')}.`;
+  const title = `${days} Days Ago from Today - ${format(targetDate, 'MMMM d, yyyy')}`;
+  const description = `Calculate ${days} days ago from today. The date was ${format(targetDate, 'EEEE, MMMM d, yyyy')}.`;
   
   return {
     title,
     description,
     alternates: {
-      canonical: `https://www.daysfromtoday.ai/${locale}/days/${n}`,
+      canonical: `https://www.daysfromtoday.ai/${locale}/days/ago/${n}`,
       languages: {
-        'en': `https://www.daysfromtoday.ai/en/days/${n}`,
-        'zh': `https://www.daysfromtoday.ai/zh/days/${n}`,
+        'en': `https://www.daysfromtoday.ai/en/days/ago/${n}`,
+        'zh': `https://www.daysfromtoday.ai/zh/days/ago/${n}`,
       }
     },
     openGraph: {
       title,
       description,
-      url: `https://www.daysfromtoday.ai/${locale}/days/${n}`,
+      url: `https://www.daysfromtoday.ai/${locale}/days/ago/${n}`,
       type: 'website',
       siteName: 'DaysFromToday',
     },
@@ -55,23 +55,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function DaysFromTodayPage({ params }: PageProps) {
+export default async function DaysAgoPage({ params }: PageProps) {
   const { locale, n } = await params;
   const days = Number(n);
   
   // 计算目标日期
   const today = new Date();
-  const targetDate = addDaysSafe(today, days);
+  const targetDate = subDaysSafe(today, days);
   
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       {/* Hero Section */}
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          {days} {days === 1 ? 'Day' : 'Days'} from Today
+        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          {days} {days === 1 ? 'Day' : 'Days'} Ago from Today
         </h1>
         <p className="text-xl text-gray-600">
-          Calculate dates in the future with precision
+          Calculate dates in the past with precision
         </p>
       </div>
       
@@ -80,16 +80,16 @@ export default async function DaysFromTodayPage({ params }: PageProps) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Target Date</CardTitle>
-            <Badge variant="primary">Future</Badge>
+            <Badge variant="secondary">Past</Badge>
           </div>
           <CardDescription>
-            {days} {days === 1 ? 'day' : 'days'} from {format(today, 'MMMM d, yyyy')}
+            {days} {days === 1 ? 'day' : 'days'} before {format(today, 'MMMM d, yyyy')}
           </CardDescription>
         </CardHeader>
         
         <CardContent>
           <div className="text-center py-8">
-            <div className="text-6xl font-bold text-blue-600 mb-4">
+            <div className="text-6xl font-bold text-purple-600 mb-4">
               {format(targetDate, 'MMM d, yyyy')}
             </div>
             <div className="text-2xl text-gray-600">
@@ -107,7 +107,7 @@ export default async function DaysFromTodayPage({ params }: PageProps) {
             </div>
             
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Days</div>
+              <div className="text-sm text-gray-500 mb-1">Days Ago</div>
               <div className="font-semibold text-gray-900">
                 {days} {days === 1 ? 'day' : 'days'}
               </div>
@@ -133,10 +133,10 @@ export default async function DaysFromTodayPage({ params }: PageProps) {
             'mainEntity': [
               {
                 '@type': 'Question',
-                'name': `What date is ${days} days from today?`,
+                'name': `What date was ${days} days ago from today?`,
                 'acceptedAnswer': {
                   '@type': 'Answer',
-                  'text': `${days} days from today is ${format(targetDate, 'EEEE, MMMM d, yyyy')}.`
+                  'text': `${days} days ago from today was ${format(targetDate, 'EEEE, MMMM d, yyyy')}.`
                 }
               }
             ]
@@ -146,3 +146,4 @@ export default async function DaysFromTodayPage({ params }: PageProps) {
     </div>
   );
 }
+
