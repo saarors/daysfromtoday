@@ -22,11 +22,12 @@
  * - 可访问性（WCAG 标准）
  */
 import type { Metadata } from "next";
-import Script from "next/script";
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { Geist, Geist_Mono } from "next/font/google";
 import GATracker from '@/app/ga-tracker';
+import GADebug from '@/app/ga-debug';
 import "../globals.css";
 
 const geistSans = Geist({
@@ -90,7 +91,7 @@ export default async function LocaleLayout({
   
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
 
-  // 临时 fallback：确保 GA 能工作（稍后排查环境变量问题）
+  // Google Analytics ID（使用官方 @next/third-parties 组件）
   const gaId = process.env.NEXT_PUBLIC_GA_ID || 'G-9D2SZK734G';
   
   return (
@@ -107,36 +108,9 @@ export default async function LocaleLayout({
         {/* Theme Color */}
         <meta name="theme-color" content="#0069FF" />
         <meta name="color-scheme" content="light" />
-      </head>
-      
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {/* Debug: GA ID status - {gaId ? 'LOADED' : 'NOT_LOADED'} */}
-        
-        {/* Google Analytics（使用 next/script 组件）*/}
-        {gaId && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${gaId}', {
-                  page_path: window.location.pathname,
-                });
-              `}
-            </Script>
-          </>
-        )}
 
         {/* Organization 结构化数据（JSON-LD）*/}
-        <Script
-          id="organization-schema"
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
@@ -164,15 +138,25 @@ export default async function LocaleLayout({
             })
           }}
         />
-
-        {/* GA 路由追踪（追踪 SPA 导航）*/}
-        {gaId && <GATracker />}
-
+      </head>
+      
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <NextIntlClientProvider messages={messages}>
           <main id="main-content" role="main">
             {children}
           </main>
         </NextIntlClientProvider>
+
+        {/* Google Analytics（官方 @next/third-parties 组件）*/}
+        {gaId && <GoogleAnalytics gaId={gaId} />}
+
+        {/* GA 路由追踪（追踪 SPA 导航）*/}
+        {gaId && <GATracker />}
+
+        {/* 调试组件（部署验证后可删除）*/}
+        <GADebug />
       </body>
     </html>
   );
