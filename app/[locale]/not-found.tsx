@@ -7,6 +7,7 @@ interface NotFoundProps {
 
 export default async function NotFound({ params }: NotFoundProps) {
   const t = await getTranslations('NotFound');
+  const locale = params?.locale || 'en';
   
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -17,7 +18,7 @@ export default async function NotFound({ params }: NotFoundProps) {
           {t('description')}
         </p>
         <Link
-          href={`/${params.locale}`}
+          href={`/${locale}`}
           className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           {t('goHome')}
