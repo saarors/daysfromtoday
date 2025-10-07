@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 interface HomePageClientProps {
   locale: string;
@@ -397,30 +398,7 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
       </section>
 
       {/* Language Switcher */}
-      <section className="container mx-auto px-4 py-8">
-        <div className="flex justify-center gap-4">
-          <Link
-            href="/en"
-            className={`px-6 py-3 rounded-full font-medium transition-all ${
-              locale === 'en'
-                ? 'btn-primary shadow-lg'
-                : 'btn-secondary'
-            }`}
-          >
-            English
-          </Link>
-          <Link
-            href="/zh"
-            className={`px-6 py-3 rounded-full font-medium transition-all ${
-              locale === 'zh'
-                ? 'btn-primary shadow-lg'
-                : 'btn-secondary'
-            }`}
-          >
-            中文
-          </Link>
-        </div>
-      </section>
+      <LanguageSwitcher currentLocale={locale} />
       
       {/* Organization 结构化数据（JSON-LD）*/}
       <script

@@ -4,6 +4,7 @@ import { zhCN, enUS } from 'date-fns/locale';
 import type { Metadata } from 'next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 interface PageProps {
   params: Promise<{
@@ -95,7 +96,11 @@ export default async function DaysAgoPage({ params }: PageProps) {
   const dateLocale = locale === 'zh' ? zhCN : enUS;
   
   return (
-    <div className="container mx-auto px-4 py-12 max-w-4xl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Language Switcher */}
+      <LanguageSwitcher currentLocale={locale} />
+      
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
       {/* Hero Section */}
       <div className="text-center mb-12">
         <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
