@@ -90,7 +90,8 @@ export default async function LocaleLayout({
   
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
 
-  const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  // 临时 fallback：确保 GA 能工作（稍后排查环境变量问题）
+  const gaId = process.env.NEXT_PUBLIC_GA_ID || 'G-9D2SZK734G';
   
   return (
     <html lang={locale} className="scroll-smooth">
@@ -111,6 +112,8 @@ export default async function LocaleLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* Debug: GA ID status - {gaId ? 'LOADED' : 'NOT_LOADED'} */}
+        
         {/* Google Analytics（使用 next/script 组件）*/}
         {gaId && (
           <>
