@@ -1,5 +1,5 @@
-import { addDays, subDays, format, isValid, parseISO } from 'date-fns';
-import { zonedTimeToUtc, utcToZonedTime } from 'date-fns-tz';
+import { addDays, format, isValid, parseISO } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
 
 /**
  * 时区安全的日期加法
@@ -20,7 +20,7 @@ export function addDaysSafe(
   }
   
   // 在目标时区进行计算（避免 DST 问题）
-  const zonedDate = utcToZonedTime(baseDate, timezone);
+  const zonedDate = toZonedTime(baseDate, timezone);
   const result = addDays(zonedDate, days);
   
   return result;
@@ -53,7 +53,7 @@ export function formatInTimezone(
   formatStr: string,
   timezone: string
 ): string {
-  const zonedDate = utcToZonedTime(date, timezone);
+  const zonedDate = toZonedTime(date, timezone);
   return format(zonedDate, formatStr);
 }
 
@@ -74,7 +74,7 @@ export function isValidDateString(dateStr: string): boolean {
  */
 export function getStartOfToday(timezone: string = 'UTC'): Date {
   const now = new Date();
-  const zonedNow = utcToZonedTime(now, timezone);
+  const zonedNow = toZonedTime(now, timezone);
   zonedNow.setHours(0, 0, 0, 0);
   return zonedNow;
 }

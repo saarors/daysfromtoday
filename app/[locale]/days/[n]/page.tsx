@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function DaysFromTodayPage({ params }: PageProps) {
-  const { locale, n } = await params;
+  const { n } = await params;
   const days = Number(n);
   
   // 计算目标日期

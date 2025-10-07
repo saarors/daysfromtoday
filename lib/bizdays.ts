@@ -1,6 +1,6 @@
 import { addDays, subDays, format, isValid } from 'date-fns';
 import { isWeekend } from './weekend-rules';
-import { isHoliday, getHolidays, type Holiday } from './holidays';
+import { isHoliday, getHolidays } from './holidays';
 
 export interface ExcludedDate {
   date: Date;
@@ -29,7 +29,7 @@ export async function addBusinessDays(
   startDate: Date,
   businessDays: number,
   countryCode: string,
-  timezone: string = 'UTC'
+  _timezone: string = 'UTC'
 ): Promise<BusinessDaysResult> {
   if (!isValid(startDate)) {
     throw new Error('Invalid start date');
@@ -107,7 +107,7 @@ export async function subBusinessDays(
   startDate: Date,
   businessDays: number,
   countryCode: string,
-  timezone: string = 'UTC'
+  _timezone: string = 'UTC'
 ): Promise<BusinessDaysResult> {
   if (!isValid(startDate)) {
     throw new Error('Invalid start date');

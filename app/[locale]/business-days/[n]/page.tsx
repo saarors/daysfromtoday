@@ -26,9 +26,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale, n } = await params;
   const days = Number(n);
   
-  // 简化版计算（用于metadata，无需等待节假日）
-  const estimatedDays = days * 1.4; // 粗略估算（考虑周末）
-  
   const title = `${days} Business Days from Today - Date Calculator`;
   const description = `Calculate ${days} business days from today, excluding weekends and holidays. Get the exact date for project planning and deadline management.`;
   
@@ -59,7 +56,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function BusinessDaysPage({ params }: PageProps) {
-  const { locale, n } = await params;
+  const { n } = await params;
   const days = Number(n);
   
   // 计算工作日（默认 US）
