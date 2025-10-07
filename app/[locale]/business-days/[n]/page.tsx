@@ -16,7 +16,15 @@ export async function generateStaticParams() {
     45, 60, 90, 100, 180, 365
   ];
   
-  return popularDays.map(n => ({ n: n.toString() }));
+  return popularDays.map(n => ({ 
+    locale: 'en',
+    n: n.toString() 
+  })).concat(
+    popularDays.map(n => ({ 
+      locale: 'zh',
+      n: n.toString() 
+    }))
+  );
 }
 
 // SEO Metadata
