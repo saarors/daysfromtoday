@@ -22,6 +22,7 @@
  * - 可访问性（WCAG 标准）
  */
 import type { Metadata } from "next";
+import Script from "next/script";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { Geist, Geist_Mono } from "next/font/google";
@@ -88,6 +89,8 @@ export default async function LocaleLayout({
   
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
 
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  
   return (
     <html lang={locale} className="scroll-smooth">
       <head>
@@ -107,30 +110,29 @@ export default async function LocaleLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* Google Analytics（移到 body 内，Next.js 15 兼容）*/}
-        {process.env.NEXT_PUBLIC_GA_ID && (
+        {/* Google Analytics（使用 next/script 组件）*/}
+        {gaId && (
           <>
-            <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
             />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
-                    page_path: window.location.pathname,
-                  });
-                `,
-              }}
-            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaId}', {
+                  page_path: window.location.pathname,
+                });
+              `}
+            </Script>
           </>
         )}
 
         {/* Organization 结构化数据（JSON-LD）*/}
-        <script
+        <Script
+          id="organization-schema"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
