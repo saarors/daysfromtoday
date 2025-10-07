@@ -11,6 +11,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 
@@ -22,6 +23,7 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
   // 自定义输入状态
   const [futureDays, setFutureDays] = useState('');
   const [pastDays, setPastDays] = useState('');
+  const router = useRouter();
   
   // 多语言内容
   const text = {
@@ -118,7 +120,7 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
     
     const basePath = mode === 'calendar' ? 'days' : 'business-days';
     const agoPart = type === 'past' ? '/ago' : '';
-    window.location.href = `/${locale}/${basePath}${agoPart}/${num}`;
+    router.push(`/${locale}/${basePath}${agoPart}/${num}`);
   };
   
   return (
