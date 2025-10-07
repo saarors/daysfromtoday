@@ -90,9 +90,6 @@ export default async function LocaleLayout({
   const messages = await getMessages();
   
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
-
-  // Google Analytics ID（使用官方 @next/third-parties 组件）
-  const gaId = process.env.NEXT_PUBLIC_GA_ID || 'G-9D2SZK734G';
   
   return (
     <html lang={locale} className="scroll-smooth">

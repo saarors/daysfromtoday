@@ -27,7 +27,7 @@ export default function GATest() {
         <h1>🔬 GA Test Page (Direct Script Injection)</h1>
         <p style={{ background: '#fff3cd', padding: '1em', border: '1px solid #ffc107', borderRadius: 4 }}>
           ⚠️ This page has GA script <strong>directly embedded</strong> in the page component, 
-          bypassing all layouts. If GA still doesn't work here, it's a Vercel deployment issue.
+          bypassing all layouts. If GA still doesn&apos;t work here, it&apos;s a Vercel deployment issue.
         </p>
         
         <hr />
@@ -37,7 +37,7 @@ export default function GATest() {
           <li>Search for: <code>PAGE_PROBE_GATEST</code> (confirms this page rendered)</li>
           <li>Search for: <code>gtag/js?id=G-9D2SZK734G</code> (GA script)</li>
           <li>Open DevTools → Network → Search for: <code>gtag</code></li>
-          <li>Open Console → Type: <code>typeof gtag</code> (should return "function")</li>
+          <li>Open Console → Type: <code>typeof gtag</code> (should return &quot;function&quot;)</li>
           <li>Check GA Realtime for active users</li>
         </ol>
         

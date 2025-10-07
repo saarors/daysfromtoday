@@ -37,7 +37,7 @@ export default function GATracker() {
     const url = pathname + (searchParams?.toString() ? `?${searchParams}` : '');
     
     // 发送页面浏览事件
-    // @ts-ignore
+    // @ts-expect-error - gtag is added by Google Analytics script
     window.gtag('config', gaId, {
       page_path: url,
     });
