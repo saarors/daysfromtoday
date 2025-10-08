@@ -217,13 +217,7 @@ export default async function WhyIBuiltPage({ params }: PageProps) {
       <TopNav locale={locale} />
       
       <div className="container mx-auto px-4 py-12 pt-24 md:pt-32 max-w-4xl">
-        <Breadcrumb 
-          locale={locale}
-          items={[
-            { label: isChinese ? '博客' : 'Blog', href: `/${locale}/blog` },
-            { label: t.title }
-          ]}
-        />
+        <Breadcrumb locale={locale} />
 
         <article className="mt-8">
           {/* Article Header */}
