@@ -1,6 +1,7 @@
 import { addDays, subDays, format, isValid } from 'date-fns';
 import { isWeekend } from './weekend-rules';
 import { isHoliday, getHolidays } from './holidays';
+import type { CountryCode } from '@/types/user-context';
 
 export interface ExcludedDate {
   date: Date;
@@ -28,7 +29,7 @@ export interface BusinessDaysResult {
 export async function addBusinessDays(
   startDate: Date,
   businessDays: number,
-  countryCode: string,
+  countryCode: CountryCode,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _timezone: string = 'UTC'
 ): Promise<BusinessDaysResult> {
@@ -109,7 +110,7 @@ export async function addBusinessDays(
 export async function subBusinessDays(
   startDate: Date,
   businessDays: number,
-  countryCode: string,
+  countryCode: CountryCode,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _timezone: string = 'UTC'
 ): Promise<BusinessDaysResult> {
