@@ -65,6 +65,14 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
           readMore: 'Read More',
           readTime: '8 min read'
         }
+      },
+
+      anniversaries: {
+        title: 'My Anniversaries',
+        subtitle: 'Manage your personal countdowns',
+        description: 'Track birthdays, anniversaries, holidays and more with recurring reminders.',
+        button: 'Manage Anniversaries',
+        icon: '📅'
       }
     },
     zh: {
@@ -104,6 +112,14 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
           readMore: '阅读更多',
           readTime: '8 分钟阅读'
         }
+      },
+
+      anniversaries: {
+        title: '我的纪念日',
+        subtitle: '管理您的个人倒计时',
+        description: '跟踪生日、纪念日、节日等，支持每年重复提醒。',
+        button: '管理纪念日',
+        icon: '📅'
       }
     }
   };
@@ -388,6 +404,57 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
                     </div>
                     <span className="text-blue-600 font-medium hover:text-blue-700">
                       {t.blog.firstPost.readMore} →
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </Link>
+        </div>
+      </section>
+
+      {/* Anniversaries Section */}
+      <section className="container mx-auto px-4 py-16 bg-gradient-to-br from-purple-50 to-pink-50">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold mb-8 text-center text-gray-900">
+            {t.anniversaries.title}
+          </h2>
+          
+          <Link href={`/${locale}/anniversaries`} className="block">
+            <Card className="card-glass hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden">
+              <div className="md:flex">
+                {/* 纪念日配图 */}
+                <div className="md:w-2/5 bg-gradient-to-br from-purple-500 to-pink-600 p-8 flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <div className="text-6xl mb-4">{t.anniversaries.icon}</div>
+                    <div className="text-2xl font-bold">Personal</div>
+                    <div className="text-sm opacity-90 mt-2">Countdowns</div>
+                  </div>
+                </div>
+                
+                {/* 纪念日内容 */}
+                <div className="md:w-3/5 p-6 md:p-8">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge variant="primary">New Feature</Badge>
+                    <span className="text-sm text-gray-500">Personal Management</span>
+                  </div>
+                  
+                  <h3 className="text-2xl font-bold mb-3 text-gray-900 hover:text-purple-600 transition-colors">
+                    {t.anniversaries.subtitle}
+                  </h3>
+                  
+                  <p className="text-gray-600 mb-4 line-clamp-3">
+                    {t.anniversaries.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <span>🎂 Birthdays</span>
+                      <span>💕 Anniversaries</span>
+                      <span>🎉 Holidays</span>
+                    </div>
+                    <span className="text-purple-600 font-medium hover:text-purple-700">
+                      {t.anniversaries.button} →
                     </span>
                   </div>
                 </div>
