@@ -17,17 +17,17 @@ const blogPosts = [
   {
     slug: 'why-i-built-daysfromtoday',
     title: {
-      en: 'Why I Built DaysFromToday: A Programmer\'s Time Anxiety',
-      zh: '为什么我要做 DaysFromToday：一个程序员的时间焦虑'
+      en: 'Why I Built DaysFromToday',
+      zh: '为什么我要做 DaysFromToday'
     },
     excerpt: {
-      en: 'As a programmer, I often need to calculate dates. This seemingly simple need made me realize the importance of time management. This is the story of how DaysFromToday was born.',
-      zh: '作为一个程序员，我经常需要计算日期。这个看似简单的需求，却让我意识到时间管理的重要性。这是 DaysFromToday 诞生的故事。'
+      en: 'In September, my 13-year-old son started boarding school. Every call, he asks: "How many days left?" It made me realize — time is the only truly fair and scarce resource we have. So I built DaysFromToday.',
+      zh: '今年9月，我13岁的儿子开始寄宿生活。每次通话他都会问："还有几天？" 这让我意识到，时间是我们唯一公平且稀缺的资源。于是我做了 DaysFromToday。'
     },
     date: '2025-10-08',
     readTime: {
-      en: '5 min read',
-      zh: '5 分钟阅读'
+      en: '6 min read',
+      zh: '6 分钟阅读'
     },
     category: {
       en: 'Story',

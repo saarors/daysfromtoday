@@ -15,12 +15,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale } = await params;
   
   const title = locale === 'zh' 
-    ? '为什么我要做 DaysFromToday：一个程序员的时间焦虑' 
-    : 'Why I Built DaysFromToday: A Programmer\'s Time Anxiety';
+    ? '为什么我要做 DaysFromToday' 
+    : 'Why I Built DaysFromToday';
   
   const description = locale === 'zh'
-    ? '作为一个程序员，我经常需要计算日期。这个看似简单的需求，却让我意识到时间管理的重要性。这是 DaysFromToday 诞生的故事。'
-    : 'As a programmer, I often need to calculate dates. This seemingly simple need made me realize the importance of time management. This is the story of how DaysFromToday was born.';
+    ? '今年9月，我13岁的儿子开始寄宿生活。每次通话他都会问："还有几天？" 这让我意识到，时间是我们唯一公平且稀缺的资源。于是我做了 DaysFromToday。'
+    : 'In September, my 13-year-old son started boarding school. Every call, he asks: "How many days left?" It made me realize — time is the only truly fair and scarce resource we have. So I built DaysFromToday.';
 
   return {
     title,
@@ -51,159 +51,197 @@ export default async function WhyIBuiltPage({ params }: PageProps) {
 
   const content = {
     en: {
-      title: "Why I Built DaysFromToday: A Programmer's Time Anxiety",
+      title: "Why I Built DaysFromToday",
       date: 'October 8, 2025',
-      readTime: '5 min read',
+      readTime: '6 min read',
       sections: [
         {
-          heading: 'The Problem That Started It All',
+          heading: '',
           content: [
-            'As a programmer, I deal with dates constantly. Project deadlines, sprint planning, holiday schedules, client deliverables - they all revolve around one question: "What date will it be X days from now?"',
-            'You\'d think this would be simple in 2025. Just Google it, right? But here\'s what actually happens:',
-            '• Google gives you a calendar widget that requires multiple clicks',
-            '• Online calculators are cluttered with ads',
-            '• Spreadsheets require manual formulas',
-            '• And none of them handle business days properly',
-            'I found myself doing this calculation dozens of times a week, and it was frustrating every single time.'
+            'Hi, I\'m Leon.',
+            'I live in London — an internet product manager, and an individual investor.'
           ]
         },
         {
-          heading: 'The "Aha!" Moment',
+          heading: '',
           content: [
-            'The breaking point came during a client call. They asked: "Can you deliver this in 60 business days?"',
-            'I paused. Opened a calendar. Started counting. Realized I needed to exclude weekends. Then holidays. Then I had to figure out which country\'s holidays...',
-            'The client was waiting. I felt stupid. This should be instant.',
-            'That night, I couldn\'t sleep. Not because of the project, but because I kept thinking: "Why doesn\'t this tool exist?"'
+            '**Time** — for all of us, is perhaps the only resource that\'s truly fair, limited, and worth mastering completely.',
+            'If we can measure time precisely, we can take back control of our lives.'
           ]
         },
         {
-          heading: 'Building the Solution I Wished Existed',
+          heading: '',
           content: [
-            'I started with a simple rule: **The answer should be visible the moment you open the page.**',
-            'No forms to fill. No buttons to click. Just open "/days/60" and see the date. That\'s it.',
-            'Then I added business days, because that\'s what professionals actually need. Not "60 days from now" but "60 working days from now."',
-            'Then timezone awareness, because a deadline in New York is different from one in Tokyo.',
-            'Then holidays, because missing a client\'s national holiday is embarrassing.',
-            'And finally, multi-language support, because time anxiety is universal.'
+            'In September this year, my 13-year-old son started his first full boarding life.',
+            'He goes to a school just outside London.',
+            '',
+            'For the past decade, we\'ve seen each other every single day.',
+            'Now, he only comes home once every three or four weeks.',
+            '',
+            'That change is small, but it\'s emotional —',
+            'for him, and for us as parents.'
           ]
         },
         {
-          heading: 'What I Learned About Time',
+          heading: '',
           content: [
-            'Building this tool taught me something unexpected: **we\'re all terrible at thinking about time.**',
-            'We say "next month" but mean different things. We forget about holidays. We underestimate how many working days are in a quarter.',
-            'DaysFromToday isn\'t just a calculator - it\'s a reality check. It shows you, in black and white, exactly when things will happen.',
-            'No optimism. No "roughly." Just facts.'
+            'During his first few days at school, we agreed to call each other every day.',
+            'Almost every call, he would bring up one word — **time**.',
+            '',
+            '"Dad, only three days till the weekend! I can sleep in."',
+            '"Dad, three more weeks and I can come home and eat your cooking."',
+            '"Dad, how many months until my birthday?"',
+            '',
+            'Every time he asked, I\'d grab my phone, open the calendar,',
+            'and quickly calculate the exact date.',
+            '',
+            'He loves hearing the countdown —',
+            'as if one day less meant happiness one step closer.',
+            '',
+            'I could sense a little time anxiety in him.',
+            'But I actually think that\'s a good thing —',
+            'a boy learning to own his time.'
           ]
         },
         {
-          heading: 'Why I Made It Free',
+          heading: '',
           content: [
-            'I could have put this behind a paywall. Added a subscription. Made it a SaaS.',
-            'But that felt wrong. Time calculation should be like air - available to everyone.',
-            'Instead, I focused on making it fast, accurate, and beautiful. The kind of tool I\'d be proud to use in front of a client.',
-            'If it helps you avoid one awkward pause during a meeting, I\'ve done my job.'
+            'Even as adults, we do similar mental math every day:',
+            '',
+            '**How long since my last loan payment? When will I finally be debt-free?**',
+            '**How many days until my wedding anniversary — please, don\'t let me forget.**',
+            '**When\'s our next family gathering? I\'d better prepare, not like last year.**',
+            '',
+            'To manage time is, in a way, to manage life itself.'
           ]
         },
         {
-          heading: 'What\'s Next',
+          heading: '',
           content: [
-            'I\'m constantly improving DaysFromToday based on real usage:',
-            '• Anniversary tracking (because we all forget important dates)',
-            '• Custom holiday calendars (for teams working across regions)',
-            '• Calendar integration (one-click export to Google/Outlook)',
-            '• Mobile app (because you need this on the go)',
-            'But the core will never change: **instant answers, zero friction.**'
+            'But most calendar apps don\'t calculate "time left".',
+            'So I built **Days From Today**.',
+            '',
+            'At first, it was just to answer my son\'s questions —',
+            'and to remind myself of the dates that matter.',
+            'Then I thought, maybe there are other fathers like me.',
+            'Or anyone who simply wants to take back ownership of their time.',
+            '',
+            'So I put it online — **free, simple, accurate**.',
+            'It supports different countries, time zones, weekdays, holidays,',
+            'so every countdown feels real and precise.'
           ]
         },
         {
-          heading: 'A Personal Note',
+          heading: '',
           content: [
-            'If you\'re reading this, you probably have the same time anxiety I do. The constant mental math. The fear of missing deadlines. The embarrassment of wrong estimates.',
-            'I built DaysFromToday for you. And for me.',
-            'Because time is the one resource we can\'t create more of. But we can get better at understanding it.',
-            '**Bookmark this tool. Share it with your team. Let it save you from one more moment of calendar confusion.**',
-            'And if it helps you even once, send me a message. I\'d love to hear how you\'re using it.',
-            '— Leon, Creator of DaysFromToday'
+            'If you, too, want to own your time,',
+            'I hope **Days From Today** can help you, even just a little.',
+            '',
+            'Thank you for reading.',
+            'I wish you a joyful, peaceful, and time-free life —',
+            'where your time truly belongs to you.',
+            '',
+            'And if you ever feel something while using it,',
+            'I\'d love to hear from you.',
+            '',
+            '— **Leon**'
           ]
         }
       ]
     },
     zh: {
-      title: '为什么我要做 DaysFromToday：一个程序员的时间焦虑',
+      title: '为什么我要做 DaysFromToday',
       date: '2025年10月8日',
-      readTime: '5 分钟阅读',
+      readTime: '6 分钟阅读',
       sections: [
         {
-          heading: '一切从一个问题开始',
+          heading: '',
           content: [
-            '作为一名程序员，我每天都要和日期打交道。项目截止日期、冲刺规划、假期安排、客户交付——所有这些都围绕着一个问题："从今天起 X 天后是哪天？"',
-            '你可能觉得这很简单，毕竟现在是 2025 年了。Google 一下不就行了？但实际情况是这样的：',
-            '• Google 会给你一个需要点好几下的日历小工具',
-            '• 在线计算器充满了广告',
-            '• 电子表格需要手动写公式',
-            '• 而且没有一个能正确处理工作日',
-            '我发现自己每周要做这个计算几十次，每次都很烦人。'
+            '你好，我是 Leon。',
+            '我现在住在伦敦，是一名互联网产品经理，也是一位独立投资人。'
           ]
         },
         {
-          heading: '顿悟时刻',
+          heading: '',
           content: [
-            '转折点出现在一次客户电话会议中。他们问："你能在 60 个工作日内交付吗？"',
-            '我停顿了。打开日历。开始数日子。意识到要排除周末。然后是节假日。然后还要搞清楚是哪个国家的节假日...',
-            '客户在等我回答。我感觉很蠢。这应该是秒答的事情。',
-            '那天晚上我睡不着。不是因为项目压力，而是一直在想："为什么这个工具不存在？"'
+            '**时间** —— 对于我们每个人来说，几乎是唯一公平、稀缺且值得完全掌控的资源。',
+            '能精准地把握时间，我们就能重新掌握生活的主动权。'
           ]
         },
         {
-          heading: '打造我想要的工具',
+          heading: '',
           content: [
-            '我从一个简单的规则开始：**答案应该在你打开页面的瞬间就看到。**',
-            '不用填表单。不用点按钮。只需要打开 "/days/60" 就能看到日期。就这么简单。',
-            '然后我加入了工作日计算，因为这才是专业人士真正需要的。不是"从今天起 60 天后"，而是"60 个工作日后"。',
-            '接着是时区感知，因为纽约的截止日期和东京的不一样。',
-            '再然后是节假日，因为忘记客户国家的节假日很尴尬。',
-            '最后是多语言支持，因为时间焦虑是全球通用的。'
+            '今年 9 月，我 13 岁的儿子开始了他人生中的第一次全寄宿生活。',
+            '他进入了一所位于伦敦郊区的中学。',
+            '',
+            '过去十多年，我们几乎每天都见面。',
+            '而从现在起，他要 3～4 周才能回家一次。',
+            '',
+            '这对他，对我和他妈妈，都是一次新的挑战。'
           ]
         },
         {
-          heading: '关于时间，我学到的事',
+          heading: '',
           content: [
-            '做这个工具让我有了一个意外发现：**我们都不擅长思考时间。**',
-            '我们说"下个月"，但每个人理解的都不一样。我们会忘记节假日。我们会低估一个季度有多少工作日。',
-            'DaysFromToday 不只是个计算器——它是现实检验。它白纸黑字地告诉你，事情到底会在什么时候发生。',
-            '没有乐观估计。没有"大概"。只有事实。'
+            '在他开始寄宿生活后的几天，我们约定每天都要通电话。',
+            '几乎每次通话，他都会提到一个词——**时间**。',
+            '',
+            '「爸爸，还有 3 天就周末啦，到时候我就不用 6 点半起床啦。」',
+            '「爸爸，还有 3 个星期我们就能见面啦，我可以回家吃好吃的！」',
+            '「爸爸，离我生日还有几个月呀？」',
+            '',
+            '每次他问这些问题时，我都会一边接电话，一边手忙脚乱地打开日历，帮他算一个精确的日子。',
+            '',
+            '他喜欢听「倒计时」，',
+            '好像只要少一天，幸福就近了一点。',
+            '',
+            '我知道，他有一点"时间焦虑"。',
+            '但我想，这其实是件好事——',
+            '一个男孩，开始学习掌握他自己的时间资源。'
           ]
         },
         {
-          heading: '为什么我把它做成免费的',
+          heading: '',
           content: [
-            '我本可以收费。加个订阅。做成 SaaS。',
-            '但这感觉不对。时间计算应该像空气一样——对所有人开放。',
-            '相反，我专注于让它快速、准确、美观。那种我在客户面前使用也会感到自豪的工具。',
-            '如果它能帮你避免会议中一次尴尬的停顿，我就完成了使命。'
+            '其实，对成年人来说，我们每天也都在做「关于时间的计算」。',
+            '',
+            '**距离上次还贷已经多久？我的负债还要几年能结束？**',
+            '**我和太太的结婚纪念日还有多久？我可不能再忘记。**',
+            '**家庭聚会哪天？还剩多少天？得提前准备，别像去年那样仓促。**',
+            '',
+            '掌握了时间，就掌握了生活最重要的秩序。'
           ]
         },
         {
-          heading: '接下来要做什么',
+          heading: '',
           content: [
-            '我在根据实际使用情况不断改进 DaysFromToday：',
-            '• 纪念日跟踪（因为我们都会忘记重要日期）',
-            '• 自定义节假日日历（为跨区域团队准备）',
-            '• 日历集成（一键导出到 Google/Outlook）',
-            '• 移动应用（因为你需要随时使用）',
-            '但核心永远不变：**即时答案，零摩擦。**'
+            '但在各种日历应用中，没有人帮我们算「倒计时」。',
+            '所以我做了这个应用 —— **Days From Today**。',
+            '',
+            '它最初只是为了方便回答儿子的问题，',
+            '也提醒我那些重要的日期和纪念日。',
+            '后来我想，也许世界上有许多和我一样的爸爸，',
+            '或者同样希望掌控自己时间的人。',
+            '',
+            '我把它发布到了网上，**免费、简洁、准确**。',
+            '它能帮你计算不同国家和时区的自然日、节假日和工作日，',
+            '让每一次「倒计时」都准确无误。'
           ]
         },
         {
-          heading: '个人感言',
+          heading: '',
           content: [
-            '如果你在读这篇文章，你可能和我有一样的时间焦虑。不断的心算。对错过截止日期的恐惧。对错误估计的尴尬。',
-            '我为你做了 DaysFromToday。也为我自己。',
-            '因为时间是我们无法创造更多的唯一资源。但我们可以变得更擅长理解它。',
-            '**收藏这个工具。分享给你的团队。让它帮你摆脱又一次日历混乱。**',
-            '如果它哪怕帮到你一次，给我发个消息。我很想听听你是如何使用它的。',
-            '— Leon，DaysFromToday 创始人'
+            '如果你也希望重新掌控自己的时间，',
+            '希望 **Days From Today** 能帮到你一点点。',
+            '',
+            '感谢你读到这里。',
+            '祝你拥有一个愉快的、自由的、掌握在自己手里的时间生活。',
+            '',
+            '如果你有任何想法或感受，',
+            '我真心欢迎你告诉我。',
+            '',
+            '谢谢。',
+            '—— **Leon**'
           ]
         }
       ]
@@ -221,20 +259,20 @@ export default async function WhyIBuiltPage({ params }: PageProps) {
 
         <article className="mt-8">
           {/* Article Header */}
-          <header className="mb-12 text-center">
-            <div className="inline-block px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full text-sm font-medium mb-6">
-              📝 {isChinese ? '创始人故事' : 'Founder Story'}
+          <header className="mb-16 text-center">
+            <div className="inline-block px-5 py-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white rounded-full text-sm font-medium mb-8 shadow-lg">
+              🕰️ {isChinese ? '创始人故事' : 'Founder Story'}
             </div>
             
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 leading-tight">
+            <h1 className="text-5xl md:text-6xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 leading-tight">
               {t.title}
             </h1>
             
-            <div className="flex items-center justify-center gap-6 text-gray-600">
+            <div className="flex items-center justify-center gap-6 text-gray-600 text-lg">
               <span>📅 {t.date}</span>
-              <span>•</span>
+              <span className="text-gray-400">|</span>
               <span>⏱️ {t.readTime}</span>
-              <span>•</span>
+              <span className="text-gray-400">|</span>
               <span>✍️ Leon</span>
             </div>
           </header>
@@ -242,17 +280,46 @@ export default async function WhyIBuiltPage({ params }: PageProps) {
           {/* Article Content */}
           <div className="prose prose-lg max-w-none">
             {t.sections.map((section, index) => (
-              <section key={index} className="mb-12">
-                <h2 className="text-3xl font-bold mb-6 text-gray-900 border-l-4 border-blue-600 pl-4">
-                  {section.heading}
-                </h2>
+              <section key={index} className="mb-16">
+                {/* 添加分隔线（第一段除外） */}
+                {index > 0 && (
+                  <div className="my-12 flex items-center justify-center">
+                    <div className="h-px w-16 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                    <div className="mx-4 text-gray-400">⸻</div>
+                    <div className="h-px w-16 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                  </div>
+                )}
                 
-                <div className="space-y-4">
-                  {section.content.map((paragraph, pIndex) => (
-                    <p key={pIndex} className="text-gray-700 leading-relaxed text-lg">
-                      {paragraph}
-                    </p>
-                  ))}
+                {section.heading && (
+                  <h2 className="text-3xl font-bold mb-8 text-gray-900 border-l-4 border-gradient-to-b from-blue-600 to-purple-600 pl-6">
+                    {section.heading}
+                  </h2>
+                )}
+                
+                <div className="space-y-6">
+                  {section.content.map((paragraph, pIndex) => {
+                    // 空段落用于段落间距
+                    if (paragraph === '') {
+                      return <div key={pIndex} className="h-4"></div>;
+                    }
+                    
+                    // 处理 Markdown 粗体语法
+                    const processMarkdown = (text: string) => {
+                      const parts = text.split(/(\*\*.*?\*\*)/g);
+                      return parts.map((part, i) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                          return <strong key={i} className="font-bold text-gray-900">{part.slice(2, -2)}</strong>;
+                        }
+                        return part;
+                      });
+                    };
+                    
+                    return (
+                      <p key={pIndex} className="text-gray-700 leading-relaxed text-lg">
+                        {processMarkdown(paragraph)}
+                      </p>
+                    );
+                  })}
                 </div>
               </section>
             ))}
