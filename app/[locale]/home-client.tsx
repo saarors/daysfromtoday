@@ -58,13 +58,13 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
       },
       
       blog: {
-        title: 'Latest from Blog',
+        title: 'Featured Story',
         firstPost: {
-          title: 'How to Calculate Days From Today: A Complete Guide',
-          date: 'October 7, 2025',
-          excerpt: 'Learn everything about calculating future and past dates, including natural days, business days, holidays, and timezone considerations.',
-          readMore: 'Read More',
-          readTime: '8 min read'
+          title: 'Why I Built DaysFromToday',
+          date: 'October 8, 2025',
+          excerpt: 'In September, my 13-year-old son started boarding school. Every call, he asks: "How many days left?" It made me realize — time is the only truly fair and scarce resource we have.',
+          readMore: 'Read Story',
+          readTime: '6 min read'
         }
       },
 
@@ -105,13 +105,13 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
       },
       
       blog: {
-        title: '最新博客',
+        title: '精选故事',
         firstPost: {
-          title: '如何计算从今天起的日期：完整指南',
-          date: '2025年10月7日',
-          excerpt: '了解关于计算未来和过去日期的所有知识，包括自然日、工作日、节假日和时区注意事项。',
-          readMore: '阅读更多',
-          readTime: '8 分钟阅读'
+          title: '为什么我要做 DaysFromToday',
+          date: '2025年10月8日',
+          excerpt: '今年9月，我13岁的儿子开始寄宿生活。每次通话他都会问："还有几天？" 这让我意识到，时间是我们唯一公平且稀缺的资源。',
+          readMore: '阅读故事',
+          readTime: '6 分钟阅读'
         }
       },
 
@@ -371,46 +371,66 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
       {/* Anniversaries Section - 使用动态卡片组件 */}
       <HomeAnniversaryCards locale={locale} />
 
-      {/* Blog Section */}
-      <section className="container mx-auto px-4 py-16 bg-white">
+      {/* Blog Section - 置顶创始人故事 */}
+      <section className="container mx-auto px-4 py-16 bg-white relative z-10">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold mb-8 text-center text-gray-900">
             {t.blog.title}
           </h2>
           
-          <Link href={`/${locale}/blog/how-to-calculate-days-from-today`} className="block">
-            <Card className="card-glass hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden">
+          <Link href={`/${locale}/blog/why-i-built-daysfromtoday`} className="block">
+            <Card className="card-glass hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden relative">
+              {/* Featured 标识 */}
+              <div className="absolute top-4 right-4 z-10">
+                <Badge className="bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold px-4 py-1.5 text-sm shadow-lg">
+                  ⭐ Featured Story
+                </Badge>
+              </div>
+              
               <div className="md:flex">
-                {/* 博客配图 */}
-                <div className="md:w-2/5 bg-gradient-to-br from-blue-500 to-purple-600 p-8 flex items-center justify-center">
-                  <div className="text-white text-center">
-                    <div className="text-6xl mb-4">📅</div>
-                    <div className="text-2xl font-bold">DaysFromToday</div>
-                    <div className="text-sm opacity-90 mt-2">Complete Guide</div>
+                {/* 博客配图 - 优化视觉效果 */}
+                <div className="md:w-2/5 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500 p-10 flex items-center justify-center relative overflow-hidden">
+                  {/* 装饰性背景 */}
+                  <div className="absolute inset-0 opacity-20">
+                    <div className="absolute top-0 left-0 w-32 h-32 bg-white rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-0 right-0 w-40 h-40 bg-white rounded-full blur-3xl"></div>
+                  </div>
+                  
+                  <div className="text-white text-center relative z-10">
+                    <div className="text-7xl mb-4 animate-pulse">🕰️</div>
+                    <div className="text-2xl font-bold mb-2">Why I Built</div>
+                    <div className="text-3xl font-extrabold mb-3">DaysFromToday</div>
+                    <div className="text-sm opacity-90 font-medium">Leon&apos;s Story</div>
                   </div>
                 </div>
                 
-                {/* 博客内容 */}
+                {/* 博客内容 - 增加信息量 */}
                 <div className="md:w-3/5 p-6 md:p-8">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Badge variant="primary">Featured</Badge>
+                  <div className="flex items-center gap-3 mb-4">
+                    <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                      Founder Story
+                    </Badge>
                     <span className="text-sm text-gray-500">{t.blog.firstPost.date}</span>
                   </div>
                   
-                  <h3 className="text-2xl font-bold mb-3 text-gray-900 hover:text-blue-600 transition-colors">
+                  <h3 className="text-2xl md:text-3xl font-bold mb-4 text-gray-900 hover:text-blue-600 transition-colors leading-tight">
                     {t.blog.firstPost.title}
                   </h3>
                   
-                  <p className="text-gray-600 mb-4 line-clamp-3">
+                  <p className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
                     {t.blog.firstPost.excerpt}
                   </p>
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-200">
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <span>📖 {t.blog.firstPost.readTime}</span>
+                      <span>✍️ Leon</span>
                     </div>
-                    <span className="text-blue-600 font-medium hover:text-blue-700">
-                      {t.blog.firstPost.readMore} →
+                    <span className="text-blue-600 font-semibold hover:text-blue-700 inline-flex items-center gap-2">
+                      {t.blog.firstPost.readMore} 
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
                     </span>
                   </div>
                 </div>

@@ -56,18 +56,18 @@ export default function BlogArticle({
   const categoryLabel = categoryText[category as keyof typeof categoryText]?.[locale as 'en' | 'zh'] || category;
 
   return (
-    <article className="mt-8">
+    <article className="mt-6">
       {/* Article Header */}
-      <header className="mb-16 text-center">
-        <div className={`inline-block px-5 py-2 ${getCategoryColor(category)} text-white rounded-full text-sm font-medium mb-8 shadow-lg`}>
+      <header className="mb-10 text-center">
+        <div className={`inline-block px-4 py-1.5 ${getCategoryColor(category)} text-white rounded-full text-sm font-medium mb-6 shadow-lg`}>
           🕰️ {categoryLabel}
         </div>
         
-        <h1 className="text-5xl md:text-6xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 leading-tight">
+        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 leading-tight">
           {content.title}
         </h1>
         
-        <div className="flex items-center justify-center gap-6 text-gray-600 text-lg">
+        <div className="flex items-center justify-center gap-4 text-gray-600 text-base">
           <span>📅 {content.date}</span>
           <span className="text-gray-400">|</span>
           <span>⏱️ {content.readTime}</span>
@@ -76,43 +76,43 @@ export default function BlogArticle({
         </div>
       </header>
 
-      {/* Article Content */}
+      {/* Article Content - 优化信息密度 */}
       <div className="prose prose-lg max-w-none">
         {content.sections.map((section, index) => (
-          <section key={index} className="mb-16">
-            {/* 添加分隔线（第一段除外） */}
+          <section key={index} className="mb-10">
+            {/* 添加分隔线（第一段除外）- 减少间距 */}
             {index > 0 && (
-              <div className="my-12 flex items-center justify-center">
-                <div className="h-px w-16 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-                <div className="mx-4 text-gray-400">⸻</div>
-                <div className="h-px w-16 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+              <div className="my-8 flex items-center justify-center">
+                <div className="h-px w-12 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                <div className="mx-3 text-gray-400 text-sm">⸻</div>
+                <div className="h-px w-12 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
               </div>
             )}
             
             {section.heading && (
-              <h2 className="text-3xl font-bold mb-8 text-gray-900 border-l-4 border-blue-600 pl-6">
+              <h2 className="text-2xl md:text-3xl font-bold mb-5 text-gray-900 border-l-4 border-blue-600 pl-5">
                 {section.heading}
               </h2>
             )}
             
-            <div className="space-y-6">
+            <div className="space-y-4">
               {section.content.map((paragraph, pIndex) => {
-                // 空段落用于段落间距
+                // 空段落用于段落间距 - 减少高度
                 if (paragraph === '') {
-                  return <div key={pIndex} className="h-4"></div>;
+                  return <div key={pIndex} className="h-2"></div>;
                 }
                 
-                // 引用块（以 > 开头）
+                // 引用块（以 > 开头）- 减少内边距
                 if (paragraph.startsWith('>')) {
                   return (
-                    <blockquote key={pIndex} className="pl-6 border-l-4 border-blue-300 bg-blue-50 py-4 pr-4 rounded-r-lg italic text-gray-700">
+                    <blockquote key={pIndex} className="pl-5 border-l-4 border-blue-300 bg-blue-50 py-3 pr-4 rounded-r-lg italic text-gray-700 text-base leading-relaxed">
                       {processMarkdown(paragraph.slice(1).trim())}
                     </blockquote>
                   );
                 }
                 
                 return (
-                  <p key={pIndex} className="text-gray-700 leading-relaxed text-lg">
+                  <p key={pIndex} className="text-gray-700 leading-relaxed text-base">
                     {processMarkdown(paragraph)}
                   </p>
                 );
