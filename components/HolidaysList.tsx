@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { getHolidays, type Holiday } from '@/lib/holidays';
 import { translateHolidayName } from '@/lib/holiday-translations';
-import { COUNTRIES, COUNTRY_TIERS } from '@/lib/country-config';
+import { getCountryInfo, COUNTRY_TIERS } from '@/lib/country-config';
 import type { CountryCode } from '@/types/user-context';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -43,13 +43,16 @@ export default function HolidaysList({ locale }: HolidaysListProps) {
       }
 
       // 初始化状态
-      const initialState: CountryHolidays[] = countries.map(country => ({
-        country,
-        countryName: COUNTRIES[country],
-        holidays: [],
-        loading: true,
-        error: false,
-      }));
+      const initialState: CountryHolidays[] = countries.map(country => {
+        const countryInfo = getCountryInfo(country);
+        return {
+          country,
+          countryName: countryInfo?.name[locale as 'en' | 'zh'] || country,
+          holidays: [],
+          loading: true,
+          error: false,
+        };
+      });
       setCountryHolidays(initialState);
 
       // 加载每个国家的节假日
