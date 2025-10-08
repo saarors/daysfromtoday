@@ -3,7 +3,7 @@
  * 
  * 功能：
  * - 左侧: 主导航（首页、纪念日、博客）
- * - 右侧: 语言切换器
+ * - 右侧: 语言切换器 + 国家选择器
  * - 固定在页面顶部
  */
 
@@ -12,6 +12,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import LanguageSwitcher from './LanguageSwitcher';
+import CountrySelector from './CountrySelector';
 
 interface TopNavProps {
   locale: string;
@@ -83,10 +84,18 @@ export default function TopNav({ locale }: TopNavProps) {
             </Link>
           </nav>
           
-          {/* 右侧：语言切换器 */}
-          <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-md border border-gray-200/50">
-            <span className="text-gray-600 text-sm">🌍</span>
-            <LanguageSwitcher currentLocale={locale} />
+          {/* 右侧：语言切换器 + 国家选择器 */}
+          <div className="flex items-center gap-3">
+            {/* 语言切换器 */}
+            <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-md border border-gray-200/50">
+              <span className="text-gray-600 text-sm">🌍</span>
+              <LanguageSwitcher currentLocale={locale} />
+            </div>
+            
+            {/* 国家选择器 */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-md border border-gray-200/50">
+              <CountrySelector locale={locale as 'en' | 'zh'} />
+            </div>
           </div>
         </div>
       </div>

@@ -10,6 +10,7 @@ import { downloadDateCalculationICS } from '@/lib/ics-generator';
 import { enhanceDateInfo, type EnhancedDateInfo } from '@/lib/date-info-enhancer';
 import { getHolidays } from '@/lib/holidays';
 import EnhancedDateResult from '@/components/EnhancedDateResult';
+import { useUserContext } from '@/store/user-context';
 
 interface DateCalculatorProps {
   days: number;
@@ -23,6 +24,9 @@ export default function DateCalculator({ days, locale, type, mode }: DateCalcula
   const [targetDate, setTargetDate] = useState<Date | null>(null);
   const [enhancedInfo, setEnhancedInfo] = useState<EnhancedDateInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // 从 Zustand 获取用户选择的国家
+  const { country } = useUserContext();
 
   useEffect(() => {
     async function calculateDate() {
@@ -47,17 +51,16 @@ export default function DateCalculator({ days, locale, type, mode }: DateCalcula
       
       // Get holidays and generate enhanced info
       try {
-        // Default country to US for now (will be replaced with country selector later)
-        const country = 'US';
+        // 使用用户选择的国家
         const year = result.getFullYear();
-        const holidays = await getHolidays(country, year);
+        const holidaysResult = await getHolidays(country, year);
         
         const info = await enhanceDateInfo(
           result,
           now,
           locale,
           country,
-          holidays,
+          holidaysResult.data, // 使用 .data 获取实际数组
           mode
         );
         setEnhancedInfo(info);
@@ -70,7 +73,7 @@ export default function DateCalculator({ days, locale, type, mode }: DateCalcula
     }
     
     calculateDate();
-  }, [days, type, mode, locale]);
+  }, [days, type, mode, locale, country]); // 添加 country 作为依赖
 
   if (!today || !targetDate) {
     return (

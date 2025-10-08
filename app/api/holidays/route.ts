@@ -28,10 +28,45 @@ export async function GET(request: NextRequest) {
     );
     
     if (!response.ok) {
-      throw new Error(`Nager.Date API error: ${response.status} ${response.statusText}`);
+      // 静默降级，不抛出错误到控制台
+      return NextResponse.json({
+        success: false,
+        data: [],
+        meta: {
+          country,
+          year: Number(year),
+          fallback: 'weekend-only',
+          error: `API returned ${response.status}`
+        }
+      }, { 
+        status: 200, // 返回 200，前端会正常处理空数据
+        headers: {
+          'Cache-Control': 'public, s-maxage=300'
+        }
+      });
     }
     
-    const holidays = await response.json();
+    const text = await response.text();
+    if (!text) {
+      // 空响应，静默降级
+      return NextResponse.json({
+        success: false,
+        data: [],
+        meta: {
+          country,
+          year: Number(year),
+          fallback: 'weekend-only',
+          error: 'Empty response from API'
+        }
+      }, { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, s-maxage=300'
+        }
+      });
+    }
+    
+    const holidays = JSON.parse(text);
     
     return NextResponse.json({
       success: true,
@@ -50,7 +85,10 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Holidays API error:', error);
+    // 静默降级，仅在开发环境输出错误
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[Holidays API] Failed for ${country}/${year}:`, error instanceof Error ? error.message : error);
+    }
     
     return NextResponse.json({
       success: false,
@@ -62,9 +100,9 @@ export async function GET(request: NextRequest) {
         error: error instanceof Error ? error.message : 'Unknown error'
       }
     }, { 
-      status: 500,
+      status: 200, // 返回 200，静默降级
       headers: {
-        'Cache-Control': 'public, s-maxage=300' // 失败时缓存 5 分钟
+        'Cache-Control': 'public, s-maxage=300'
       }
     });
   }

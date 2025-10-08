@@ -12,10 +12,11 @@ import {
   getQuarter as dateFnsGetQuarter,
   format,
   addDays,
-  isSameDay,
-  isWeekend as dateFnsIsWeekend
+  isSameDay
 } from 'date-fns';
 import { Holiday } from './holidays';
+import { isWeekend as isCountryWeekend } from '@/lib/country-config';
+import type { CountryCode } from '@/types/user-context';
 
 /**
  * 增强的日期信息接口
@@ -81,15 +82,15 @@ export function getQuarter(date: Date): number {
 
 /**
  * 判断是否为工作日
- * 考虑周末和节假日
+ * 考虑周末和节假日（按国家）
  */
 export function isWorkingDay(
   date: Date,
-  country: string,
+  country: CountryCode,
   holidays: Holiday[]
 ): boolean {
-  // 检查是否是周末
-  if (dateFnsIsWeekend(date)) {
+  // 使用国家特定的周末规则
+  if (isCountryWeekend(date, country)) {
     return false;
   }
   
@@ -102,11 +103,12 @@ export function isWorkingDay(
 }
 
 /**
- * 计算两个日期之间的工作日数量
+ * 计算两个日期之间的工作日数量（按国家）
  */
 export function countWorkdays(
   startDate: Date,
   endDate: Date,
+  country: CountryCode,
   holidays: Holiday[]
 ): { workdays: number; weekends: number; holidays: number; excluded: Date[] } {
   let workdays = 0;
@@ -131,7 +133,7 @@ export function countWorkdays(
     if (isHoliday) {
       holidaysCount++;
       excluded.push(currentDate);
-    } else if (dateFnsIsWeekend(currentDate)) {
+    } else if (isCountryWeekend(currentDate, country)) {
       weekends++;
       excluded.push(currentDate);
     } else {
@@ -269,7 +271,7 @@ export async function enhanceDateInfo(
   targetDate: Date,
   today: Date,
   locale: string,
-  country: string,
+  country: CountryCode,
   holidays: Holiday[],
   mode: 'calendar' | 'business'
 ): Promise<EnhancedDateInfo> {
@@ -280,10 +282,10 @@ export async function enhanceDateInfo(
   const dayOfYear = getDayOfYear(targetDate);
   const quarter = getQuarter(targetDate);
   
-  // 工作日信息
+  // 工作日信息（使用国家）
   const isWorkday = isWorkingDay(targetDate, country, holidays);
   const { workdays, weekends, holidays: holidaysCount, excluded } = 
-    countWorkdays(today, targetDate, holidays);
+    countWorkdays(today, targetDate, country, holidays);
   
   // 节假日相关
   const nearestHoliday = findNearestHoliday(targetDate, holidays);

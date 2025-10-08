@@ -1,0 +1,91 @@
+[
+  {
+    "date": "2025-01-01",
+    "localName": "New Year's Day",
+    "name": "New Year's Day",
+    "countryCode": "US",
+    "global": true,
+    "types": ["Public"]
+  },
+  {
+    "date": "2025-01-20",
+    "localName": "Martin Luther King Jr. Day",
+    "name": "Martin Luther King Jr. Day",
+    "countryCode": "US",
+    "global": true,
+    "types": ["Public"]
+  },
+  {
+    "date": "2025-02-17",
+    "localName": "Presidents' Day",
+    "name": "Presidents' Day",
+    "countryCode": "US",
+    "global": true,
+    "types": ["Public"]
+  },
+  {
+    "date": "2025-05-26",
+    "localName": "Memorial Day",
+    "name": "Memorial Day",
+    "countryCode": "US",
+    "global": true,
+    "types": ["Public"]
+  },
+  {
+    "date": "2025-06-19",
+    "localName": "Juneteenth",
+    "name": "Juneteenth",
+    "countryCode": "US",
+    "global": true,
+    "types": ["Public"]
+  },
+  {
+    "date": "2025-07-04",
+    "localName": "Independence Day",
+    "name": "Independence Day",
+    "countryCode": "US",
+    "global": true,
+    "types": ["Public"]
+  },
+  {
+    "date": "2025-09-01",
+    "localName": "Labor Day",
+    "name": "Labor Day",
+    "countryCode": "US",
+    "global": true,
+    "types": ["Public"]
+  },
+  {
+    "date": "2025-10-13",
+    "localName": "Columbus Day",
+    "name": "Columbus Day",
+    "countryCode": "US",
+    "global": false,
+    "types": ["Public"]
+  },
+  {
+    "date": "2025-11-11",
+    "localName": "Veterans Day",
+    "name": "Veterans Day",
+    "countryCode": "US",
+    "global": true,
+    "types": ["Public"]
+  },
+  {
+    "date": "2025-11-27",
+    "localName": "Thanksgiving Day",
+    "name": "Thanksgiving Day",
+    "countryCode": "US",
+    "global": true,
+    "types": ["Public"]
+  },
+  {
+    "date": "2025-12-25",
+    "localName": "Christmas Day",
+    "name": "Christmas Day",
+    "countryCode": "US",
+    "global": true,
+    "types": ["Public"]
+  }
+]
+

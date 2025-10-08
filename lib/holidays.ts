@@ -1,24 +1,40 @@
 import { format } from 'date-fns';
+import type { CountryCode } from '@/types/user-context';
 
 export interface Holiday {
   date: string;        // ISO 8601: "2025-01-01"
   localName: string;   // 本地语言名称
   name: string;        // 英文名称
   countryCode: string;
-  global: boolean;     // 是否全国性节假日
-  types: string[];     // ["Public", "Bank", "School", etc.]
+  global?: boolean;    // 是否全国性节假日
+  types?: string[];    // ["Public", "Bank", "School", etc.]
 }
 
 /**
- * 从 API 获取节假日（带缓存）
+ * 节假日数据返回结果
+ */
+export interface HolidaysResult {
+  data: Holiday[];
+  source: 'api' | 'fallback' | 'empty';
+  lastUpdate: string;
+}
+
+/**
+ * 从 API 获取节假日（多层数据源）
+ * 
+ * 数据源优先级：
+ * 1. Nager.Date API（主源）
+ * 2. 本地 JSON（Tier 1 国家兜底）
+ * 3. 空数组（无数据）
+ * 
  * @param country - 国家代码
  * @param year - 年份
- * @returns 节假日数组
+ * @returns 节假日数据结果
  */
 export async function getHolidays(
-  country: string,
+  country: CountryCode,
   year: number
-): Promise<Holiday[]> {
+): Promise<HolidaysResult> {
   try {
     // 检查是否在浏览器环境
     const isBrowser = typeof window !== 'undefined';
@@ -45,22 +61,44 @@ export async function getHolidays(
     
     const response = await fetch(url, fetchOptions);
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch holidays: ${response.status}`);
+    if (response.ok) {
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        return {
+          data: data.data,
+          source: 'api',
+          lastUpdate: new Date().toISOString()
+        };
+      }
     }
-    
-    const data = await response.json();
-    
-    if (!data.success) {
-      console.error('Holidays API error:', data.meta?.error);
-      return [];
-    }
-    
-    return data.data || [];
   } catch (error) {
-    console.error('Error fetching holidays:', error);
-    return [];
+    console.error('Nager.Date API failed:', error);
   }
+  
+  // 降级到本地 JSON（仅 Tier 1 国家）
+  try {
+    const tier1Countries: CountryCode[] = ['US', 'CN', 'GB', 'JP', 'DE'];
+    
+    if (tier1Countries.includes(country)) {
+      // 动态导入本地 JSON（使用绝对路径）
+      const localData = await import(`../data/holidays/${country}-${year}.json`);
+      return {
+        data: localData.default || localData,
+        source: 'fallback',
+        lastUpdate: new Date().toISOString()
+      };
+    }
+  } catch (error) {
+    console.error(`Local fallback failed for ${country}-${year}:`, error);
+  }
+  
+  // 无数据
+  return {
+    data: [],
+    source: 'empty',
+    lastUpdate: new Date().toISOString()
+  };
 }
 
 /**
