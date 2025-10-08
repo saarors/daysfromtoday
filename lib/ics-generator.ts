@@ -54,7 +54,7 @@ function escapeICSText(text: string): string {
  * 生成 ICS 日历文件内容
  */
 export function generateICS(options: ICSEventOptions): string {
-  const { title, date, description, reminder = true, locale = 'en' } = options;
+  const { title, date, description, reminder = true } = options;
   
   const eventDate = formatICSDate(date);
   const now = formatICSDateTime(new Date());
@@ -115,8 +115,7 @@ export function generateDateCalculationICS(
   days: number,
   targetDate: Date,
   type: 'future' | 'past',
-  mode: 'calendar' | 'business',
-  locale: string = 'en'
+  mode: 'calendar' | 'business'
 ): string {
   const text = {
     en: {
@@ -165,11 +164,9 @@ export function downloadDateCalculationICS(
   days: number,
   targetDate: Date,
   type: 'future' | 'past',
-  mode: 'calendar' | 'business',
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  locale: string = 'en'
+  mode: 'calendar' | 'business'
 ): void {
-  const icsContent = generateDateCalculationICS(days, targetDate, type, mode, locale);
+  const icsContent = generateDateCalculationICS(days, targetDate, type, mode);
   const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   

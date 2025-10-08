@@ -90,7 +90,7 @@ export default function DateCalculator({ days, locale, type, mode }: DateCalcula
   // 下载日历事件
   const handleDownloadICS = () => {
     if (!targetDate) return;
-    downloadDateCalculationICS(days, targetDate, type, mode, locale);
+    downloadDateCalculationICS(days, targetDate, type, mode);
   };
 
   const text = {

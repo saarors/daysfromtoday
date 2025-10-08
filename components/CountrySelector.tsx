@@ -8,7 +8,7 @@
 import { useState, useEffect } from 'react';
 import { useUserContext } from '@/store/user-context';
 import { COUNTRIES } from '@/lib/country-config';
-import type { Locale } from '@/types/user-context';
+import type { Locale, CountryCode } from '@/types/user-context';
 
 interface CountrySelectorProps {
   locale: Locale;
