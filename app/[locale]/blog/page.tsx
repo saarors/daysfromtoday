@@ -15,6 +15,26 @@ interface PageProps {
 // 博客文章列表（未来可以从数据库或文件系统读取）
 const blogPosts = [
   {
+    slug: 'why-i-built-daysfromtoday',
+    title: {
+      en: 'Why I Built DaysFromToday: A Programmer\'s Time Anxiety',
+      zh: '为什么我要做 DaysFromToday：一个程序员的时间焦虑'
+    },
+    excerpt: {
+      en: 'As a programmer, I often need to calculate dates. This seemingly simple need made me realize the importance of time management. This is the story of how DaysFromToday was born.',
+      zh: '作为一个程序员，我经常需要计算日期。这个看似简单的需求，却让我意识到时间管理的重要性。这是 DaysFromToday 诞生的故事。'
+    },
+    date: '2025-10-08',
+    readTime: {
+      en: '5 min read',
+      zh: '5 分钟阅读'
+    },
+    category: {
+      en: 'Story',
+      zh: '故事'
+    }
+  },
+  {
     slug: 'how-to-calculate-days-from-today',
     title: {
       en: 'How to Calculate Days From Today: A Complete Guide',
