@@ -3,14 +3,16 @@ import Link from 'next/link';
 import TopNav from '@/components/TopNav';
 import Breadcrumb from '@/components/Breadcrumb';
 
+interface PageParams {
+  locale: string;
+}
+
 interface PageProps {
-  params: {
-    locale: string;
-  };
+  params: Promise<PageParams>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { locale } = params;
+  const { locale } = await params;
   
   const title = locale === 'zh' 
     ? '为什么我要做 DaysFromToday：一个程序员的时间焦虑' 
@@ -43,8 +45,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default function WhyIBuiltPage({ params }: PageProps) {
-  const { locale } = params;
+export default async function WhyIBuiltPage({ params }: PageProps) {
+  const { locale } = await params;
   const isChinese = locale === 'zh';
 
   const content = {
