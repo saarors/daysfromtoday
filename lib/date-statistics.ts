@@ -38,7 +38,8 @@ export async function calculateDateStatistics(
   const weekends = allDates.filter(date => isWeekend(date)).length;
   
   // 获取节假日（不包括周末的节假日）
-  const holidays = await getHolidays(countryCode);
+  const year = startDate.getFullYear();
+  const holidays = await getHolidays(countryCode, year);
   const holidayDates = holidays
     .filter(holiday => {
       const holidayDate = new Date(holiday.date);
