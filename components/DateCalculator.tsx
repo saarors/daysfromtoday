@@ -7,6 +7,9 @@ import { zhCN, enUS } from 'date-fns/locale';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { downloadDateCalculationICS } from '@/lib/ics-generator';
+import { enhanceDateInfo, type EnhancedDateInfo } from '@/lib/date-info-enhancer';
+import { getHolidays } from '@/lib/holidays';
+import EnhancedDateResult from '@/components/EnhancedDateResult';
 
 interface DateCalculatorProps {
   days: number;
@@ -18,25 +21,56 @@ interface DateCalculatorProps {
 export default function DateCalculator({ days, locale, type, mode }: DateCalculatorProps) {
   const [today, setToday] = useState<Date | null>(null);
   const [targetDate, setTargetDate] = useState<Date | null>(null);
+  const [enhancedInfo, setEnhancedInfo] = useState<EnhancedDateInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const now = new Date();
-    setToday(now);
-    
-    if (mode === 'calendar') {
-      const result = type === 'future' 
-        ? addDaysSafe(now, days)
-        : subDaysSafe(now, days);
+    async function calculateDate() {
+      setIsLoading(true);
+      const now = new Date();
+      setToday(now);
+      
+      // Calculate target date
+      let result: Date;
+      if (mode === 'calendar') {
+        result = type === 'future' 
+          ? addDaysSafe(now, days)
+          : subDaysSafe(now, days);
+      } else {
+        // For business days, we'll use a simple calculation for now
+        // In a real app, you'd want to use the business days calculation
+        result = type === 'future' 
+          ? addDaysSafe(now, days)
+          : subDaysSafe(now, days);
+      }
       setTargetDate(result);
-    } else {
-      // For business days, we'll use a simple calculation for now
-      // In a real app, you'd want to use the business days calculation
-      const result = type === 'future' 
-        ? addDaysSafe(now, days)
-        : subDaysSafe(now, days);
-      setTargetDate(result);
+      
+      // Get holidays and generate enhanced info
+      try {
+        // Default country to US for now (will be replaced with country selector later)
+        const country = 'US';
+        const year = result.getFullYear();
+        const holidays = await getHolidays(country, year);
+        
+        const info = await enhanceDateInfo(
+          result,
+          now,
+          locale,
+          country,
+          holidays,
+          mode
+        );
+        setEnhancedInfo(info);
+      } catch (error) {
+        console.error('Failed to generate enhanced info:', error);
+        // Continue without enhanced info
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }, [days, type, mode]);
+    
+    calculateDate();
+  }, [days, type, mode, locale]);
 
   if (!today || !targetDate) {
     return (
@@ -157,6 +191,11 @@ export default function DateCalculator({ days, locale, type, mode }: DateCalcula
           </div>
         </CardContent>
       </Card>
+      
+      {/* Enhanced Date Information */}
+      {enhancedInfo && !isLoading && (
+        <EnhancedDateResult info={enhancedInfo} locale={locale} />
+      )}
     </div>
   );
 }
