@@ -48,9 +48,11 @@ export async function addBusinessDays(
   // 获取节假日数据（当前年和下一年）
   const currentYear = currentDate.getFullYear();
   const nextYear = currentYear + 1;
+  const currentYearResult = await getHolidays(countryCode, currentYear);
+  const nextYearResult = await getHolidays(countryCode, nextYear);
   const holidays = [
-    ...(await getHolidays(countryCode, currentYear)),
-    ...(await getHolidays(countryCode, nextYear))
+    ...currentYearResult.data,
+    ...nextYearResult.data
   ];
   
   while (remainingDays > 0) {
@@ -127,9 +129,11 @@ export async function subBusinessDays(
   // 获取节假日数据（当前年和上一年）
   const currentYear = currentDate.getFullYear();
   const prevYear = currentYear - 1;
+  const currentYearResult = await getHolidays(countryCode, currentYear);
+  const prevYearResult = await getHolidays(countryCode, prevYear);
   const holidays = [
-    ...(await getHolidays(countryCode, currentYear)),
-    ...(await getHolidays(countryCode, prevYear))
+    ...currentYearResult.data,
+    ...prevYearResult.data
   ];
   
   while (remainingDays > 0) {
