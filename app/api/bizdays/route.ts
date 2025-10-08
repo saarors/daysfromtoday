@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { addBusinessDays, subBusinessDays } from '@/lib/bizdays';
+import type { CountryCode } from '@/types/user-context';
 import { parseISO, isValid } from 'date-fns';
 
 export const runtime = 'edge';
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
   try {
     const fromParam = searchParams.get('from');
     const daysParam = searchParams.get('days');
-    const country = searchParams.get('country') || 'US';
+    const country = (searchParams.get('country') || 'US') as CountryCode;
     const timezone = searchParams.get('timezone') || 'UTC';
     const direction = searchParams.get('direction') || 'future';
     
