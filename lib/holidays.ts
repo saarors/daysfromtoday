@@ -1,7 +1,5 @@
 import { format } from 'date-fns';
 import type { CountryCode } from '@/types/user-context';
-import { getLocalHolidays } from '@/data/holidays/index';
-import type { HolidayEntry } from '@/data/holidays/types';
 
 export interface Holiday {
   date: string;        // ISO 8601: "2025-01-01"
@@ -22,26 +20,11 @@ export interface HolidaysResult {
 }
 
 /**
- * 转换本地配置格式到兼容格式
- */
-function convertToHolidayFormat(entries: HolidayEntry[], country: CountryCode): Holiday[] {
-  return entries.map(entry => ({
-    date: entry.date,
-    localName: entry.name.zh,
-    name: entry.name.en,
-    countryCode: country,
-    global: entry.isNational,
-    types: [entry.type]
-  }));
-}
-
-/**
- * 从多层数据源获取节假日
+ * 从 API 获取节假日数据
  * 
  * 数据源优先级：
- * 1. 本地 Markdown 配置（主源）
- * 2. Nager.Date API（降级）
- * 3. 空数组（无数据）
+ * 1. /api/holidays 端点（包含本地配置 + Nager.Date API 降级）
+ * 2. 空数组（无数据）
  * 
  * @param country - 国家代码
  * @param year - 年份
@@ -51,22 +34,6 @@ export async function getHolidays(
   country: CountryCode,
   year: number
 ): Promise<HolidaysResult> {
-  // 1. 优先使用本地配置
-  try {
-    const localResult = await getLocalHolidays(country, year);
-    
-    if (localResult.success && localResult.data.length > 0) {
-      return {
-        data: convertToHolidayFormat(localResult.data, country),
-        source: 'local',
-        lastUpdate: localResult.lastUpdate
-      };
-    }
-  } catch (error) {
-    console.warn(`Local holidays failed for ${country} ${year}:`, error);
-  }
-  
-  // 2. 降级到 API
   try {
     // 检查是否在浏览器环境
     const isBrowser = typeof window !== 'undefined';
@@ -105,10 +72,10 @@ export async function getHolidays(
       }
     }
   } catch (error) {
-    console.error('API fallback failed:', error);
+    console.error('API request failed:', error);
   }
   
-  // 3. 无数据
+  // 降级：无数据
   return {
     data: [],
     source: 'empty',
