@@ -200,3 +200,11 @@ export function getCountryInfo(code: CountryCode): CountryInfo | undefined {
  */
 export const DEFAULT_COUNTRY: CountryCode = 'US';
 
+/**
+ * 国家层级分组
+ */
+export const COUNTRY_TIERS = {
+  tier1: ['US', 'CN', 'GB', 'JP', 'DE'] as CountryCode[],
+  tier2: ['CA', 'AU', 'FR', 'ES', 'IT', 'BR', 'IN', 'MX', 'SG', 'AE'] as CountryCode[]
+};
+

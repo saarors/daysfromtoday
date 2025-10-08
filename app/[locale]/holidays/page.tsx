@@ -47,13 +47,7 @@ export default async function HolidaysPage({ params }: PageProps) {
       <TopNav locale={locale} />
       
       <div className="container mx-auto px-4 py-12 pt-24 md:pt-32 max-w-7xl">
-        <Breadcrumb 
-          locale={locale}
-          items={[
-            { label: locale === 'zh' ? '首页' : 'Home', href: `/${locale}` },
-            { label: locale === 'zh' ? '节假日列表' : 'Holidays' }
-          ]}
-        />
+        <Breadcrumb locale={locale} />
         
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gradient-calendly">
