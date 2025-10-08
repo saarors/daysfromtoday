@@ -41,23 +41,51 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   });
 
-  // 2. FAQ 页面（所有语言）
+  // 2. 纪念日页面（所有语言）
   locales.forEach(locale => {
     sitemapEntries.push({
-      url: `${baseUrl}/${locale}/faq`,
+      url: `${baseUrl}/${locale}/anniversaries`,
       lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.9,
+      changeFrequency: 'weekly',
+      priority: 0.8,
     });
   });
 
-  // 3. 常用日期计算页面（优化 SEO）
+  // 3. 节假日列表页面（所有语言）
+  locales.forEach(locale => {
+    sitemapEntries.push({
+      url: `${baseUrl}/${locale}/holidays`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    });
+  });
+
+  // 4. 博客页面（所有语言）
+  locales.forEach(locale => {
+    sitemapEntries.push({
+      url: `${baseUrl}/${locale}/blog`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    });
+    
+    // 博客文章
+    sitemapEntries.push({
+      url: `${baseUrl}/${locale}/blog/why-i-built-daysfromtoday`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    });
+  });
+
+  // 5. 常用日期计算页面（优化 SEO）
   const commonDays = [
     1, 2, 3, 4, 5, 6, 7, 10, 14, 15, 20, 21, 28, 30, 
     45, 60, 90, 100, 120, 180, 365
   ];
 
-  // 3.1 未来日期（自然日）
+  // 5.1 未来日期（自然日）
   locales.forEach(locale => {
     commonDays.forEach(days => {
       sitemapEntries.push({
@@ -69,7 +97,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   });
 
-  // 3.2 过去日期（自然日）
+  // 5.2 过去日期（自然日）
   locales.forEach(locale => {
     commonDays.forEach(days => {
       sitemapEntries.push({
@@ -81,7 +109,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   });
 
-  // 3.3 工作日（未来）
+  // 5.3 工作日（未来）
   const businessDays = [
     1, 2, 3, 5, 7, 10, 14, 15, 20, 21, 28, 30, 
     45, 60, 90
@@ -98,7 +126,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   });
 
-  // 3.4 工作日（过去）
+  // 5.4 工作日（过去）
   locales.forEach(locale => {
     businessDays.forEach(days => {
       sitemapEntries.push({

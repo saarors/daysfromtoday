@@ -25,11 +25,13 @@ export default function TopNav({ locale }: TopNavProps) {
     en: {
       home: 'Home',
       anniversaries: 'Anniversaries',
+      holidays: 'Holidays',
       blog: 'Blog'
     },
     zh: {
       home: '首页',
       anniversaries: '纪念日',
+      holidays: '节假日',
       blog: '博客'
     }
   };
@@ -70,6 +72,17 @@ export default function TopNav({ locale }: TopNavProps) {
               }`}
             >
               {t.anniversaries}
+            </Link>
+            <span className="text-gray-300">|</span>
+            <Link 
+              href={`/${locale}/holidays`}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                isActive(`/${locale}/holidays`)
+                  ? 'text-blue-600 bg-blue-50'
+                  : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+              }`}
+            >
+              {t.holidays}
             </Link>
             <span className="text-gray-300">|</span>
             <Link 
