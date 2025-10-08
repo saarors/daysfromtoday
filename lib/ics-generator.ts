@@ -152,8 +152,7 @@ export function generateDateCalculationICS(
     title,
     date: targetDate,
     description,
-    reminder: true,
-    locale
+    reminder: true
   });
 }
 
