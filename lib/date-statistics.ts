@@ -10,6 +10,7 @@
 
 import { eachDayOfInterval, isWeekend, isSameDay } from 'date-fns';
 import { getHolidays } from './holidays';
+import type { CountryCode } from '@/types/user-context';
 
 export interface DateStatistics {
   totalDays: number;        // 总天数
@@ -24,7 +25,7 @@ export interface DateStatistics {
 export async function calculateDateStatistics(
   startDate: Date,
   endDate: Date,
-  countryCode: string = 'US'
+  countryCode: CountryCode = 'US'
 ): Promise<DateStatistics> {
   // 确保 startDate < endDate
   const start = startDate < endDate ? startDate : endDate;
@@ -39,7 +40,8 @@ export async function calculateDateStatistics(
   
   // 获取节假日（不包括周末的节假日）
   const year = startDate.getFullYear();
-  const holidays = await getHolidays(countryCode, year);
+  const holidaysResult = await getHolidays(countryCode, year);
+  const holidays = holidaysResult.data;
   const holidayDates = holidays
     .filter(holiday => {
       const holidayDate = new Date(holiday.date);
