@@ -199,41 +199,182 @@ const content = {
 
 ## 🚢 发布上线
 
-### 发布流程
+### 完整发布流程
+
+#### 方法一：标准发布流程（推荐）
 
 ```bash
-# 1. 本地预览
+# 1. 创建新文章
+node scripts/create-blog-post.js your-article-slug Story
+
+# 2. 编辑内容
+# 打开生成的文件 app/[locale]/blog/your-article-slug/page.tsx
+# 填写中英文内容、标题、摘要等
+
+# 3. 准备图片
+# 上传封面图到 /public/images/blog/your-article-slug-cover.jpg (1200×675px)
+# 上传OG图到 /public/images/blog/your-article-slug-og.jpg (1200×630px)
+
+# 4. 本地预览
 npm run dev
-# 访问 http://localhost:3000/zh/blog/your-slug
+# 访问 http://localhost:3000/zh/blog/your-article-slug
+# 检查排版、内容、链接
 
-# 2. 更新博客列表
-# 编辑 app/[locale]/blog/page.tsx
-# 添加新文章到 blogPosts 数组
-
-# 3. 提交代码
+# 5. 提交代码
 git add .
 git commit -m "feat: 发布博客 - 文章标题"
 git push origin main
 
-# 4. 部署到 Vercel
+# 6. 部署到生产环境
+vercel --prod
+
+# 7. 验证部署
+# 访问 https://www.daysfromtoday.ai/zh/blog/your-article-slug
+# 测试 SEO 元数据、社交分享
+```
+
+#### 方法二：快速发布流程
+
+```bash
+# 一键创建、编辑、提交、部署
+node scripts/create-blog-post.js my-story Story && \
+vim app/[locale]/blog/my-story/page.tsx && \
+git add . && \
+git commit -m "feat: 发布博客 - My Story" && \
+git push origin main && \
 vercel --prod
 ```
 
-### 更新博客列表
+---
 
-在 `app/[locale]/blog/page.tsx` 中添加新文章：
+## 🔄 更新博客内容
+
+### 更新已发布的文章
+
+```bash
+# 1. 编辑文章
+vim app/[locale]/blog/existing-article/page.tsx
+
+# 2. 更新修改日期（可选）
+# 在 blogPost 对象中更新 date 字段
+
+# 3. 本地预览
+npm run dev
+
+# 4. 提交更新
+git add app/[locale]/blog/existing-article/page.tsx
+git commit -m "fix: 更新博客内容 - 文章标题"
+git push origin main
+
+# 5. 部署
+vercel --prod
+```
+
+### 更新博客图片
+
+```bash
+# 1. 替换图片文件
+cp new-cover.jpg public/images/blog/article-slug-cover.jpg
+
+# 2. 优化图片（推荐使用 ImageOptim 或在线工具）
+# 确保大小 < 200KB
+
+# 3. 提交
+git add public/images/blog/
+git commit -m "chore: 更新博客封面图"
+git push origin main
+vercel --prod
+```
+
+---
+
+## 🏠 首页博客卡片管理
+
+### 置顶博客文章到首页
+
+编辑 `app/[locale]/home-client.tsx`：
+
+1. **更新博客文本内容**：
+
+```typescript
+// 在 text.en 和 text.zh 中更新
+blog: {
+  title: 'Featured Story',  // 或 'Latest from Blog'
+  firstPost: {
+    title: '您的文章标题',
+    date: '2025-10-08',
+    excerpt: '吸引人的摘要内容（100-160字符）',
+    readMore: 'Read Story',
+    readTime: '6 min read'
+  }
+}
+```
+
+2. **更新博客卡片链接**：
+
+```typescript
+// 找到 Blog Section，更新链接
+<Link href={`/${locale}/blog/your-article-slug`} className="block">
+```
+
+3. **自定义卡片样式**（可选）：
+
+```typescript
+// 修改配图部分
+<div className="md:w-2/5 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500">
+  <div className="text-white text-center">
+    <div className="text-7xl mb-4">🕰️</div>  {/* 自定义图标 */}
+    <div className="text-2xl font-bold mb-2">标题行1</div>
+    <div className="text-3xl font-extrabold mb-3">标题行2</div>
+  </div>
+</div>
+```
+
+4. **提交更新**：
+
+```bash
+git add app/[locale]/home-client.tsx
+git commit -m "feat: 首页置顶博客 - 文章标题"
+git push origin main
+vercel --prod
+```
+
+### Featured 标识管理
+
+显示 Featured 标识：
+```typescript
+<div className="absolute top-4 right-4 z-10">
+  <Badge className="bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold px-4 py-1.5 text-sm shadow-lg">
+    ⭐ Featured Story
+  </Badge>
+</div>
+```
+
+移除 Featured 标识：
+```typescript
+// 删除或注释掉上述代码块
+```
+
+---
+
+## 📋 博客列表页面管理
+
+### 添加文章到博客列表
+
+编辑 `app/[locale]/blog/page.tsx`：
 
 ```typescript
 const blogPosts = [
+  // 新文章放在最前面（按时间倒序）
   {
-    slug: 'your-article-slug',
+    slug: 'newest-article',
     title: {
-      en: 'Your Article Title',
-      zh: '您的文章标题'
+      en: 'Newest Article Title',
+      zh: '最新文章标题'
     },
     excerpt: {
-      en: 'Short excerpt in English',
-      zh: '中文简短摘要'
+      en: 'English excerpt (100-160 chars)',
+      zh: '中文摘要（80-120字符）'
     },
     date: '2025-10-08',
     readTime: {
@@ -243,10 +384,98 @@ const blogPosts = [
     category: {
       en: 'Story',
       zh: '故事'
-    }
+    },
+    featured: true  // 可选：标记为精选文章
   },
   // ... 其他文章
 ];
+```
+
+### 文章排序
+
+- **时间倒序**（推荐）：最新文章在最前面
+- **Featured 优先**：精选文章置顶
+- **分类排序**：按Story/Guide/News/Update分组
+
+---
+
+## 🔍 SEO 提交与验证
+
+### Google Search Console 提交
+
+```bash
+# 1. 获取新文章 URL
+https://www.daysfromtoday.ai/zh/blog/your-article-slug
+
+# 2. 在 GSC 中提交
+- 打开 Google Search Console
+- 使用 URL 检查工具
+- 请求编入索引
+
+# 3. 验证 Sitemap（自动更新）
+https://www.daysfromtoday.ai/sitemap.xml
+```
+
+### 社交分享测试
+
+```bash
+# Facebook Debugger
+https://developers.facebook.com/tools/debug/
+# 输入文章 URL，检查 OG 标签
+
+# Twitter Card Validator
+https://cards-dev.twitter.com/validator
+# 输入文章 URL，检查 Twitter Card
+
+# LinkedIn Post Inspector
+https://www.linkedin.com/post-inspector/
+# 输入文章 URL，检查预览效果
+```
+
+---
+
+## 🛠️ 常见操作命令
+
+### 快速命令清单
+
+```bash
+# 创建新文章
+node scripts/create-blog-post.js <slug> <category>
+
+# 本地预览
+npm run dev
+
+# 清理缓存重新构建
+rm -rf .next && npm run dev
+
+# 提交代码
+git add . && git commit -m "feat: 发布博客 - 标题" && git push origin main
+
+# 部署到生产
+vercel --prod
+
+# 查看部署日志
+vercel inspect <deployment-url> --logs
+
+# 回滚到上一个版本
+vercel rollback
+```
+
+### 批量操作
+
+```bash
+# 批量创建文章
+for slug in story-1 story-2 story-3; do
+  node scripts/create-blog-post.js $slug Story
+done
+
+# 批量优化图片（需要 ImageOptim CLI）
+imageoptim public/images/blog/*.jpg
+
+# 批量提交多篇文章
+git add app/[locale]/blog/*/
+git commit -m "feat: 批量发布博客文章"
+git push origin main
 ```
 
 ---
