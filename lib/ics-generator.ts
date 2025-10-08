@@ -136,14 +136,14 @@ export function generateDateCalculationICS(
     }
   };
   
-  const t = text[locale as keyof typeof text] || text.en;
+  const t = text.en; // 默认使用英文
   const typeText = type === 'future' ? t.future(days) : t.past(days);
   const modeText = mode === 'calendar' ? t.calendar : t.business;
-  const dateText = format(targetDate, locale === 'zh' ? 'yyyy年M月d日' : 'MMM d, yyyy');
+  const dateText = format(targetDate, 'MMM d, yyyy');
   
   const title = `${typeText} - ${dateText}`;
   const description = t.description(
-    type === 'future' ? (locale === 'zh' ? '之后' : 'from today') : (locale === 'zh' ? '之前' : 'ago'),
+    type === 'future' ? 'from today' : 'ago',
     modeText,
     dateText
   );
