@@ -255,3 +255,11 @@ export function formatCountdown(daysUntil: number, locale: string = 'en'): strin
     return locale === 'zh' ? `${daysAgo} 天前` : `${daysAgo} days ago`;
   }
 }
+
+/**
+ * 格式化纪念日类型显示
+ */
+export function formatAnniversaryType(type: Anniversary['type'], locale: string = 'en'): string {
+  const typeConfig = ANNIVERSARY_TYPES[type];
+  return locale === 'zh' ? typeConfig.name : typeConfig.nameEn;
+}

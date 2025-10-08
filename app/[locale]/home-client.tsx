@@ -14,7 +14,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+import TopNav from '@/components/TopNav';
+import HomeAnniversaryCards from '@/components/HomeAnniversaryCards';
 
 interface HomePageClientProps {
   locale: string;
@@ -142,6 +143,9 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
+      {/* 顶部导航栏 */}
+      <TopNav locale={locale} />
+      
       {/* 装饰性背景元素 */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="decoration-blob decoration-blob-pink w-96 h-96 -top-48 -right-48"></div>
@@ -149,8 +153,8 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
         <div className="decoration-blob decoration-blob-blue w-64 h-64 top-1/2 right-1/4"></div>
       </div>
 
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24 relative z-10">
+      {/* Hero Section - 添加顶部间距以避免被顶部导航遮挡 */}
+      <section className="container mx-auto px-4 py-16 md:py-24 pt-24 md:pt-32 relative z-10">
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gradient-calendly">
             {t.slogan}
@@ -364,6 +368,9 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
         </div>
       </section>
 
+      {/* Anniversaries Section - 使用动态卡片组件 */}
+      <HomeAnniversaryCards locale={locale} />
+
       {/* Blog Section */}
       <section className="container mx-auto px-4 py-16 bg-white">
         <div className="max-w-6xl mx-auto">
@@ -371,7 +378,7 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
             {t.blog.title}
           </h2>
           
-          <Link href={`/${locale}/faq`} className="block">
+          <Link href={`/${locale}/blog/how-to-calculate-days-from-today`} className="block">
             <Card className="card-glass hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden">
               <div className="md:flex">
                 {/* 博客配图 */}
@@ -412,60 +419,6 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
           </Link>
         </div>
       </section>
-
-      {/* Anniversaries Section */}
-      <section className="container mx-auto px-4 py-16 bg-gradient-to-br from-purple-50 to-pink-50">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold mb-8 text-center text-gray-900">
-            {t.anniversaries.title}
-          </h2>
-          
-          <Link href={`/${locale}/anniversaries`} className="block">
-            <Card className="card-glass hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden">
-              <div className="md:flex">
-                {/* 纪念日配图 */}
-                <div className="md:w-2/5 bg-gradient-to-br from-purple-500 to-pink-600 p-8 flex items-center justify-center">
-                  <div className="text-white text-center">
-                    <div className="text-6xl mb-4">{t.anniversaries.icon}</div>
-                    <div className="text-2xl font-bold">Personal</div>
-                    <div className="text-sm opacity-90 mt-2">Countdowns</div>
-                  </div>
-                </div>
-                
-                {/* 纪念日内容 */}
-                <div className="md:w-3/5 p-6 md:p-8">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Badge variant="primary">New Feature</Badge>
-                    <span className="text-sm text-gray-500">Personal Management</span>
-                  </div>
-                  
-                  <h3 className="text-2xl font-bold mb-3 text-gray-900 hover:text-purple-600 transition-colors">
-                    {t.anniversaries.subtitle}
-                  </h3>
-                  
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    {t.anniversaries.description}
-                  </p>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span>🎂 Birthdays</span>
-                      <span>💕 Anniversaries</span>
-                      <span>🎉 Holidays</span>
-                    </div>
-                    <span className="text-purple-600 font-medium hover:text-purple-700">
-                      {t.anniversaries.button} →
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </Link>
-        </div>
-      </section>
-
-      {/* Language Switcher */}
-      <LanguageSwitcher currentLocale={locale} />
       
       {/* Organization 结构化数据（JSON-LD）*/}
       <script

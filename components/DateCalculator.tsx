@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { zhCN, enUS } from 'date-fns/locale';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { downloadDateCalculationICS } from '@/lib/ics-generator';
 
 interface DateCalculatorProps {
   days: number;
@@ -49,6 +50,12 @@ export default function DateCalculator({ days, locale, type, mode }: DateCalcula
   const dateLocale = locale === 'zh' ? zhCN : enUS;
   const isChinese = locale === 'zh';
 
+  // 下载日历事件
+  const handleDownloadICS = () => {
+    if (!targetDate) return;
+    downloadDateCalculationICS(days, targetDate, type, mode, locale);
+  };
+
   const text = {
     en: {
       title: (days: number) => `${days} ${days === 1 ? 'Day' : 'Days'} ${type === 'future' ? 'from' : 'ago from'} Today`,
@@ -60,7 +67,9 @@ export default function DateCalculator({ days, locale, type, mode }: DateCalcula
       targetDate: 'Target Date',
       dayOfWeek: 'Day of the Week',
       badge: mode === 'calendar' ? 'Natural Days' : 'Business Days',
-      badgeColor: mode === 'calendar' ? 'bg-blue-100 text-blue-800' : 'bg-cyan-100 text-cyan-800'
+      badgeColor: mode === 'calendar' ? 'bg-blue-100 text-blue-800' : 'bg-cyan-100 text-cyan-800',
+      addToCalendar: '📅 Add to Calendar',
+      addToCalendarDesc: 'Download ICS file with 1-day reminder'
     },
     zh: {
       title: (days: number) => `从今天起 ${days} 天${type === 'future' ? '后' : '前'}`,
@@ -72,7 +81,9 @@ export default function DateCalculator({ days, locale, type, mode }: DateCalcula
       targetDate: '目标日期',
       dayOfWeek: '星期',
       badge: mode === 'calendar' ? '自然日' : '工作日',
-      badgeColor: mode === 'calendar' ? 'bg-blue-100 text-blue-800' : 'bg-cyan-100 text-cyan-800'
+      badgeColor: mode === 'calendar' ? 'bg-blue-100 text-blue-800' : 'bg-cyan-100 text-cyan-800',
+      addToCalendar: '📅 加入日历',
+      addToCalendarDesc: '下载 ICS 文件，包含提前1天提醒'
     }
   };
 
@@ -99,9 +110,22 @@ export default function DateCalculator({ days, locale, type, mode }: DateCalcula
           <div className="text-6xl font-bold text-blue-600 mb-4" suppressHydrationWarning>
             {format(targetDate, isChinese ? 'yyyy年M月d日' : 'MMM d, yyyy', { locale: dateLocale })}
           </div>
-          <div className="text-2xl text-gray-600" suppressHydrationWarning>
+          <div className="text-2xl text-gray-600 mb-6" suppressHydrationWarning>
             {format(targetDate, 'EEEE', { locale: dateLocale })}
           </div>
+          
+          {/* 加入日历按钮 - 仅在未来日期中显示 */}
+          {type === 'future' && (
+            <div className="mt-6">
+              <button
+                onClick={handleDownloadICS}
+                className="btn-primary inline-flex items-center gap-2 text-base px-6 py-3"
+              >
+                {t.addToCalendar}
+              </button>
+              <p className="text-sm text-gray-500 mt-2">{t.addToCalendarDesc}</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

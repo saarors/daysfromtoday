@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+import TopNav from '@/components/TopNav';
 import DateCalculator from '@/components/DateCalculator';
 
 interface PageProps {
@@ -78,10 +78,10 @@ export default async function DaysFromTodayPage({ params }: PageProps) {
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Language Switcher */}
-      <LanguageSwitcher currentLocale={locale} />
+      {/* Top Navigation */}
+      <TopNav locale={locale} />
       
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
+      <div className="container mx-auto px-4 py-12 pt-24 md:pt-32 max-w-4xl">
         <DateCalculator 
           days={days} 
           locale={locale} 

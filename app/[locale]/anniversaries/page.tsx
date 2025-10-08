@@ -1,16 +1,16 @@
 import type { Metadata } from 'next';
 import AnniversaryManager from '@/components/AnniversaryManager';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+import TopNav from '@/components/TopNav';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 // SEO Metadata
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { locale } = params;
+  const { locale } = await params;
   
   const title = locale === 'zh' 
     ? '我的纪念日 - 倒计时管理工具' 
@@ -46,25 +46,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default function AnniversariesPage({ params }: PageProps) {
-  const { locale } = params;
+export default async function AnniversariesPage({ params }: PageProps) {
+  const { locale } = await params;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <LanguageSwitcher currentLocale={locale} />
+      {/* 顶部导航栏 */}
+      <TopNav locale={locale} />
       
-      <div className="container mx-auto px-4 py-12 max-w-6xl">
+      <div className="container mx-auto px-4 pt-24 pb-12 max-w-6xl">
         <AnniversaryManager locale={locale} />
-        
-        {/* 返回首页按钮 */}
-        <div className="text-center mt-8">
-          <a 
-            href={`/${locale}`} 
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            {locale === 'zh' ? '返回首页' : 'Back to Homepage'}
-          </a>
-        </div>
       </div>
     </div>
   );

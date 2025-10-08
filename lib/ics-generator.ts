@@ -2,82 +2,45 @@
  * ICS 日历文件生成器
  * 
  * 功能：
- * 1. 生成符合 RFC 5545 标准的 .ics 文件
- * 2. 支持全天事件和提醒
- * 3. 多语言事件标题和描述
- * 
- * 标准：
- * - RFC 5545: Internet Calendaring and Scheduling Core Object Specification (iCalendar)
- * - 兼容 Google Calendar、Apple Calendar、Outlook
- * 
- * 符合项目规范：
- * - TypeScript 严格模式
- * - 纯函数设计
- * - 完整的错误处理
+ * - 生成符合 RFC5545 标准的 ICS 文件
+ * - 支持全天事件
+ * - 支持提醒功能
+ * - 支持多语言事件描述
  */
 
 import { format } from 'date-fns';
 
-/**
- * ICS 事件配置
- */
-export interface ICSEvent {
-  // 事件标题
+interface ICSEventOptions {
   title: string;
-  
-  // 事件描述
-  description: string;
-  
-  // 事件日期（Date 对象）
   date: Date;
-  
-  // 是否为全天事件
-  allDay?: boolean;
-  
-  // 提醒设置（分钟）
-  reminderMinutes?: number;
-  
-  // 事件位置（可选）
-  location?: string;
-  
-  // 事件 URL（可选）
-  url?: string;
+  description?: string;
+  reminder?: boolean; // 是否添加提前1天提醒
+  locale?: string;
 }
 
 /**
- * 生成唯一的事件 ID
+ * 格式化日期为 ICS 格式 (YYYYMMDD)
+ */
+function formatICSDate(date: Date): string {
+  return format(date, 'yyyyMMdd');
+}
+
+/**
+ * 格式化日期时间为 ICS 格式 (YYYYMMDDTHHmmss)
+ */
+function formatICSDateTime(date: Date): string {
+  return format(date, "yyyyMMdd'T'HHmmss");
+}
+
+/**
+ * 生成唯一ID
  */
 function generateUID(): string {
-  const timestamp = Date.now();
-  const random = Math.random().toString(36).substring(2, 15);
-  return `${timestamp}-${random}@daysfromtoday.com`;
-}
-
-/**
- * 格式化日期为 iCalendar 格式
- * 
- * @param date - 日期对象
- * @param allDay - 是否为全天事件
- * @returns iCalendar 格式的日期字符串
- */
-function formatICSDate(date: Date, allDay: boolean = true): string {
-  if (allDay) {
-    // 全天事件格式：YYYYMMDD
-    return format(date, 'yyyyMMdd');
-  } else {
-    // 带时间的格式：YYYYMMDDTHHmmssZ
-    return format(date, "yyyyMMdd'T'HHmmss'Z'");
-  }
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}@daysfromtoday.ai`;
 }
 
 /**
  * 转义 ICS 文本内容
- * 
- * 根据 RFC 5545 规范，需要转义特殊字符：
- * - 逗号 (,)
- * - 分号 (;)
- * - 反斜杠 (\)
- * - 换行符 (\n)
  */
 function escapeICSText(text: string): string {
   return text
@@ -88,41 +51,17 @@ function escapeICSText(text: string): string {
 }
 
 /**
- * 折叠长行（RFC 5545 要求每行不超过 75 字符）
+ * 生成 ICS 日历文件内容
  */
-function foldLine(line: string): string {
-  if (line.length <= 75) {
-    return line;
-  }
+export function generateICS(options: ICSEventOptions): string {
+  const { title, date, description, reminder = true, locale = 'en' } = options;
   
-  const lines: string[] = [];
-  let currentLine = line.substring(0, 75);
-  let remaining = line.substring(75);
-  
-  lines.push(currentLine);
-  
-  while (remaining.length > 0) {
-    currentLine = ' ' + remaining.substring(0, 74); // 续行以空格开头
-    remaining = remaining.substring(74);
-    lines.push(currentLine);
-  }
-  
-  return lines.join('\r\n');
-}
-
-/**
- * 生成 ICS 文件内容
- * 
- * @param event - 事件配置
- * @returns ICS 文件内容字符串
- */
-export function generateICS(event: ICSEvent): string {
-  const now = new Date();
+  const eventDate = formatICSDate(date);
+  const now = formatICSDateTime(new Date());
   const uid = generateUID();
-  const dtstart = formatICSDate(event.date, event.allDay);
-  const dtstamp = formatICSDate(now, false);
   
-  const lines: string[] = [
+  // 构建 ICS 内容
+  const icsContent = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'PRODID:-//DaysFromToday//Date Calculator//EN',
@@ -130,97 +69,118 @@ export function generateICS(event: ICSEvent): string {
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
     `UID:${uid}`,
-    `DTSTAMP:${dtstamp}`,
-  ];
+    `DTSTAMP:${now}`,
+    `DTSTART;VALUE=DATE:${eventDate}`,
+    `DTEND;VALUE=DATE:${eventDate}`,
+    `SUMMARY:${escapeICSText(title)}`,
+    description ? `DESCRIPTION:${escapeICSText(description)}` : null,
+    'STATUS:CONFIRMED',
+    'TRANSP:TRANSPARENT',
+    // 添加提醒（提前1天）
+    reminder ? 'BEGIN:VALARM' : null,
+    reminder ? 'ACTION:DISPLAY' : null,
+    reminder ? `DESCRIPTION:${escapeICSText(title)}` : null,
+    reminder ? 'TRIGGER:-P1D' : null, // 提前1天
+    reminder ? 'END:VALARM' : null,
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].filter(line => line !== null).join('\r\n');
   
-  // 添加日期
-  if (event.allDay) {
-    lines.push(`DTSTART;VALUE=DATE:${dtstart}`);
-  } else {
-    lines.push(`DTSTART:${dtstart}`);
-  }
+  return icsContent;
+}
+
+/**
+ * 下载 ICS 文件
+ */
+export function downloadICS(options: ICSEventOptions, filename?: string): void {
+  const icsContent = generateICS(options);
+  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
   
-  // 添加标题（必需）
-  lines.push(foldLine(`SUMMARY:${escapeICSText(event.title)}`));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename || `event-${formatICSDate(options.date)}.ics`;
   
-  // 添加描述（可选）
-  if (event.description) {
-    lines.push(foldLine(`DESCRIPTION:${escapeICSText(event.description)}`));
-  }
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
   
-  // 添加位置（可选）
-  if (event.location) {
-    lines.push(foldLine(`LOCATION:${escapeICSText(event.location)}`));
-  }
-  
-  // 添加 URL（可选）
-  if (event.url) {
-    lines.push(foldLine(`URL:${event.url}`));
-  }
-  
-  // 添加提醒（可选）
-  if (event.reminderMinutes) {
-    lines.push('BEGIN:VALARM');
-    lines.push('ACTION:DISPLAY');
-    lines.push(`DESCRIPTION:${escapeICSText(event.title)}`);
-    lines.push(`TRIGGER:-PT${event.reminderMinutes}M`);
-    lines.push('END:VALARM');
-  }
-  
-  lines.push('END:VEVENT');
-  lines.push('END:VCALENDAR');
-  
-  // 使用 CRLF 换行符（RFC 5545 要求）
-  return lines.join('\r\n');
+  URL.revokeObjectURL(url);
 }
 
 /**
  * 生成日期计算事件的 ICS 文件
- * 
- * @param targetDate - 目标日期
- * @param days - 天数
- * @param locale - 语言
- * @returns ICS 文件内容
  */
 export function generateDateCalculationICS(
-  targetDate: Date,
   days: number,
-  locale: 'en' | 'zh' = 'en'
+  targetDate: Date,
+  type: 'future' | 'past',
+  mode: 'calendar' | 'business',
+  locale: string = 'en'
 ): string {
-  const formattedDate = format(targetDate, 'yyyy-MM-dd');
+  const text = {
+    en: {
+      future: (d: number) => `${d} ${d === 1 ? 'day' : 'days'} from today`,
+      past: (d: number) => `${d} ${d === 1 ? 'day' : 'days'} ago`,
+      calendar: 'Calendar days',
+      business: 'Business days',
+      description: (type: string, mode: string, date: string) => 
+        `This is ${days} ${mode} ${type} from today. Target date: ${date}. Generated by DaysFromToday.ai`
+    },
+    zh: {
+      future: (d: number) => `从今天起 ${d} 天后`,
+      past: (d: number) => `从今天起 ${d} 天前`,
+      calendar: '自然日',
+      business: '工作日',
+      description: (type: string, mode: string, date: string) => 
+        `这是从今天起${days}${mode}${type}的日期。目标日期：${date}。由 DaysFromToday.ai 生成`
+    }
+  };
   
-  const title = locale === 'zh'
-    ? `${Math.abs(days)} 天${days >= 0 ? '后' : '前'}：${formattedDate}`
-    : `${Math.abs(days)} days ${days >= 0 ? 'from' : 'before'} today: ${formattedDate}`;
+  const t = text[locale as keyof typeof text] || text.en;
+  const typeText = type === 'future' ? t.future(days) : t.past(days);
+  const modeText = mode === 'calendar' ? t.calendar : t.business;
+  const dateText = format(targetDate, locale === 'zh' ? 'yyyy年M月d日' : 'MMM d, yyyy');
   
-  const description = locale === 'zh'
-    ? `从今天开始计算，${Math.abs(days)} 天${days >= 0 ? '后' : '前'}是 ${formattedDate}。由 DaysFromToday 计算生成。`
-    : `Calculated by DaysFromToday: ${Math.abs(days)} days ${days >= 0 ? 'from' : 'before'} today is ${formattedDate}.`;
+  const title = `${typeText} - ${dateText}`;
+  const description = t.description(
+    type === 'future' ? (locale === 'zh' ? '之后' : 'from today') : (locale === 'zh' ? '之前' : 'ago'),
+    modeText,
+    dateText
+  );
   
   return generateICS({
     title,
-    description,
     date: targetDate,
-    allDay: true,
-    reminderMinutes: 60, // 提前 1 小时提醒
-    url: `https://daysfromtoday.com/${locale}/days/${days}`
+    description,
+    reminder: true,
+    locale
   });
 }
 
 /**
- * 生成 ICS 下载响应（用于 API 路由）
- * 
- * @param icsContent - ICS 文件内容
- * @param filename - 文件名（不含扩展名）
- * @returns Response 对象
+ * 下载日期计算事件的 ICS 文件
  */
-export function createICSResponse(icsContent: string, filename: string = 'event'): Response {
-  return new Response(icsContent, {
-    headers: {
-      'Content-Type': 'text/calendar; charset=utf-8',
-      'Content-Disposition': `attachment; filename="${filename}.ics"`,
-      'Cache-Control': 'no-cache'
-    }
-  });
+export function downloadDateCalculationICS(
+  days: number,
+  targetDate: Date,
+  type: 'future' | 'past',
+  mode: 'calendar' | 'business',
+  locale: string = 'en'
+): void {
+  const icsContent = generateDateCalculationICS(days, targetDate, type, mode, locale);
+  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  
+  const filename = `${days}-${mode === 'calendar' ? 'days' : 'business-days'}-${type}-${formatICSDate(targetDate)}.ics`;
+  
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  URL.revokeObjectURL(url);
 }
-

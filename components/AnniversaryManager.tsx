@@ -11,10 +11,12 @@ import {
   AnniversaryValidator,
   ANNIVERSARY_TYPES,
   formatAnniversaryDate,
-  formatCountdown
+  formatCountdown,
+  formatAnniversaryType
 } from '@/lib/anniversary';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { calculateDateStatisticsSync } from '@/lib/date-statistics';
 
 interface AnniversaryManagerProps {
   locale: string;
@@ -25,9 +27,17 @@ export default function AnniversaryManager({ locale }: AnniversaryManagerProps) 
   const [countdowns, setCountdowns] = useState<AnniversaryCountdown[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // 防止 hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 加载纪念日数据
   useEffect(() => {
+    if (!mounted) return;
+
     const loadAnniversaries = () => {
       const all = AnniversaryStorage.getAll();
       setAnniversaries(all);
@@ -41,7 +51,7 @@ export default function AnniversaryManager({ locale }: AnniversaryManagerProps) 
     window.addEventListener('storage', handleStorageChange);
     
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  }, [mounted]);
 
   // 添加纪念日
   const handleAddAnniversary = (formData: Partial<Anniversary>) => {
@@ -112,17 +122,30 @@ export default function AnniversaryManager({ locale }: AnniversaryManagerProps) 
 
   const t = text[locale as keyof typeof text] || text.en;
 
+  // 在客户端渲染完成前显示加载状态
+  if (!mounted) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-gray-900">{t.title}</h2>
+          <div className="animate-pulse bg-gray-200 h-10 w-32 rounded"></div>
+        </div>
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">加载中...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      {/* 标题和添加按钮 */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">{t.title}</h2>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="btn-primary"
-        >
-          {t.addButton}
-        </button>
+      {/* 标题 */}
+      <div className="text-center">
+        <h1 className="text-5xl font-bold mb-4 text-gradient-calendly">{t.title}</h1>
+        <p className="text-xl text-gray-600">
+          {locale === 'zh' ? '管理您的个人纪念日，设置倒计时提醒' : 'Manage your personal anniversaries with countdown reminders'}
+        </p>
       </div>
 
       {/* 今天的纪念日 */}
@@ -171,30 +194,58 @@ export default function AnniversaryManager({ locale }: AnniversaryManagerProps) 
             <div className="space-y-3">
               {upcomingCountdowns.map((countdown) => {
                 const typeConfig = ANNIVERSARY_TYPES[countdown.anniversary.type];
+                
+                // 计算统计信息
+                const stats = countdown.daysUntil > 0 
+                  ? calculateDateStatisticsSync(new Date(), new Date(countdown.nextOccurrence))
+                  : null;
+                
                 return (
-                  <div key={countdown.anniversary.id} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{typeConfig.icon}</span>
-                      <div>
-                        <h3 className="font-semibold text-blue-900">{countdown.anniversary.name}</h3>
-                        <p className="text-sm text-blue-700">
-                          {formatAnniversaryDate(countdown.anniversary.date, locale)}
-                        </p>
-                        {countdown.anniversary.isRecurring && (
-                          <Badge className="text-xs bg-blue-100 text-blue-800 mt-1">
-                            {t.recurring}
-                          </Badge>
-                        )}
+                  <div key={countdown.anniversary.id} className="p-3 bg-blue-50 rounded-lg">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{typeConfig.icon}</span>
+                        <div>
+                          <h3 className="font-semibold text-blue-900">{countdown.anniversary.name}</h3>
+                          <p className="text-sm text-blue-700">
+                            {formatAnniversaryDate(countdown.anniversary.date, locale)}
+                          </p>
+                          {countdown.anniversary.isRecurring && (
+                            <Badge className="text-xs bg-blue-100 text-blue-800 mt-1">
+                              {t.recurring}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-blue-900">
+                          {countdown.daysUntil}
+                        </div>
+                        <div className="text-sm text-blue-700">
+                          {formatCountdown(countdown.daysUntil, locale)}
+                        </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-blue-900">
-                        {countdown.daysUntil}
+                    
+                    {/* 统计信息 */}
+                    {stats && (
+                      <div className="mt-3 pt-3 border-t border-blue-200">
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          <div className="bg-blue-50 rounded-lg p-2">
+                            <div className="text-xs text-gray-600">💼 {locale === 'zh' ? '工作日' : 'Work'}</div>
+                            <div className="text-sm font-bold text-blue-600">{stats.businessDays}</div>
+                          </div>
+                          <div className="bg-purple-50 rounded-lg p-2">
+                            <div className="text-xs text-gray-600">🏖️ {locale === 'zh' ? '周末' : 'Weekend'}</div>
+                            <div className="text-sm font-bold text-purple-600">{stats.weekends}</div>
+                          </div>
+                          <div className="bg-pink-50 rounded-lg p-2">
+                            <div className="text-xs text-gray-600">📅 {locale === 'zh' ? '自然日' : 'Days'}</div>
+                            <div className="text-sm font-bold text-pink-600">{stats.totalDays}</div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-sm text-blue-700">
-                        {formatCountdown(countdown.daysUntil, locale)}
-                      </div>
-                    </div>
+                    )}
                   </div>
                 );
               })}
@@ -220,49 +271,77 @@ export default function AnniversaryManager({ locale }: AnniversaryManagerProps) 
             <div className="space-y-3">
               {countdowns.map((countdown) => {
                 const typeConfig = ANNIVERSARY_TYPES[countdown.anniversary.type];
+                
+                // 计算统计信息（仅针对未来日期）
+                const stats = !countdown.isPast && countdown.nextOccurrence
+                  ? calculateDateStatisticsSync(new Date(), new Date(countdown.nextOccurrence))
+                  : null;
+                
                 return (
-                  <div key={countdown.anniversary.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{typeConfig.icon}</span>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{countdown.anniversary.name}</h3>
-                        <p className="text-sm text-gray-600">
-                          {formatAnniversaryDate(countdown.anniversary.date, locale)}
-                        </p>
-                        {countdown.anniversary.isRecurring && (
-                          <Badge className="text-xs bg-blue-100 text-blue-800 mt-1">
-                            {t.recurring}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        <div className={`text-lg font-bold ${
-                          countdown.isToday ? 'text-green-600' : 
-                          countdown.isPast ? 'text-gray-500' : 'text-blue-600'
-                        }`}>
-                          {countdown.daysUntil}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {formatCountdown(countdown.daysUntil, locale)}
+                  <div key={countdown.anniversary.id} className="p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-start gap-3 flex-1">
+                        <span className="text-2xl">{typeConfig.icon}</span>
+                        <div>
+                          <h3 className="font-semibold text-gray-900">{countdown.anniversary.name}</h3>
+                          <p className="text-sm text-gray-600">
+                            {formatAnniversaryDate(countdown.anniversary.date, locale)}
+                          </p>
+                          {countdown.anniversary.isRecurring && (
+                            <Badge className="text-xs bg-blue-100 text-blue-800 mt-1">
+                              {t.recurring}
+                            </Badge>
+                          )}
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setEditingId(countdown.anniversary.id)}
-                          className="text-blue-600 hover:text-blue-800 text-sm"
-                        >
-                          {t.edit}
-                        </button>
-                        <button
-                          onClick={() => handleDeleteAnniversary(countdown.anniversary.id)}
-                          className="text-red-600 hover:text-red-800 text-sm"
-                        >
-                          {t.delete}
-                        </button>
+                      <div className="flex items-start gap-3">
+                        <div className="text-right">
+                          <div className={`text-2xl font-bold ${
+                            countdown.isToday ? 'text-green-600' : 
+                            countdown.isPast ? 'text-gray-500' : 'text-blue-600'
+                          }`}>
+                            {countdown.daysUntil}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {formatCountdown(countdown.daysUntil, locale)}
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() => setEditingId(countdown.anniversary.id)}
+                            className="text-blue-600 hover:text-blue-800 text-xs"
+                          >
+                            {t.edit}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteAnniversary(countdown.anniversary.id)}
+                            className="text-red-600 hover:text-red-800 text-xs"
+                          >
+                            {t.delete}
+                          </button>
+                        </div>
                       </div>
                     </div>
+                    
+                    {/* 统计信息 - 仅显示未来日期 */}
+                    {stats && (
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          <div className="bg-blue-50 rounded-lg p-2">
+                            <div className="text-xs text-gray-600">💼 {locale === 'zh' ? '工作日' : 'Work'}</div>
+                            <div className="text-sm font-bold text-blue-600">{stats.businessDays}</div>
+                          </div>
+                          <div className="bg-purple-50 rounded-lg p-2">
+                            <div className="text-xs text-gray-600">🏖️ {locale === 'zh' ? '周末' : 'Weekend'}</div>
+                            <div className="text-sm font-bold text-purple-600">{stats.weekends}</div>
+                          </div>
+                          <div className="bg-pink-50 rounded-lg p-2">
+                            <div className="text-xs text-gray-600">📅 {locale === 'zh' ? '自然日' : 'Days'}</div>
+                            <div className="text-sm font-bold text-pink-600">{stats.totalDays}</div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -298,6 +377,19 @@ export default function AnniversaryManager({ locale }: AnniversaryManagerProps) 
           }}
           onCancel={() => setEditingId(null)}
         />
+      )}
+
+      {/* 添加纪念日按钮 - 放在底部 */}
+      {!showAddForm && !editingId && (
+        <div className="text-center pt-8 pb-4">
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="btn-primary px-8 py-4 text-lg inline-flex items-center gap-2"
+          >
+            <span className="text-2xl">✨</span>
+            {t.addButton}
+          </button>
+        </div>
       )}
     </div>
   );
