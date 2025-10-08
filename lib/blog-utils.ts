@@ -4,6 +4,7 @@
  * 用于生成博客相关的 SEO 元数据、JSON-LD 等
  */
 
+import React from 'react';
 import type { Metadata } from 'next';
 import type { BlogPost, BlogPostJsonLd, BlogMetadata } from '@/types/blog';
 
@@ -103,12 +104,18 @@ export function generateBlogJsonLd(
 
 /**
  * 处理 Markdown 粗体语法
+ * 
+ * @param text 要处理的文本
+ * @returns 处理后的内容数组
  */
-export function processMarkdown(text: string): (string | JSX.Element)[] {
+export function processMarkdown(text: string): (string | React.ReactElement)[] {
   const parts = text.split(/(\*\*.*?\*\*)/g);
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} className="font-bold text-gray-900">{part.slice(2, -2)}</strong>;
+      return React.createElement('strong', { 
+        key: i, 
+        className: 'font-bold text-gray-900' 
+      }, part.slice(2, -2));
     }
     return part;
   });

@@ -26,10 +26,8 @@ export default function BlogArticle({
   content, 
   locale, 
   category,
-  slug,
   author 
 }: BlogArticleProps) {
-  const isChinese = locale === 'zh';
   
   const text = {
     en: {
