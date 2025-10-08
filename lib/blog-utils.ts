@@ -6,7 +6,7 @@
 
 import React from 'react';
 import type { Metadata } from 'next';
-import type { BlogPost, BlogPostJsonLd, BlogMetadata } from '@/types/blog';
+import type { BlogPost, BlogPostJsonLd } from '@/types/blog';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
 const SITE_NAME = 'DaysFromToday';

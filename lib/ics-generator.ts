@@ -166,6 +166,7 @@ export function downloadDateCalculationICS(
   targetDate: Date,
   type: 'future' | 'past',
   mode: 'calendar' | 'business',
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   locale: string = 'en'
 ): void {
   const icsContent = generateDateCalculationICS(days, targetDate, type, mode, locale);

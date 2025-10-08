@@ -29,6 +29,7 @@ export async function addBusinessDays(
   startDate: Date,
   businessDays: number,
   countryCode: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _timezone: string = 'UTC'
 ): Promise<BusinessDaysResult> {
   if (!isValid(startDate)) {
@@ -107,6 +108,7 @@ export async function subBusinessDays(
   startDate: Date,
   businessDays: number,
   countryCode: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _timezone: string = 'UTC'
 ): Promise<BusinessDaysResult> {
   if (!isValid(startDate)) {

@@ -33,7 +33,7 @@ export default function CountrySelector({ locale }: CountrySelectorProps) {
     <div className="country-selector relative">
       <select
         value={country}
-        onChange={(e) => setCountry(e.target.value as any)}
+        onChange={(e) => setCountry(e.target.value as CountryCode)}
         className="
           appearance-none
           px-4 py-2
