@@ -26,6 +26,10 @@ export default function LanguageSwitcher({ currentLocale }: LanguageSwitcherProp
   }, []);
 
   // 只返回语言链接，容器由 TopNav 提供
+  if (!mounted) {
+    return <div className="flex gap-1 w-24 h-8" />; // Placeholder
+  }
+
   return (
     <div className="flex gap-1" suppressHydrationWarning>
       <Link

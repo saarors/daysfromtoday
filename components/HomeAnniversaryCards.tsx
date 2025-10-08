@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { AnniversaryCalculator, formatAnniversaryType } from '@/lib/anniversary';
+import { AnniversaryCalculator, AnniversaryCountdown, formatAnniversaryType } from '@/lib/anniversary';
 import { calculateDateStatisticsSync } from '@/lib/date-statistics';
 
 interface HomeAnniversaryCardsProps {
@@ -12,7 +12,7 @@ interface HomeAnniversaryCardsProps {
 }
 
 export default function HomeAnniversaryCards({ locale }: HomeAnniversaryCardsProps) {
-  const [upcomingAnniversaries, setUpcomingAnniversaries] = useState<any[]>([]);
+  const [upcomingAnniversaries, setUpcomingAnniversaries] = useState<AnniversaryCountdown[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

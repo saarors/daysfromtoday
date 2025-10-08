@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { format } from 'date-fns';
-import { zhCN, enUS } from 'date-fns/locale';
 import { 
   Anniversary, 
   AnniversaryCountdown, 
@@ -11,8 +9,7 @@ import {
   AnniversaryValidator,
   ANNIVERSARY_TYPES,
   formatAnniversaryDate,
-  formatCountdown,
-  formatAnniversaryType
+  formatCountdown
 } from '@/lib/anniversary';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -23,7 +20,6 @@ interface AnniversaryManagerProps {
 }
 
 export default function AnniversaryManager({ locale }: AnniversaryManagerProps) {
-  const [anniversaries, setAnniversaries] = useState<Anniversary[]>([]);
   const [countdowns, setCountdowns] = useState<AnniversaryCountdown[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -39,8 +35,6 @@ export default function AnniversaryManager({ locale }: AnniversaryManagerProps) 
     if (!mounted) return;
 
     const loadAnniversaries = () => {
-      const all = AnniversaryStorage.getAll();
-      setAnniversaries(all);
       setCountdowns(AnniversaryCalculator.getAllCountdowns());
     };
 
@@ -73,7 +67,6 @@ export default function AnniversaryManager({ locale }: AnniversaryManagerProps) 
     };
 
     AnniversaryStorage.save(newAnniversary);
-    setAnniversaries(AnniversaryStorage.getAll());
     setCountdowns(AnniversaryCalculator.getAllCountdowns());
     setShowAddForm(false);
   };
@@ -81,9 +74,8 @@ export default function AnniversaryManager({ locale }: AnniversaryManagerProps) 
   // 删除纪念日
   const handleDeleteAnniversary = (id: string) => {
     if (confirm(locale === 'zh' ? '确定要删除这个纪念日吗？' : 'Are you sure you want to delete this anniversary?')) {
-      AnniversaryStorage.delete(id);
-      setAnniversaries(AnniversaryStorage.getAll());
-      setCountdowns(AnniversaryCalculator.getAllCountdowns());
+    AnniversaryStorage.delete(id);
+    setCountdowns(AnniversaryCalculator.getAllCountdowns());
     }
   };
 
@@ -369,7 +361,6 @@ export default function AnniversaryManager({ locale }: AnniversaryManagerProps) 
               const existing = AnniversaryStorage.getById(editingId);
               if (existing) {
                 AnniversaryStorage.save({ ...existing, ...data });
-                setAnniversaries(AnniversaryStorage.getAll());
                 setCountdowns(AnniversaryCalculator.getAllCountdowns());
               }
             }
