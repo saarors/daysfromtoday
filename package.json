@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "holidays:init": "tsx scripts/generate-holidays.ts init",
+    "holidays:update": "tsx scripts/generate-holidays.ts update",
+    "holidays:validate": "tsx scripts/validate-holidays.ts"
   },
   "dependencies": {
     "@next/mdx": "^15.5.4",
@@ -36,6 +39,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
     "tailwindcss": "^4",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   }
 }
