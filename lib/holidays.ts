@@ -20,14 +20,30 @@ export async function getHolidays(
   year: number
 ): Promise<Holiday[]> {
   try {
-    // 在 Server Component 中需要使用完整 URL
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001';
-    const url = `${baseUrl}/api/holidays?country=${country}&year=${year}`;
+    // 检查是否在浏览器环境
+    const isBrowser = typeof window !== 'undefined';
     
-    const response = await fetch(url, { 
-      next: { revalidate: 86400 }, // 24h 缓存
-      cache: 'force-cache'
-    });
+    // 构建 API URL
+    let url: string;
+    if (isBrowser) {
+      // 浏览器端使用相对路径
+      url = `/api/holidays?country=${country}&year=${year}`;
+    } else {
+      // 服务端使用完整 URL
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      url = `${baseUrl}/api/holidays?country=${country}&year=${year}`;
+    }
+    
+    // 构建 fetch 配置
+    const fetchOptions: RequestInit = {};
+    
+    // 仅在服务端添加 Next.js 缓存配置
+    if (!isBrowser) {
+      fetchOptions.next = { revalidate: 86400 }; // 24h 缓存
+      fetchOptions.cache = 'force-cache';
+    }
+    
+    const response = await fetch(url, fetchOptions);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch holidays: ${response.status}`);
