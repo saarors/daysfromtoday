@@ -417,7 +417,8 @@ function getFlagEmoji(country: CountryCode): string {
   const flags: Record<CountryCode, string> = {
     'CN': '🇨🇳', 'US': '🇺🇸', 'GB': '🇬🇧', 'JP': '🇯🇵', 'DE': '🇩🇪',
     'FR': '🇫🇷', 'CA': '🇨🇦', 'AU': '🇦🇺', 'IN': '🇮🇳', 'BR': '🇧🇷',
-    'MX': '🇲🇽', 'IT': '🇮🇹', 'ES': '🇪🇸', 'SG': '🇸🇬', 'AE': '🇦🇪'
+    'MX': '🇲🇽', 'IT': '🇮🇹', 'ES': '🇪🇸', 'SG': '🇸🇬', 'AE': '🇦🇪',
+    'KR': '🇰🇷'
   };
   return flags[country] || '🏳️';
 }
