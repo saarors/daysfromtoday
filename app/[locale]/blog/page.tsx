@@ -15,6 +15,48 @@ interface PageProps {
 // 博客文章列表（未来可以从数据库或文件系统读取）
 const blogPosts = [
   {
+    slug: 'time-mastery-is-freedom',
+    title: {
+      en: 'Time Mastery = Life Mastery: Why Time is Your Only Fair Advantage',
+      zh: '时间的哲学：为什么掌控时间 = 掌控人生'
+    },
+    excerpt: {
+      en: 'Life\'s unfair. Some people are born rich, some lucky, some just tired. But here\'s the one thing that\'s fair: time. Everyone gets 24 hours a day. The only question is: are you the boss of your time, or just another employee working for it?',
+      zh: '说真的，人生这场游戏不公平的地方太多了。但偏偏有一件事，老天挺公道——那就是时间。每个人，一天都是 24 小时。问题是：你是时间的老板，还是它的打工人？'
+    },
+    date: '2025-10-09',
+    readTime: {
+      en: '6 min read',
+      zh: '6 分钟阅读'
+    },
+    category: {
+      en: 'Philosophy',
+      zh: '哲学思考'
+    },
+    featured: true
+  },
+  {
+    slug: 'why-remember-future-day',
+    title: {
+      en: 'Why We Need to Remember a Day in the Future',
+      zh: '我们为什么要记住未来的某一天'
+    },
+    excerpt: {
+      en: 'When you hit forty, something changes. Your memory starts playing hide and seek. But honestly, I started forgetting things way earlier. Time doesn\'t yell. It whispers. And one day you realize it\'s already gone.',
+      zh: '年过四十之后，我发现自己变了。原来能记住的小事儿，现在老忘。时间吧，真是个狡猾的朋友。它不提醒、不催促，但它默默地让你付出代价。'
+    },
+    date: '2025-10-09',
+    readTime: {
+      en: '5 min read',
+      zh: '5 分钟阅读'
+    },
+    category: {
+      en: 'Warmth',
+      zh: '温度思考'
+    },
+    featured: true
+  },
+  {
     slug: 'why-i-built-daysfromtoday',
     title: {
       en: 'Why I Built DaysFromToday',

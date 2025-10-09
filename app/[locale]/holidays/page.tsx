@@ -11,12 +11,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale } = await params;
   
   const title = locale === 'zh' 
-    ? '各国节假日列表 - DaysFromToday' 
-    : 'Holidays by Country - DaysFromToday';
+    ? '距离节假日还有几天 | 全球节假日倒计时日历' 
+    : 'Days Until Holiday Calculator | Holiday Countdown Calendar';
   
   const description = locale === 'zh'
-    ? '查看全球各国的节假日列表，包括美国、中国、英国、日本、德国等15个国家的公共假期。'
-    : 'View public holidays for countries worldwide, including US, China, UK, Japan, Germany and 15 other countries.';
+    ? '查看全球各国的节假日列表和倒计时。包括美国、中国、英国、日本、德国等15个国家的公共假期，自动计算距离下一个节假日还有几天。'
+    : 'View public holidays and countdowns for countries worldwide. Includes US, China, UK, Japan, Germany and 15 other countries. Automatically calculate days until the next holiday.';
 
   return {
     title,

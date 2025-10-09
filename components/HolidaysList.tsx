@@ -185,24 +185,42 @@ export default function HolidaysList({ locale }: HolidaysListProps) {
 
               {!loading && !error && holidays.length > 0 && (
                 <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {holidays.map((holiday, index) => (
-                    <div
-                      key={index}
-                      className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <div className="font-medium text-gray-900">
-                        {holiday.translatedName}
+                  {holidays.map((holiday, index) => {
+                    // 安全地解析日期
+                    let dateStr = '';
+                    try {
+                      if (holiday.date) {
+                        const dateObj = new Date(holiday.date);
+                        if (!isNaN(dateObj.getTime())) {
+                          dateStr = format(dateObj, isChinese ? 'M月d日 (EEEE)' : 'MMM d (EEEE)', { locale: dateLocale });
+                        } else {
+                          dateStr = holiday.date; // 如果无法解析，直接显示原始字符串
+                        }
+                      }
+                    } catch (error) {
+                      console.error('Date parsing error:', holiday.date, error);
+                      dateStr = holiday.date || 'Invalid date';
+                    }
+
+                    return (
+                      <div
+                        key={index}
+                        className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="font-medium text-gray-900">
+                          {holiday.translatedName}
+                        </div>
+                        <div className="text-sm text-gray-600 mt-1">
+                          {dateStr}
+                        </div>
+                        {holiday.global && (
+                          <Badge variant="success" size="sm" className="mt-1">
+                            {isChinese ? '全国性' : 'National'}
+                          </Badge>
+                        )}
                       </div>
-                      <div className="text-sm text-gray-600 mt-1">
-                        {format(new Date(holiday.date), isChinese ? 'M月d日 (EEEE)' : 'MMM d (EEEE)', { locale: dateLocale })}
-                      </div>
-                      {holiday.global && (
-                        <Badge variant="success" size="sm" className="mt-1">
-                          {isChinese ? '全国性' : 'National'}
-                        </Badge>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </CardContent>

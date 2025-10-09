@@ -13,12 +13,12 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const { locale } = await params;
   
   const title = locale === 'zh' 
-    ? 'Days From Today - 精确的日期计算工具'
-    : 'Days From Today - Accurate Date Calculator';
+    ? 'Days From Today 计算器 | 日期计算器和倒计时工具'
+    : 'Days From Today Calculator | Date Calculator & Countdown Timer';
     
   const description = locale === 'zh'
-    ? '简单、快速、强大的日期计算工具。支持自然日、工作日、周末和节假日计算。'
-    : 'Simple, fast, and powerful date calculation tool. Support for natural days, business days, weekends, and holidays.';
+    ? '免费在线日期计算器和倒计时工具。计算未来或过去的日期，支持自然日、工作日、节假日计算和纪念日倒计时。'
+    : 'Free online date calculator and countdown timer. Calculate future or past dates with support for calendar days, business days, holidays, and anniversary countdowns.';
   
   return {
     title,

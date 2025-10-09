@@ -32,13 +32,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale, n } = await params;
   const days = Number(n);
   
-  const title = `${days} Business Days Ago from Today - Date Calculator`;
-  const description = `Calculate ${days} business days ago from today, excluding weekends and holidays. Get the exact date for project planning and deadline management.`;
+  const title = locale === 'zh'
+    ? `${days} 个工作日前是哪天 | 过去工作日计算器`
+    : `${days} Business Days Ago Calculator | Past Workdays`;
+  const description = locale === 'zh'
+    ? `计算从今天起 ${days} 个工作日前是哪一天，自动排除周末和节假日。适用于回溯项目日期、验证历史记录。`
+    : `Calculate what date it was ${days} business days ago from today, excluding weekends and holidays. Perfect for tracking past project dates and historical records.`;
   
   return {
     title,
     description,
-    keywords: ['business days ago calculator', 'working days ago', 'weekday calculator', 'past project deadline'],
+    keywords: locale === 'zh'
+      ? ['工作日计算器', '过去工作日', '历史日期', '项目回溯']
+      : ['business days ago calculator', 'past workdays', 'working days ago', 'historical dates'],
     alternates: {
       canonical: `https://www.daysfromtoday.ai/${locale}/business-days/ago/${n}`,
       languages: {

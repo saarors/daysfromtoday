@@ -32,8 +32,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale, n } = await params;
   const days = Number(n);
   
-  const title = `${days} Days from Today - Date Calculator`;
-  const description = `Calculate ${days} days from today. Get accurate date calculations with our free online tool.`;
+  const title = locale === 'zh'
+    ? `${days} 天后是哪天 | 未来日期计算器`
+    : `${days} Days from Today Calculator | Future Date Calculator`;
+  const description = locale === 'zh'
+    ? `计算从今天起 ${days} 天后是哪一天。免费在线日期计算器，支持自然日、工作日、节假日计算和倒计时。`
+    : `Calculate what date it will be ${days} days from today. Free online date calculator with support for calendar days, business days, holidays, and countdown timer.`;
   
   return {
     title,

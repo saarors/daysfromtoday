@@ -13,12 +13,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale } = await params;
   
   const title = locale === 'zh' 
-    ? '我的纪念日 - 倒计时管理工具' 
-    : 'My Anniversaries - Countdown Management Tool';
+    ? '纪念日倒计时 | 生日、节日、婚礼倒计时管理器' 
+    : 'Anniversary Countdown | Birthday, Wedding & Holiday Countdown Timer';
   
   const description = locale === 'zh'
-    ? '管理您的个人纪念日，设置倒计时提醒，包括生日、纪念日、节日等。支持每年重复提醒。'
-    : 'Manage your personal anniversaries with countdown reminders. Track birthdays, anniversaries, holidays and more with recurring annual notifications.';
+    ? '免费的纪念日倒计时工具。管理生日、婚礼纪念日、退休倒计时、考试倒计时和重要节日。支持自动提醒和每年重复倒计时。'
+    : 'Free anniversary countdown tool. Manage birthdays, wedding anniversaries, retirement countdowns, exam countdowns and important holidays. Supports automatic reminders and recurring annual countdowns.';
   
   return {
     title,
