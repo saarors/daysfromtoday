@@ -4,11 +4,12 @@
  * 功能：
  * 1. 允许所有搜索引擎抓取
  * 2. 指向动态生成的 sitemap.xml
- * 3. 设置爬虫规则
+ * 3. 指向 Image Sitemap（图片索引优化）
+ * 4. 设置爬虫规则
  * 
  * SEO 要求：
  * - 允许所有搜索引擎（userAgent: '*'）
- * - 提供 sitemap 位置
+ * - 提供 sitemap 位置（包括主 sitemap 和 image sitemap）
  * - 不阻止任何路径
  * 
  * 符合项目规范：
@@ -28,7 +29,10 @@ export default function robots(): MetadataRoute.Robots {
       // 可选：未来可以添加 disallow 规则
       // disallow: ['/api/', '/admin/'],
     },
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: [
+      `${baseUrl}/sitemap.xml`,
+      `${baseUrl}/image-sitemap.xml`,
+    ],
   };
 }
 
