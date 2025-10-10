@@ -25,6 +25,16 @@
     "title": "Page Not Found",
     "description": "The page you are looking for does not exist.",
     "goHome": "Go to Homepage"
+  },
+  "common": {
+    "home": "Home"
+  },
+  "breadcrumb": {
+    "philosophy": "Philosophy",
+    "tools": "Tools",
+    "stories": "Stories",
+    "guides": "Guides",
+    "updates": "Updates"
   }
 }
 

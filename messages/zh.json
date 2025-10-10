@@ -25,6 +25,16 @@
     "title": "页面未找到",
     "description": "您要查找的页面不存在。",
     "goHome": "返回首页"
+  },
+  "common": {
+    "home": "首页"
+  },
+  "breadcrumb": {
+    "philosophy": "哲学思考",
+    "tools": "工具介绍",
+    "stories": "用户故事",
+    "guides": "使用指南",
+    "updates": "产品更新"
   }
 }
 
