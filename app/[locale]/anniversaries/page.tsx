@@ -3,14 +3,14 @@ import AnniversaryManager from '@/components/AnniversaryManager';
 import TopNav from '@/components/TopNav';
 
 interface PageProps {
-  params: Promise<{
+  params: {
     locale: string;
-  }>;
+  };
 }
 
 // SEO Metadata
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { locale } = await params;
+  const { locale } = params;
   
   const title = locale === 'zh' 
     ? '纪念日倒计时 | 生日、节日、婚礼倒计时管理器' 
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function AnniversariesPage({ params }: PageProps) {
-  const { locale } = await params;
+  const { locale } = params;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">

@@ -6,10 +6,10 @@
  */
 
 import { notFound } from 'next/navigation';
-import { allUpdates } from 'contentlayer/generated';
+import { allUpdates } from '@/.contentlayer/generated';
 import { Metadata } from 'next';
 import { MDXContent } from '@/components/mdx-content';
-import { Breadcrumb } from '@/components/breadcrumb';
+import Breadcrumb from '@/components/Breadcrumb';
 import { getTranslations } from 'next-intl/server';
 
 interface UpdatePageProps {
@@ -35,8 +35,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: UpdatePageProps): Promise<Metadata> {
+  const { locale, slug } = await params;
   const update = allUpdates.find(
-    (u) => u.slug === params.slug && u.locale === params.locale
+    (u) => u.slug === slug && u.locale === locale
   );
 
   if (!update) {
@@ -50,40 +51,38 @@ export async function generateMetadata({
     openGraph: {
       title: update.title,
       description: update.description,
-      images: update.coverImage ? [update.coverImage] : [],
       type: 'article',
-      publishedTime: update.publishedAt,
+      publishedTime: String(new Date().toISOString()),
       authors: [update.author],
     },
     twitter: {
       card: 'summary_large_image',
       title: update.title,
       description: update.description,
-      images: update.coverImage ? [update.coverImage] : [],
     },
   };
 }
 
 export default async function UpdatePage({ params }: UpdatePageProps) {
+  const { locale, slug } = params;
   const update = allUpdates.find(
-    (u) => u.slug === params.slug && u.locale === params.locale
+    (u) => u.slug === slug && u.locale === locale
   );
 
   if (!update) {
     notFound();
   }
 
-  const t = await getTranslations({ locale: params.locale });
+  const t = await getTranslations({ locale });
 
   const breadcrumbs = [
-    { label: t('common.home'), href: `/${params.locale}` },
-    { label: t('breadcrumb.updates'), href: `/${params.locale}/updates` },
+    { label: t('common.home'), href: `/${locale}` },
+    { label: t('breadcrumb.updates'), href: `/${locale}/updates` },
     { label: update.title, href: update.url },
   ];
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Breadcrumb items={breadcrumbs} locale={params.locale} />
 
       <header className="mb-8">
         {/* 版本标签（如果有） */}
@@ -102,8 +101,8 @@ export default async function UpdatePage({ params }: UpdatePageProps) {
         <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
           <span>{update.author}</span>
           <span>•</span>
-          <time dateTime={update.publishedAt}>
-            {new Date(update.publishedAt).toLocaleDateString(params.locale, {
+          <time dateTime={update.date}>
+            {new Date(update.date).toLocaleDateString(locale, {
               year: 'numeric',
               month: 'long',
               day: 'numeric',
@@ -114,30 +113,9 @@ export default async function UpdatePage({ params }: UpdatePageProps) {
         </div>
       </header>
 
-      {update.coverImage && (
-        <div className="mb-8">
-          <img
-            src={update.coverImage}
-            alt={update.title}
-            className="w-full rounded-lg"
-          />
-        </div>
-      )}
 
-      <MDXContent code={update.body.code} />
+      <MDXContent code={update.body?.code || update.body?.raw || ''} />
 
-      <footer className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex flex-wrap gap-2">
-          {update.tags?.map((tag) => (
-            <span
-              key={tag}
-              className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      </footer>
     </div>
   );
 }

@@ -8,11 +8,11 @@ interface PageParams {
 }
 
 interface PageProps {
-  params: Promise<PageParams>;
+  params: PageParams;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { locale } = await params;
+  const { locale } = params;
   
   const title = locale === 'zh' 
     ? '为什么我要做 DaysFromToday' 
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function WhyIBuiltPage({ params }: PageProps) {
-  const { locale } = await params;
+  const { locale } = params;
   const isChinese = locale === 'zh';
 
   const content = {

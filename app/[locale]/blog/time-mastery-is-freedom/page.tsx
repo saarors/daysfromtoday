@@ -8,11 +8,11 @@ interface PageParams {
 }
 
 interface PageProps {
-  params: Promise<PageParams>;
+  params: PageParams;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { locale } = await params;
+  const { locale } = params;
   
   const title = locale === 'zh' 
     ? '时间的哲学：为什么掌控时间 = 掌控人生' 
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function TimeMasteryPage({ params }: PageProps) {
-  const { locale } = await params;
+  const { locale } = params;
   const isChinese = locale === 'zh';
 
   const content = {

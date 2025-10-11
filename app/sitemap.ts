@@ -41,7 +41,7 @@ import {
   allStories,
   allGuides,
   allUpdates,
-} from 'contentlayer/generated';
+} from '@/.contentlayer/generated';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
@@ -156,55 +156,55 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // 6. 内容类型页面（Philosophy/Tools/Stories/Guides/Updates）
 
-  // 6.1 Philosophy（哲学思考）
-  allPhilosophies.forEach(philosophy => {
-    sitemapEntries.push({
-      url: `${baseUrl}${philosophy.url}`,
-      lastModified: new Date(philosophy.publishedAt),
-      changeFrequency: 'monthly',
-      priority: 0.7,
+    // 6.1 Philosophy（哲学思考）
+    allPhilosophies.forEach(philosophy => {
+      sitemapEntries.push({
+        url: `${baseUrl}${philosophy.url}`,
+        lastModified: new Date(philosophy.date),
+        changeFrequency: 'monthly',
+        priority: 0.7,
+      });
     });
-  });
 
-  // 6.2 Tools（工具介绍）
-  allTools.forEach(tool => {
-    sitemapEntries.push({
-      url: `${baseUrl}${tool.url}`,
-      lastModified: new Date(tool.publishedAt),
-      changeFrequency: 'monthly',
-      priority: 0.8, // 工具介绍优先级较高
+    // 6.2 Tools（工具介绍）
+    allTools.forEach(tool => {
+      sitemapEntries.push({
+        url: `${baseUrl}${tool.url}`,
+        lastModified: new Date(tool.date),
+        changeFrequency: 'monthly',
+        priority: 0.8, // 工具介绍优先级较高
+      });
     });
-  });
 
-  // 6.3 Stories（用户故事）
-  allStories.forEach(story => {
-    sitemapEntries.push({
-      url: `${baseUrl}${story.url}`,
-      lastModified: new Date(story.publishedAt),
-      changeFrequency: 'monthly',
-      priority: 0.6,
+    // 6.3 Stories（用户故事）
+    allStories.forEach(story => {
+      sitemapEntries.push({
+        url: `${baseUrl}${story.url}`,
+        lastModified: new Date(story.date),
+        changeFrequency: 'monthly',
+        priority: 0.6,
+      });
     });
-  });
 
-  // 6.4 Guides（使用指南）
-  allGuides.forEach(guide => {
-    sitemapEntries.push({
-      url: `${baseUrl}${guide.url}`,
-      lastModified: new Date(guide.publishedAt),
-      changeFrequency: 'weekly', // 指南可能更新更频繁
-      priority: 0.8,
+    // 6.4 Guides（使用指南）
+    allGuides.forEach(guide => {
+      sitemapEntries.push({
+        url: `${baseUrl}${guide.url}`,
+        lastModified: new Date(guide.date),
+        changeFrequency: 'weekly', // 指南可能更新更频繁
+        priority: 0.8,
+      });
     });
-  });
 
-  // 6.5 Updates（产品更新）
-  allUpdates.forEach(update => {
-    sitemapEntries.push({
-      url: `${baseUrl}${update.url}`,
-      lastModified: new Date(update.publishedAt),
-      changeFrequency: 'monthly',
-      priority: 0.7,
+    // 6.5 Updates（产品更新）
+    allUpdates.forEach(update => {
+      sitemapEntries.push({
+        url: `${baseUrl}${update.url}`,
+        lastModified: new Date(update.date),
+        changeFrequency: 'monthly',
+        priority: 0.7,
+      });
     });
-  });
 
   return sitemapEntries;
 }

@@ -25,23 +25,24 @@ import type { Metadata } from "next";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import GATracker from '@/app/ga-tracker';
 import "../globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: "swap", // 优化字体加载
-  preload: true,
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
   preload: true,
 });
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
+  display: "swap",
+  preload: true,
+});
+
 
 /**
  * 全局 metadata（适用于所有页面的默认值）
@@ -80,10 +81,10 @@ export default async function LocaleLayout({
   params
 }: {
   children: React.ReactNode;
-  params: Promise<{ locale: string }>;
+  params: { locale: string };
 }) {
-  // Next.js 15: params 需要先 await
-  const { locale } = await params;
+  // Next.js 14: params 直接使用
+  const { locale } = params;
   
   // 获取当前语言的翻译文件
   const messages = await getMessages();
@@ -91,70 +92,19 @@ export default async function LocaleLayout({
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
   
   return (
-    <html lang={locale} className="scroll-smooth">
-      <head>
-        {/* Google Search Console 验证 */}
-        {process.env.NEXT_PUBLIC_GSC_VERIFICATION && (
-          <meta 
-            name="google-site-verification" 
-            content={process.env.NEXT_PUBLIC_GSC_VERIFICATION} 
-          />
-        )}
-        
-        {/* Theme Color */}
-        <meta name="theme-color" content="#0069FF" />
-        <meta name="color-scheme" content="light" />
+    <NextIntlClientProvider messages={messages}>
+      <main id="main-content" role="main">
+        {children}
+      </main>
 
-        {/* Organization 结构化数据（JSON-LD）*/}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Organization',
-              'name': 'DaysFromToday',
-              'alternateName': 'Days From Today',
-              'url': baseUrl,
-              'logo': `${baseUrl}/logo.png`,
-              'sameAs': [
-                'https://github.com/leeleon/daysfromtoday'
-              ],
-              'description': 'Calculate dates from today with ease',
-              'founder': {
-                '@type': 'Person',
-                'name': 'Leon',
-                'url': `${baseUrl}/${locale}/faq`
-              },
-              'contactPoint': {
-                '@type': 'ContactPoint',
-                'contactType': 'Customer Support',
-                'email': 'feedback@daysfromtoday.com',
-                'availableLanguage': ['en', 'zh']
-              }
-            })
-          }}
-        />
-      </head>
-      
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        suppressHydrationWarning
-      >
-        <NextIntlClientProvider messages={messages}>
-          <main id="main-content" role="main">
-            {children}
-          </main>
-        </NextIntlClientProvider>
+      {/* Google Analytics（性能监控与用户分析）*/}
+      {process.env.NEXT_PUBLIC_GA_ID && (
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+      )}
 
-        {/* Google Analytics（性能监控与用户分析）*/}
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
-        )}
-
-        {/* GA 路由追踪（追踪 SPA 导航）*/}
-        <GATracker />
-      </body>
-    </html>
+      {/* GA 路由追踪（追踪 SPA 导航）*/}
+      <GATracker />
+    </NextIntlClientProvider>
   );
 }
 

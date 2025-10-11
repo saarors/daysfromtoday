@@ -1,8 +1,9 @@
 import { defineDocumentType, makeSource } from 'contentlayer/source-files';
-import rehypeHighlight from 'rehype-highlight';
-import rehypeSlug from 'rehype-slug';
-import rehypeAutolinkHeadings from 'rehype-autolink-headings';
-import remarkGfm from 'remark-gfm';
+// TODO: 修复 rehype 插件类型错误
+// import rehypeHighlight from 'rehype-highlight';
+// import rehypeSlug from 'rehype-slug';
+// import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+// import remarkGfm from 'remark-gfm';
 
 // ============================================================
 // 辅助函数
@@ -348,21 +349,15 @@ export const Updates = defineDocumentType(() => ({
 export default makeSource({
   contentDirPath: 'content',
   documentTypes: [Philosophy, Tools, Stories, Guides, Updates],
+  disableImportAliasWarning: true,
   mdx: {
-    remarkPlugins: [remarkGfm],
-    rehypePlugins: [
-      rehypeSlug,
-      [
-        rehypeAutolinkHeadings,
-        {
-          behavior: 'wrap',
-          properties: {
-            className: ['anchor'],
-          },
-        },
-      ],
-      rehypeHighlight,
-    ],
+    // TODO: 修复插件类型问题后重新启用
+    // remarkPlugins: [remarkGfm],
+    // rehypePlugins: [
+    //   rehypeSlug,
+    //   [rehypeAutolinkHeadings, { behavior: 'wrap' }],
+    //   rehypeHighlight,
+    // ],
   },
 });
 

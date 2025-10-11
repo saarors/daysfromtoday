@@ -67,8 +67,8 @@
 @theme inline {
   --color-background: var(--color-bg-primary);
   --color-foreground: var(--color-text-primary);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
   
   /* 自定义 Tailwind 颜色 */
   --color-calendly-blue: var(--color-primary);
@@ -89,7 +89,7 @@
 body {
   background: var(--color-bg-secondary);
   color: var(--color-text-primary);
-  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -170,7 +170,7 @@ body {
 
 /* 数字显示（大号） */
 .number-display {
-  font-family: var(--font-geist-mono);
+  font-family: var(--font-jetbrains-mono);
   font-size: 72px;
   font-weight: 700;
   line-height: 1;

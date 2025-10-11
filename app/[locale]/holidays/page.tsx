@@ -4,11 +4,11 @@ import Breadcrumb from '@/components/Breadcrumb';
 import HolidaysList from '@/components/HolidaysList';
 
 interface PageProps {
-  params: Promise<{ locale: string }>;
+  params: { locale: string };
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { locale } = await params;
+  const { locale } = params;
   
   const title = locale === 'zh' 
     ? '距离节假日还有几天 | 全球节假日倒计时日历' 
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function HolidaysPage({ params }: PageProps) {
-  const { locale } = await params;
+  const { locale } = params;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">

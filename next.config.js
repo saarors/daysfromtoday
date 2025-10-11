@@ -11,14 +11,15 @@
  * - TypeScript 严格模式
  * - Edge Runtime 兼容
  */
-import type { NextConfig } from "next";
-import { withContentlayer } from 'next-contentlayer';
-import createNextIntlPlugin from 'next-intl/plugin';
+const { withContentlayer } = require('next-contentlayer');
+const createNextIntlPlugin = require('next-intl/plugin');
 
 // 创建 next-intl 插件，指向 i18n 配置文件
 const withNextIntl = createNextIntlPlugin('./i18n/config.ts');
 
-const nextConfig: NextConfig = {
+const nextConfig = {
+  // Next.js 14 不需要 outputFileTracingRoot
+  
   // SEO 优化配置
   compress: true, // 启用 gzip 压缩
   
@@ -46,13 +47,36 @@ const nextConfig: NextConfig = {
   // i18n 配置已由 next-intl 中间件处理
   
   // Webpack 配置（Contentlayer 需要）
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
+    // 修复 recentlyCreatedOwnerStacks 错误
     config.infrastructureLogging = {
       level: 'error',
     };
+    
+    // 优化模块解析
+    config.resolve = {
+      ...config.resolve,
+      fallback: {
+        ...config.resolve?.fallback,
+        fs: false,
+        path: false,
+        os: false,
+      },
+    };
+    
+    // 修复 React 相关错误
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+    
     return config;
   },
 };
 
 // 导出包装后的配置（先 Contentlayer，再 next-intl）
-export default withNextIntl(withContentlayer(nextConfig));
+module.exports = withNextIntl(withContentlayer(nextConfig));

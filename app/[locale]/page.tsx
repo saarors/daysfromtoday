@@ -9,8 +9,8 @@ interface PageParams {
 }
 
 // SEO Metadata
-export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
-  const { locale } = await params;
+export async function generateMetadata({ params }: { params: PageParams }): Promise<Metadata> {
+  const { locale } = params;
   
   const title = locale === 'zh' 
     ? 'Days From Today 计算器 | 日期计算器和倒计时工具'
@@ -45,8 +45,8 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   };
 }
 
-export default async function HomePage({ params }: { params: Promise<PageParams> }) {
-  const { locale } = await params;
+export default async function HomePage({ params }: { params: PageParams }) {
+  const { locale } = params;
   
   return <HomePageClient locale={locale} />;
 }

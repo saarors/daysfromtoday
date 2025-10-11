@@ -9,7 +9,7 @@ interface PageParams {
 }
 
 interface PageProps {
-  params: Promise<PageParams>;
+  params: PageParams;
 }
 
 // 博客文章列表（未来可以从数据库或文件系统读取）
@@ -99,7 +99,7 @@ const blogPosts = [
 ];
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { locale } = await params;
+  const { locale } = params;
   
   const title = locale === 'zh' ? '博客 - DaysFromToday' : 'Blog - DaysFromToday';
   const description = locale === 'zh' 
@@ -128,7 +128,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function BlogPage({ params }: PageProps) {
-  const { locale } = await params;
+  const { locale } = params;
   
   const text = {
     en: {

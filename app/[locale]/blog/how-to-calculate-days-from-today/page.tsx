@@ -6,11 +6,11 @@ interface PageParams {
 }
 
 interface PageProps {
-  params: Promise<PageParams>;
+  params: PageParams;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { locale } = await params;
+  const { locale } = params;
   
   const title = locale === 'zh' 
     ? '如何计算从今天起的日期：完整指南 - DaysFromToday' 
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
-  const { locale } = await params;
+  const { locale } = params;
   
   const content = {
     en: {

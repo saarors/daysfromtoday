@@ -3,10 +3,10 @@ import TopNav from '@/components/TopNav';
 import DateCalculator from '@/components/DateCalculator';
 
 interface PageProps {
-  params: Promise<{
+  params: {
     locale: string;
     n: string;
-  }>;
+  };
 }
 
 // 预生成热门页面
@@ -29,7 +29,7 @@ export async function generateStaticParams() {
 
 // SEO Metadata
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { locale, n } = await params;
+  const { locale, n } = params;
   const days = Number(n);
   
   const title = locale === 'zh'
@@ -77,7 +77,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function DaysFromTodayPage({ params }: PageProps) {
-  const { locale, n } = await params;
+  const { locale, n } = params;
   const days = Number(n);
   
   return (
