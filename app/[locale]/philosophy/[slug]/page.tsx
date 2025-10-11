@@ -77,7 +77,7 @@ export default async function PhilosophyPage({ params }: PhilosophyPageProps) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <Breadcrumb items={breadcrumbItems} />
+        <Breadcrumb items={breadcrumbItems} locale={locale} />
         
         <article className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
           <header className="mb-8">
