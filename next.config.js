@@ -3,13 +3,16 @@
  * 
  * 集成：
  * 1. next-intl 国际化插件
- * 2. Cloudflare R2 图片支持
+ * 2. Contentlayer 内容管理
+ * 3. Cloudflare R2 图片支持
  * 
  * 符合项目规范：
  * - 使用 next-intl 路由（不使用 Next.js 内置 i18n）
  * - TypeScript 严格模式
  * - Edge Runtime 兼容
+ * - Contentlayer 0.3.4 与 Next.js 14.2 兼容
  */
+const { withContentlayer } = require('next-contentlayer');
 const createNextIntlPlugin = require('next-intl/plugin');
 
 // 创建 next-intl 插件，指向 i18n 配置文件
@@ -76,5 +79,5 @@ const nextConfig = {
   },
 };
 
-// 导出包装后的配置
-module.exports = withNextIntl(nextConfig);
+// 导出包装后的配置（先 Contentlayer，再 next-intl）
+module.exports = withNextIntl(withContentlayer(nextConfig));
