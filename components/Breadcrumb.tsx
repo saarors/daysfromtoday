@@ -18,7 +18,7 @@ interface BreadcrumbProps {
 
 interface BreadcrumbItem {
   label: string;   // 显示文本
-  href: string;    // 链接地址
+  href?: string;   // 链接地址（可选，当前页可以为空）
 }
 
 export function Breadcrumb({ items, locale }: BreadcrumbProps) {
@@ -38,7 +38,7 @@ export function Breadcrumb({ items, locale }: BreadcrumbProps) {
       '@type': 'ListItem',
       position: index + 1,
       name: item.label,
-      item: `${process.env.NEXT_PUBLIC_SITE_URL}${item.href}`,
+      item: `${process.env.NEXT_PUBLIC_SITE_URL}${item.href || ''}`,
     })),
   };
 
@@ -60,7 +60,7 @@ export function Breadcrumb({ items, locale }: BreadcrumbProps) {
             const isLast = index === breadcrumbItems.length - 1;
 
             return (
-              <li key={item.href} className="flex items-center">
+              <li key={item.href || item.label} className="flex items-center">
                 {/* 分隔符 */}
                 {index > 0 && (
                   <span className="mx-2 text-gray-400 dark:text-gray-600">
@@ -78,7 +78,7 @@ export function Breadcrumb({ items, locale }: BreadcrumbProps) {
                   </span>
                 ) : (
                   <Link
-                    href={item.href}
+                    href={item.href || '#'}
                     className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   >
                     {item.label}
