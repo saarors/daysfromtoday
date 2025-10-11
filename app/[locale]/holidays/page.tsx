@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import TopNav from '@/components/TopNav';
-import Breadcrumb from '@/components/Breadcrumb';
+import { Breadcrumb } from '@/components/Breadcrumb';
 import HolidaysList from '@/components/HolidaysList';
 
 interface PageProps {

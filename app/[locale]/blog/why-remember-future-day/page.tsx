@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import TopNav from '@/components/TopNav';
-import Breadcrumb from '@/components/Breadcrumb';
+import { Breadcrumb } from '@/components/Breadcrumb';
 
 interface PageParams {
   locale: string;

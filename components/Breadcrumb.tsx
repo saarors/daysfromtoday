@@ -1,162 +1,132 @@
 /**
- * 面包屑导航组件
+ * Breadcrumb - 面包屑导航组件
  * 
- * 功能：
- * - 显示页面层级结构
- * - 支持多语言
- * - 与语言切换器在同一行
+ * 功能:
+ * - 动态生成路径导航
+ * - 多语言支持
+ * - Schema.org 结构化数据（SEO 优化）
+ * - 响应式设计
  */
 
-'use client';
-
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface BreadcrumbProps {
+  items?: BreadcrumbItem[];
   locale: string;
 }
 
 interface BreadcrumbItem {
-  label: string;
-  href: string;
+  label: string;   // 显示文本
+  href: string;    // 链接地址
 }
 
-export default function Breadcrumb({ locale }: BreadcrumbProps) {
-  const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
+export function Breadcrumb({ items, locale }: BreadcrumbProps) {
+  const t = useTranslations();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // 如果没有提供 items，生成默认的面包屑
+  const breadcrumbItems = items || [
+    { label: t('common.home'), href: `/${locale}` },
+    { label: t('common.currentPage'), href: '' }
+  ];
 
-  const text = {
-    en: {
-      home: 'Home',
-      anniversaries: 'My Anniversaries',
-      blog: 'Blog',
-      days: 'Days Calculation',
-      businessDays: 'Business Days'
-    },
-    zh: {
-      home: '首页',
-      anniversaries: '我的纪念日',
-      blog: '博客',
-      days: '日期计算',
-      businessDays: '工作日'
-    }
+  // 构建 Schema.org 结构化数据
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: breadcrumbItems.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.label,
+      item: `${process.env.NEXT_PUBLIC_SITE_URL}${item.href}`,
+    })),
   };
-
-  const t = text[locale as keyof typeof text] || text.en;
-
-  const getBreadcrumbs = (): BreadcrumbItem[] => {
-    if (!mounted || !pathname) return [{ label: t.home, href: `/${locale}` }];
-
-    const segments = pathname.split('/').filter(Boolean);
-    const breadcrumbs: BreadcrumbItem[] = [
-      { label: t.home, href: `/${locale}` }
-    ];
-
-    // 移除语言前缀
-    if (segments[0] === locale || segments[0] === 'en' || segments[0] === 'zh') {
-      segments.shift();
-    }
-
-    // 特殊路径处理 - 简化面包屑
-    const path = segments.join('/');
-    
-    // 1. 纪念日页面
-    if (path === 'anniversaries') {
-      breadcrumbs.push({ label: t.anniversaries, href: `/${locale}/anniversaries` });
-      return breadcrumbs;
-    }
-    
-    // 2. 博客列表页
-    if (path === 'blog') {
-      breadcrumbs.push({ label: t.blog, href: `/${locale}/blog` });
-      return breadcrumbs;
-    }
-    
-    // 3. 博客文章详情页
-    if (path.startsWith('blog/')) {
-      breadcrumbs.push({ label: t.blog, href: `/${locale}/blog` });
-      // 文章标题会由具体页面提供，这里只添加博客列表链接
-      return breadcrumbs;
-    }
-    
-    // 3. 未来日期计算：/days/[n] 或 /business-days/[n]
-    const futureCalendarMatch = path.match(/^days\/(\d+)$/);
-    const futureBusinessMatch = path.match(/^business-days\/(\d+)$/);
-    
-    if (futureCalendarMatch) {
-      const days = futureCalendarMatch[1];
-      const label = locale === 'zh' ? `未来${days}天` : `${days} Days Later`;
-      breadcrumbs.push({ label, href: `/${locale}/days/${days}` });
-      return breadcrumbs;
-    }
-    
-    if (futureBusinessMatch) {
-      const days = futureBusinessMatch[1];
-      const label = locale === 'zh' ? `未来${days}个工作日` : `${days} Business Days Later`;
-      breadcrumbs.push({ label, href: `/${locale}/business-days/${days}` });
-      return breadcrumbs;
-    }
-    
-    // 4. 过去日期计算：/days/ago/[n] 或 /business-days/ago/[n]
-    const pastCalendarMatch = path.match(/^days\/ago\/(\d+)$/);
-    const pastBusinessMatch = path.match(/^business-days\/ago\/(\d+)$/);
-    
-    if (pastCalendarMatch) {
-      const days = pastCalendarMatch[1];
-      const label = locale === 'zh' ? `过去${days}天` : `${days} Days Ago`;
-      breadcrumbs.push({ label, href: `/${locale}/days/ago/${days}` });
-      return breadcrumbs;
-    }
-    
-    if (pastBusinessMatch) {
-      const days = pastBusinessMatch[1];
-      const label = locale === 'zh' ? `过去${days}个工作日` : `${days} Business Days Ago`;
-      breadcrumbs.push({ label, href: `/${locale}/business-days/ago/${days}` });
-      return breadcrumbs;
-    }
-
-    // 默认处理（其他页面）
-    return breadcrumbs;
-  };
-
-  const breadcrumbs = getBreadcrumbs();
-
-  // 在客户端挂载前不显示详细路径
-  if (!mounted) {
-    return (
-      <nav className="flex items-center text-sm text-gray-600" suppressHydrationWarning>
-        <Link href={`/${locale}`} className="hover:text-blue-600 transition-colors">
-          {t.home}
-        </Link>
-      </nav>
-    );
-  }
 
   return (
-    <nav className="flex items-center text-sm text-gray-600" suppressHydrationWarning>
-      {breadcrumbs.map((item, index) => (
-        <span key={item.href} className="flex items-center">
-          {index > 0 && (
-            <span className="mx-2 text-gray-400">/</span>
-          )}
-          {index === breadcrumbs.length - 1 ? (
-            <span className="text-gray-900 font-medium">{item.label}</span>
-          ) : (
-            <Link 
-              href={item.href} 
-              className="hover:text-blue-600 transition-colors"
-            >
-              {item.label}
-            </Link>
-          )}
-        </span>
-      ))}
-    </nav>
+    <>
+      {/* Schema.org 结构化数据 */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+
+      {/* 面包屑导航 */}
+      <nav
+        aria-label="Breadcrumb"
+        className="mb-6 text-sm text-gray-600 dark:text-gray-400"
+      >
+        <ol className="flex items-center space-x-2 flex-wrap">
+          {breadcrumbItems.map((item, index) => {
+            const isLast = index === breadcrumbItems.length - 1;
+
+            return (
+              <li key={item.href} className="flex items-center">
+                {/* 分隔符 */}
+                {index > 0 && (
+                  <span className="mx-2 text-gray-400 dark:text-gray-600">
+                    /
+                  </span>
+                )}
+
+                {/* 链接或当前页 */}
+                {isLast ? (
+                  <span
+                    className="font-medium text-gray-900 dark:text-gray-100"
+                    aria-current="page"
+                  >
+                    {item.label}
+                  </span>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+    </>
   );
 }
 
+/**
+ * 工具函数：从路径生成面包屑数据
+ */
+export function generateBreadcrumbs(
+  pathname: string,
+  locale: string,
+  t: any
+): BreadcrumbItem[] {
+  const segments = pathname.split('/').filter(Boolean);
+  const breadcrumbs: BreadcrumbItem[] = [];
+
+  // 添加首页
+  breadcrumbs.push({
+    label: t('common.home'),
+    href: `/${locale}`,
+  });
+
+  // 移除 locale 部分
+  const pathSegments = segments.filter((seg) => seg !== locale);
+
+  // 构建路径
+  let currentPath = `/${locale}`;
+  pathSegments.forEach((segment, index) => {
+    currentPath += `/${segment}`;
+
+    // 获取翻译标签（如果存在）
+    const labelKey = `breadcrumb.${segment}`;
+    const label = t.has(labelKey) ? t(labelKey) : segment;
+
+    breadcrumbs.push({
+      label,
+      href: currentPath,
+    });
+  });
+
+  return breadcrumbs;
+}
