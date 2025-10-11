@@ -7,7 +7,7 @@
     "build": "contentlayer build && next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "contentlayer generate",
+    "postinstall": "contentlayer build",
     "holidays:init": "tsx scripts/generate-holidays.ts init",
     "holidays:update": "tsx scripts/generate-holidays.ts update",
     "holidays:validate": "tsx scripts/validate-holidays.ts"
