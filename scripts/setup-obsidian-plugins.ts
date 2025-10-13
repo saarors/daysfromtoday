@@ -11,7 +11,7 @@
  */
 
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
 
 const OBSIDIAN_DIR = 'obsidian';
 
