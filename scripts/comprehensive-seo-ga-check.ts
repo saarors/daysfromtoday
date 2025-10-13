@@ -97,7 +97,7 @@ class ComprehensiveSEOGAValidator {
       result.warnings.push(...seoChecks.warnings);
 
     } catch (error) {
-      result.issues.push(`Network error: ${error.message}`);
+      result.issues.push(`Network error: ${error instanceof Error ? error.message : String(error)}`);
     }
 
     return result;
