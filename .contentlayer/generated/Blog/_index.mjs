@@ -3,6 +3,6 @@
 import blog__en__whyICreatedDaysfromtodayMd from './blog__en__why-i-created-daysfromtoday.md.json' assert { type: 'json' }
 import blog__en__whyWeNeedToRememberAFutureDayMd from './blog__en__why-we-need-to-remember-a-future-day.md.json' assert { type: 'json' }
 import blog__zh__whyICreatedDaysfromtodayMd from './blog__zh__why-i-created-daysfromtoday.md.json' assert { type: 'json' }
-import blog__zh__Md from './blog__zh__我们为什么要记住未来的某一天.md.json' assert { type: 'json' }
+import blog__zh__whyWeNeedToRememberAFutureDayMd from './blog__zh__why-we-need-to-remember-a-future-day.md.json' assert { type: 'json' }
 
-export const allBlogs = [blog__en__whyICreatedDaysfromtodayMd, blog__en__whyWeNeedToRememberAFutureDayMd, blog__zh__whyICreatedDaysfromtodayMd, blog__zh__Md]
+export const allBlogs = [blog__en__whyICreatedDaysfromtodayMd, blog__en__whyWeNeedToRememberAFutureDayMd, blog__zh__whyICreatedDaysfromtodayMd, blog__zh__whyWeNeedToRememberAFutureDayMd]
