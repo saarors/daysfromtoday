@@ -31,7 +31,12 @@
     "sync:obsidian:watch": "tsx scripts/sync-obsidian-to-content.ts --watch --verbose",
     "sync:obsidian:all": "tsx scripts/sync-obsidian-to-content.ts --verbose",
     "obsidian:setup": "tsx scripts/setup-obsidian-plugins.ts",
-    "obsidian:full-workflow": "npm run obsidian:setup && npm run sync:obsidian:watch"
+    "obsidian:full-workflow": "npm run obsidian:setup && npm run sync:obsidian:watch",
+    "blog:workflow": "tsx scripts/blog-publishing-workflow.ts",
+    "blog:check": "tsx scripts/blog-publishing-workflow.ts --check",
+    "blog:translate": "tsx scripts/blog-publishing-workflow.ts --translate",
+    "blog:update": "tsx scripts/blog-publishing-workflow.ts --update",
+    "blog:deploy": "tsx scripts/blog-publishing-workflow.ts --deploy"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.908.0",
