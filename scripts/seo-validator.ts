@@ -73,7 +73,7 @@ class SEOValidator {
       await this.checkInternalLinks(pagePath, report);
 
     } catch (error) {
-      report.issues.push(`验证错误: ${error.message}`);
+      report.issues.push(`验证错误: ${error instanceof Error ? error.message : String(error)}`);
       report.score -= 30;
     }
 
