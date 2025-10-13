@@ -69,8 +69,8 @@ export default async function PhilosophyPage({ params }: PhilosophyPageProps) {
   }
 
   const breadcrumbItems = [
-    { label: t('nav.home'), href: `/${locale}` },
-    { label: t('nav.philosophy'), href: `/${locale}/philosophy` },
+    { label: t('home'), href: `/${locale}` },
+    { label: t('breadcrumb.philosophy'), href: `/${locale}/philosophy` },
     { label: philosophy.title },
   ];
 

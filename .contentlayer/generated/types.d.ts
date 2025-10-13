@@ -27,111 +27,6 @@ export type Blog = {
   body: MDX
   url: string
   slug: string
-}
-
-export type Guides = {
-  /** File path relative to `contentDirPath` */
-  _id: string
-  _raw: Local.RawDocumentData
-  type: 'Guides'
-  title: string
-  description: string
-  date: IsoDateTimeString
-  author: string
-  category: string
-  tags: string[]
-  featured: boolean
-  image?: string | undefined
-  readingTime?: string | undefined
-  locale: string
-  /** MDX file body */
-  body: MDX
-  url: string
-  slug: string
-}
-
-export type Philosophy = {
-  /** File path relative to `contentDirPath` */
-  _id: string
-  _raw: Local.RawDocumentData
-  type: 'Philosophy'
-  title: string
-  description: string
-  date: IsoDateTimeString
-  author: string
-  category: string
-  tags: string[]
-  featured: boolean
-  image?: string | undefined
-  readingTime?: string | undefined
-  locale: string
-  /** MDX file body */
-  body: MDX
-  url: string
-  slug: string
-}
-
-export type Stories = {
-  /** File path relative to `contentDirPath` */
-  _id: string
-  _raw: Local.RawDocumentData
-  type: 'Stories'
-  title: string
-  description: string
-  date: IsoDateTimeString
-  author: string
-  category: string
-  tags: string[]
-  featured: boolean
-  image?: string | undefined
-  readingTime?: string | undefined
-  locale: string
-  /** MDX file body */
-  body: MDX
-  url: string
-  slug: string
-}
-
-export type Tools = {
-  /** File path relative to `contentDirPath` */
-  _id: string
-  _raw: Local.RawDocumentData
-  type: 'Tools'
-  title: string
-  description: string
-  date: IsoDateTimeString
-  author: string
-  category: string
-  tags: string[]
-  featured: boolean
-  image?: string | undefined
-  readingTime?: string | undefined
-  locale: string
-  /** MDX file body */
-  body: MDX
-  url: string
-  slug: string
-}
-
-export type Updates = {
-  /** File path relative to `contentDirPath` */
-  _id: string
-  _raw: Local.RawDocumentData
-  type: 'Updates'
-  title: string
-  description: string
-  date: IsoDateTimeString
-  author: string
-  category: string
-  tags: string[]
-  featured: boolean
-  image?: string | undefined
-  readingTime?: string | undefined
-  locale: string
-  /** MDX file body */
-  body: MDX
-  url: string
-  slug: string
 }  
 
 /** Nested types */
@@ -142,8 +37,8 @@ export type Updates = {
 export type AllTypes = DocumentTypes | NestedTypes
 export type AllTypeNames = DocumentTypeNames | NestedTypeNames
 
-export type DocumentTypes = Blog | Guides | Philosophy | Stories | Tools | Updates
-export type DocumentTypeNames = 'Blog' | 'Guides' | 'Philosophy' | 'Stories' | 'Tools' | 'Updates'
+export type DocumentTypes = Blog
+export type DocumentTypeNames = 'Blog'
 
 export type NestedTypes = never
 export type NestedTypeNames = never
@@ -151,11 +46,6 @@ export type NestedTypeNames = never
 export type DataExports = {
   allDocuments: DocumentTypes[]
   allBlogs: Blog[]
-  allPhilosophies: Philosophy[]
-  allTools: Tools[]
-  allStories: Stories[]
-  allGuides: Guides[]
-  allUpdates: Updates[]
 }
 
 
@@ -176,11 +66,6 @@ declare global {
 
 export type DocumentTypeMap = {
   Blog: Blog
-  Guides: Guides
-  Philosophy: Philosophy
-  Stories: Stories
-  Tools: Tools
-  Updates: Updates
 }
 
 export type NestedTypeMap = {

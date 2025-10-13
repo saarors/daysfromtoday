@@ -1,0 +1,26 @@
+{
+  "templater-obsidian:create-new-note-from-template": [
+    {
+      "modifiers": ["Ctrl", "Shift"],
+      "key": "T"
+    }
+  ],
+  "templater-obsidian:replace-templates-in-active-note": [
+    {
+      "modifiers": ["Ctrl", "Shift"],
+      "key": "R"
+    }
+  ],
+  "obsidian-image-uploader:upload-image": [
+    {
+      "modifiers": ["Ctrl", "Shift"],
+      "key": "I"
+    }
+  ],
+  "obsidian-image-uploader:upload-image-from-clipboard": [
+    {
+      "modifiers": ["Ctrl", "Shift"],
+      "key": "V"
+    }
+  ]
+}

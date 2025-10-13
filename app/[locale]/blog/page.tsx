@@ -15,85 +15,44 @@ interface PageProps {
 // 博客文章列表（未来可以从数据库或文件系统读取）
 const blogPosts = [
   {
-    slug: 'time-mastery-is-freedom',
+    slug: 'why-i-created-daysfromtoday',
     title: {
-      en: 'Time Mastery = Life Mastery: Why Time is Your Only Fair Advantage',
-      zh: '时间的哲学：为什么掌控时间 = 掌控人生'
+      en: 'Why I Created DaysFromToday',
+      zh: '我为什么创建了 DaysFromToday'
     },
     excerpt: {
-      en: 'Life\'s unfair. Some people are born rich, some lucky, some just tired. But here\'s the one thing that\'s fair: time. Everyone gets 24 hours a day. The only question is: are you the boss of your time, or just another employee working for it?',
-      zh: '说真的，人生这场游戏不公平的地方太多了。但偏偏有一件事，老天挺公道——那就是时间。每个人，一天都是 24 小时。问题是：你是时间的老板，还是它的打工人？'
+      en: 'In September this year, my 13-year-old son began his first full boarding school life. This changed how he views time. Time — for each of us, it\'s almost the only fair, scarce, and completely controllable resource worth mastering.',
+      zh: '今年9月，我13岁的儿子开始了他人生中的第一次全寄宿生活。这改变了他看待时间的方式。时间 —— 对于我们每个人来说，几乎是唯一公平、稀缺且值得完全掌控的资源。'
     },
-    date: '2025-10-09',
+    date: '2025-10-10',
     readTime: {
       en: '6 min read',
       zh: '6 分钟阅读'
     },
     category: {
-      en: 'Philosophy',
-      zh: '哲学思考'
+      en: 'Personal',
+      zh: '个人'
     },
     featured: true
   },
   {
-    slug: 'why-remember-future-day',
+    slug: 'why-we-need-to-remember-a-future-day',
     title: {
       en: 'Why We Need to Remember a Day in the Future',
       zh: '我们为什么要记住未来的某一天'
     },
     excerpt: {
-      en: 'When you hit forty, something changes. Your memory starts playing hide and seek. But honestly, I started forgetting things way earlier. Time doesn\'t yell. It whispers. And one day you realize it\'s already gone.',
+      en: 'After turning forty, I noticed something had changed in me. Things I used to remember easily, I now keep forgetting. Time, what a sneaky friend it is. It doesn\'t remind you, doesn\'t rush you, but it silently makes you pay the price.',
       zh: '年过四十之后，我发现自己变了。原来能记住的小事儿，现在老忘。时间吧，真是个狡猾的朋友。它不提醒、不催促，但它默默地让你付出代价。'
     },
-    date: '2025-10-09',
+    date: '2025-10-11',
     readTime: {
       en: '5 min read',
       zh: '5 分钟阅读'
     },
     category: {
-      en: 'Warmth',
-      zh: '温度思考'
-    },
-    featured: true
-  },
-  {
-    slug: 'why-i-built-daysfromtoday',
-    title: {
-      en: 'Why I Built DaysFromToday',
-      zh: '为什么我要做 DaysFromToday'
-    },
-    excerpt: {
-      en: 'In September, my 13-year-old son started boarding school. Every call, he asks: "How many days left?" It made me realize — time is the only truly fair and scarce resource we have. So I built DaysFromToday.',
-      zh: '今年9月，我13岁的儿子开始寄宿生活。每次通话他都会问："还有几天？" 这让我意识到，时间是我们唯一公平且稀缺的资源。于是我做了 DaysFromToday。'
-    },
-    date: '2025-10-08',
-    readTime: {
-      en: '6 min read',
-      zh: '6 分钟阅读'
-    },
-    category: {
-      en: 'Story',
-      zh: '故事'
-    }
-  },
-  {
-    slug: 'how-to-calculate-days-from-today',
-    title: {
-      en: 'How to Calculate Days From Today: A Complete Guide',
-      zh: '如何计算从今天起的日期：完整指南'
-    },
-    excerpt: {
-      en: 'Learn everything about calculating future and past dates, including natural days, business days, holidays, and timezone considerations.',
-      zh: '了解关于计算未来和过去日期的所有知识，包括自然日、工作日、节假日和时区注意事项。'
-    },
-    date: '2025-10-07',
-    readTime: {
-      en: '8 min read',
-      zh: '8 分钟阅读'
-    },
-    category: {
-      en: 'Guide',
-      zh: '指南'
+      en: 'Blog',
+      zh: '博客'
     }
   }
 ];
@@ -106,24 +65,55 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ? '探索日期计算、时间管理和工作效率提升的实用技巧和深度文章。'
     : 'Explore practical tips and in-depth articles on date calculation, time management, and productivity.';
   
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
+  const blogUrl = `${baseUrl}/${locale}/blog`;
+  
   return {
     title,
     description,
+    keywords: locale === 'zh' 
+      ? '日期计算,时间管理,工作效率,博客,文章'
+      : 'date calculation,time management,productivity,blog,articles',
     alternates: {
-      canonical: `https://www.daysfromtoday.ai/${locale}/blog`,
+      canonical: blogUrl,
       languages: {
-        'en': 'https://www.daysfromtoday.ai/en/blog',
-        'zh': 'https://www.daysfromtoday.ai/zh/blog',
+        'en': `${baseUrl}/en/blog`,
+        'zh': `${baseUrl}/zh/blog`,
       }
     },
     openGraph: {
       title,
       description,
-      url: `https://www.daysfromtoday.ai/${locale}/blog`,
+      url: blogUrl,
       siteName: 'DaysFromToday',
       locale: locale === 'zh' ? 'zh_CN' : 'en_US',
       type: 'website',
-    }
+      images: [
+        {
+          url: `${baseUrl}/images/blog-og.jpg`,
+          alt: title,
+          width: 1200,
+          height: 630,
+        }
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [`${baseUrl}/images/blog-og.jpg`],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
   };
 }
 

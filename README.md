@@ -236,10 +236,31 @@ vercel rollback          # 回滚部署
 
 ## 📖 文档
 
-- [博客系统完整指南](docs/BLOG_SYSTEM.md)
-- [博客快速参考](docs/BLOG_QUICK_REFERENCE.md)
-- [博客模板规范](docs/templates/BLOG_TEMPLATE.md)
-- [CLI 工具指南](docs/ai/CLI_TOOLS_GUIDE.md)
+### 🚀 **快速开始**
+- [Obsidian 博客创作工作流](docs/getting-started/OBSIDIAN_BLOG_WORKFLOW.md) - **新文档** ⭐
+- [博客快速参考](docs/getting-started/BLOG_QUICK_REFERENCE.md)
+- [技术栈快速参考](docs/getting-started/TECH_STACK_QUICK_REFERENCE.md)
+
+### 📝 **内容创作**
+- [Obsidian 完整工作流](docs/OBSIDIAN_COMPLETE_WORKFLOW.md) - **新文档** ⭐
+- [博客系统完整指南](docs/content-creation/BLOG_SYSTEM.md)
+- [博客内容指南](docs/content-creation/BLOG_CONTENT_GUIDELINES.md)
+- [MDX 组件使用](docs/content-creation/MDX_COMPONENTS.md)
+- [Obsidian 工作流](docs/content-creation/OBSIDIAN_WORKFLOW.md)
+
+### 🔍 **SEO 与优化**
+- [SEO 检查清单](docs/seo-optimization/SEO_CHECKLIST.md)
+- [Google Search Console 指南](docs/seo-optimization/GOOGLE_SEARCH_CONSOLE_GUIDE.md)
+- [Google Analytics 设置](docs/analytics/GOOGLE_ANALYTICS_SETUP.md)
+
+### 🏗️ **技术架构**
+- [技术栈文档](docs/technical-architecture/TECH_STACK.md)
+- [产品路线图 v2](docs/technical-architecture/PRODUCT_ROADMAP_V2.md)
+- [部署指南](docs/deployment/DEPLOYMENT_CHECKLIST.md)
+
+### 📊 **完整文档库**
+- [文档库索引](docs/README.md) - 查看所有文档
+- [文档整理方案](docs/DOCUMENTATION_REORGANIZATION_PLAN.md) - 文档整理详情
 
 ---
 

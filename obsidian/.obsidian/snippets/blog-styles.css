@@ -1,0 +1,160 @@
+/* DaysFromToday 博客样式优化 */
+
+/* 基础样式 */
+.markdown-preview-view {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  line-height: 1.6;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 标题样式 */
+.markdown-preview-view h1 {
+  color: #2c3e50;
+  border-bottom: 2px solid #007acc;
+  padding-bottom: 8px;
+  margin-top: 32px;
+  margin-bottom: 16px;
+}
+
+.markdown-preview-view h2 {
+  color: #34495e;
+  border-bottom: 1px solid #bdc3c7;
+  padding-bottom: 4px;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.markdown-preview-view h3 {
+  color: #2c3e50;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+/* 引用块样式 */
+.markdown-preview-view blockquote {
+  border-left: 4px solid #007acc;
+  background-color: #f8f9fa;
+  padding: 16px;
+  margin: 16px 0;
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+}
+
+/* 代码块样式 */
+.markdown-preview-view pre {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 16px;
+  overflow-x: auto;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.markdown-preview-view code {
+  background-color: #f1f3f4;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.9em;
+}
+
+/* 表格样式 */
+.markdown-preview-view table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+}
+
+.markdown-preview-view th,
+.markdown-preview-view td {
+  border: 1px solid #e9ecef;
+  padding: 12px;
+  text-align: left;
+}
+
+.markdown-preview-view th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+/* 链接样式 */
+.markdown-preview-view a {
+  color: #007acc;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-bottom 0.2s ease;
+}
+
+.markdown-preview-view a:hover {
+  border-bottom: 1px solid #007acc;
+}
+
+/* 图片样式 */
+.markdown-preview-view img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 16px 0;
+}
+
+/* 列表样式 */
+.markdown-preview-view ul,
+.markdown-preview-view ol {
+  padding-left: 24px;
+}
+
+.markdown-preview-view li {
+  margin: 8px 0;
+}
+
+/* 任务列表样式 */
+.markdown-preview-view input[type="checkbox"] {
+  margin-right: 8px;
+  transform: scale(1.1);
+}
+
+/* 分隔线样式 */
+.markdown-preview-view hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(to right, #007acc, #00d4aa);
+  margin: 32px 0;
+}
+
+/* 表情符号样式 */
+.markdown-preview-view .emoji {
+  font-size: 1.2em;
+  margin-right: 4px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .markdown-preview-view {
+    padding: 16px;
+  }
+  
+  .markdown-preview-view table {
+    font-size: 0.9em;
+  }
+  
+  .markdown-preview-view th,
+  .markdown-preview-view td {
+    padding: 8px;
+  }
+}
+
+/* 打印样式 */
+@media print {
+  .markdown-preview-view {
+    max-width: none;
+    padding: 0;
+  }
+  
+  .markdown-preview-view a {
+    color: #000;
+    text-decoration: underline;
+  }
+}

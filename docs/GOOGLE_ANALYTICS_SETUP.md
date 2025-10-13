@@ -22,7 +22,7 @@
 
 ```bash
 Name: NEXT_PUBLIC_GA_ID
-Value: G-9D2SZK734G
+Value: [GA_ID]
 Environment: ✅ Production (必须勾选)
 ```
 
@@ -118,14 +118,14 @@ export default async function LocaleLayout({ children, params }) {
 ### **Step 1：命令行快速验证**
 
 ```bash
-curl -s 'https://www.daysfromtoday.ai/en' | grep 'G-9D2SZK734G'
+curl -s 'https://www.daysfromtoday.ai/en' | grep '[GA_ID]'
 ```
 
 **预期输出：**
 ```html
-<script src="https://www.googletagmanager.com/gtag/js?id=G-9D2SZK734G" ...
+<script src="https://www.googletagmanager.com/gtag/js?id=[GA_ID]" ...
 window.dataLayer = window.dataLayer || [];
-gtag('config', 'G-9D2SZK734G', {
+gtag('config', '[GA_ID]', {
 ```
 
 ---
@@ -134,7 +134,7 @@ gtag('config', 'G-9D2SZK734G', {
 
 1. 访问：https://www.daysfromtoday.ai/en
 2. 右键 → "查看源代码" (View Page Source)
-3. `Ctrl/Cmd + F` 搜索：`G-9D2SZK734G`
+3. `Ctrl/Cmd + F` 搜索：`[GA_ID]`
 4. ✅ 应该在 `<body>` 标签内找到 GA 脚本
 
 ---
@@ -148,7 +148,7 @@ gtag('config', 'G-9D2SZK734G', {
 
 **预期结果：**
 ```
-✅ gtag/js?id=G-9D2SZK734G  (Status: 200)
+✅ gtag/js?id=[GA_ID]  (Status: 200)
 ✅ collect?v=2&...           (Status: 200)
 ```
 
@@ -171,7 +171,7 @@ window.dataLayer
 ### **Step 5：Google Analytics 实时报告**
 
 1. 访问：https://analytics.google.com/
-2. 选择属性：`DaysFromToday (G-9D2SZK734G)`
+2. 选择属性：`DaysFromToday ([GA_ID])`
 3. 报告 → 实时 → 概览
 4. 打开网站：https://www.daysfromtoday.ai/en
 5. ✅ 应该看到 **1 个活跃用户**
@@ -375,7 +375,7 @@ export default function GATracker() {
 
 目前配置：
 ```javascript
-gtag('config', 'G-9D2SZK734G', {
+gtag('config', '[GA_ID]', {
   page_path: window.location.pathname,
   // anonymize_ip: true,  // 可选：IP 匿名化
 });
@@ -389,7 +389,7 @@ gtag('config', 'G-9D2SZK734G', {
 
 2. **IP 匿名化**
    ```javascript
-   gtag('config', 'G-9D2SZK734G', {
+   gtag('config', '[GA_ID]', {
      anonymize_ip: true,
    });
    ```

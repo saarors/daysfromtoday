@@ -27,7 +27,7 @@ import rehypePrism from 'rehype-prism-plus'
 export const Blog = defineDocumentType(() => ({
   name: 'Blog',
   contentType: 'mdx',
-  filePathPattern: `blog/**/*.mdx`,
+  filePathPattern: `blog/**/*.md`,
   fields: {
     title: { type: 'string', required: true },
     description: { type: 'string', required: true },
@@ -47,7 +47,7 @@ export const Blog = defineDocumentType(() => ({
     },
     slug: {
       type: 'string',
-      resolve: (doc) => doc._raw.flattenedPath.split('/').pop(),
+      resolve: (doc) => doc._raw.flattenedPath.split('/').pop()?.replace(/\.mdx?$/, '') || '',
     },
   },
 }))
@@ -56,7 +56,7 @@ export const Blog = defineDocumentType(() => ({
 export const Philosophy = defineDocumentType(() => ({
   name: 'Philosophy',
   contentType: 'mdx',
-  filePathPattern: `philosophy/**/*.mdx`,
+  filePathPattern: `philosophy/**/*.md`,
   fields: {
     title: { type: 'string', required: true },
     description: { type: 'string', required: true },
@@ -76,7 +76,7 @@ export const Philosophy = defineDocumentType(() => ({
     },
     slug: {
       type: 'string',
-      resolve: (doc) => doc._raw.flattenedPath.split('/').pop(),
+      resolve: (doc) => doc._raw.flattenedPath.split('/').pop()?.replace(/\.mdx?$/, '') || '',
     },
   },
 }))
@@ -85,7 +85,7 @@ export const Philosophy = defineDocumentType(() => ({
 export const Tools = defineDocumentType(() => ({
   name: 'Tools',
   contentType: 'mdx',
-  filePathPattern: `tools/**/*.mdx`,
+  filePathPattern: `tools/**/*.md`,
   fields: {
     title: { type: 'string', required: true },
     description: { type: 'string', required: true },
@@ -105,7 +105,7 @@ export const Tools = defineDocumentType(() => ({
     },
     slug: {
       type: 'string',
-      resolve: (doc) => doc._raw.flattenedPath.split('/').pop(),
+      resolve: (doc) => doc._raw.flattenedPath.split('/').pop()?.replace(/\.mdx?$/, '') || '',
     },
   },
 }))
@@ -114,7 +114,7 @@ export const Tools = defineDocumentType(() => ({
 export const Stories = defineDocumentType(() => ({
   name: 'Stories',
   contentType: 'mdx',
-  filePathPattern: `stories/**/*.mdx`,
+  filePathPattern: `stories/**/*.md`,
   fields: {
     title: { type: 'string', required: true },
     description: { type: 'string', required: true },
@@ -134,7 +134,7 @@ export const Stories = defineDocumentType(() => ({
     },
     slug: {
       type: 'string',
-      resolve: (doc) => doc._raw.flattenedPath.split('/').pop(),
+      resolve: (doc) => doc._raw.flattenedPath.split('/').pop()?.replace(/\.mdx?$/, '') || '',
     },
   },
 }))
@@ -143,7 +143,7 @@ export const Stories = defineDocumentType(() => ({
 export const Guides = defineDocumentType(() => ({
   name: 'Guides',
   contentType: 'mdx',
-  filePathPattern: `guides/**/*.mdx`,
+  filePathPattern: `guides/**/*.md`,
   fields: {
     title: { type: 'string', required: true },
     description: { type: 'string', required: true },
@@ -163,7 +163,7 @@ export const Guides = defineDocumentType(() => ({
     },
     slug: {
       type: 'string',
-      resolve: (doc) => doc._raw.flattenedPath.split('/').pop(),
+      resolve: (doc) => doc._raw.flattenedPath.split('/').pop()?.replace(/\.mdx?$/, '') || '',
     },
   },
 }))
@@ -172,7 +172,7 @@ export const Guides = defineDocumentType(() => ({
 export const Updates = defineDocumentType(() => ({
   name: 'Updates',
   contentType: 'mdx',
-  filePathPattern: `updates/**/*.mdx`,
+  filePathPattern: `updates/**/*.md`,
   fields: {
     title: { type: 'string', required: true },
     description: { type: 'string', required: true },
@@ -192,14 +192,14 @@ export const Updates = defineDocumentType(() => ({
     },
     slug: {
       type: 'string',
-      resolve: (doc) => doc._raw.flattenedPath.split('/').pop(),
+      resolve: (doc) => doc._raw.flattenedPath.split('/').pop()?.replace(/\.mdx?$/, '') || '',
     },
   },
 }))
 
 export default makeSource({
-  contentDirPath: 'content',
-  documentTypes: [Blog, Philosophy, Tools, Stories, Guides, Updates],
+  contentDirPath: 'obsidian/content',
+  documentTypes: [Blog],
   mdx: {
     remarkPlugins: [
       remarkGfm, // GitHub Flavored Markdown

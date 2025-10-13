@@ -27,7 +27,9 @@
     "goHome": "返回首页"
   },
   "common": {
-    "home": "首页"
+    "home": "首页",
+    "blog": "博客",
+    "currentPage": "当前页面"
   },
   "breadcrumb": {
     "philosophy": "哲学思考",

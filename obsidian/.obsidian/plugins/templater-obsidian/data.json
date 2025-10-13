@@ -1,0 +1,44 @@
+{
+  "command_timeout": 5000,
+  "templates_folder": "templates",
+  "templates_pairs": [
+    [
+      "<%",
+      "%>"
+    ],
+    [
+      "<%*",
+      "*%>"
+    ]
+  ],
+  "trigger_on_file_creation": true,
+  "auto_jump_to_cursor": true,
+  "enable_system_commands": false,
+  "shell_path": "",
+  "user_scripts_folder": "",
+  "enable_folder_templates": true,
+  "folder_templates": [
+    {
+      "folder": "content/blog/en",
+      "template": "templates/universal-blog-template.md"
+    },
+    {
+      "folder": "content/blog/zh",
+      "template": "templates/universal-blog-template.md"
+    }
+  ],
+  "enable_file_templates": true,
+  "file_templates": [
+    {
+      "trigger": "blog",
+      "template": "universal-blog-template.md"
+    }
+  ],
+  "syntax_highlighting": true,
+  "syntax_highlighting_mobile": false,
+  "enabled_templates_hotkeys": [
+    "universal-blog-template.md"
+  ],
+  "startup_templates": [],
+  "intellisense_render": 1
+}

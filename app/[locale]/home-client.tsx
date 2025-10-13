@@ -60,9 +60,9 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
       blog: {
         title: 'Featured Story',
         firstPost: {
-          title: 'Why I Built DaysFromToday',
-          date: 'October 8, 2025',
-          excerpt: 'In September, my 13-year-old son started boarding school. Every call, he asks: "How many days left?" It made me realize — time is the only truly fair and scarce resource we have.',
+          title: 'Why I Created DaysFromToday',
+          date: 'October 10, 2025',
+          excerpt: 'In September this year, my 13-year-old son began his first full boarding school life. This changed how he views time. Time — for each of us, it\'s almost the only fair, scarce, and completely controllable resource worth mastering.',
           readMore: 'Read Story',
           readTime: '6 min read'
         }
@@ -107,9 +107,9 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
       blog: {
         title: '精选故事',
         firstPost: {
-          title: '为什么我要做 DaysFromToday',
-          date: '2025年10月8日',
-          excerpt: '今年9月，我13岁的儿子开始寄宿生活。每次通话他都会问："还有几天？" 这让我意识到，时间是我们唯一公平且稀缺的资源。',
+          title: '我为什么创建了 DaysFromToday',
+          date: '2025年10月10日',
+          excerpt: '今年9月，我13岁的儿子开始了他人生中的第一次全寄宿生活。这改变了他看待时间的方式。时间 —— 对于我们每个人来说，几乎是唯一公平、稀缺且值得完全掌控的资源。',
           readMore: '阅读故事',
           readTime: '6 分钟阅读'
         }
@@ -378,7 +378,7 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
             {t.blog.title}
           </h2>
           
-          <Link href={`/${locale}/blog/why-i-built-daysfromtoday`} className="block">
+          <Link href={`/${locale}/blog/why-i-created-daysfromtoday`} className="block">
             <Card className="card-glass hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden relative">
               {/* Featured 标识 */}
               <div className="absolute top-4 right-4 z-10">

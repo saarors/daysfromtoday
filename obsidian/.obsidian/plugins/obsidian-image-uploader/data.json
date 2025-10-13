@@ -1,0 +1,11 @@
+{
+  "apiEndpoint": "http://localhost:3000/api/upload-image",
+  "uploadHeader": "Content-Type: multipart/form-data",
+  "uploadBody": "file=$FILE&category=blog&locale=en",
+  "imageUrlPath": "https://cdn.daysfromtoday.ai/images/blog/en/",
+  "maxWidth": 4096,
+  "enableResize": false,
+  "responsePath": "url",
+  "enableAutoRename": true,
+  "autoRenamePattern": "{{timestamp}}"
+}

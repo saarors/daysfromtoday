@@ -27,7 +27,9 @@
     "goHome": "Go to Homepage"
   },
   "common": {
-    "home": "Home"
+    "home": "Home",
+    "blog": "Blog",
+    "currentPage": "Current Page"
   },
   "breadcrumb": {
     "philosophy": "Philosophy",

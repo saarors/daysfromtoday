@@ -26,8 +26,8 @@ export function Breadcrumb({ items, locale }: BreadcrumbProps) {
 
   // 如果没有提供 items，生成默认的面包屑
   const breadcrumbItems = items || [
-    { label: t('common.home'), href: `/${locale}` },
-    { label: t('common.currentPage'), href: '' }
+    { label: locale === 'zh' ? '首页' : 'Home', href: `/${locale}` },
+    { label: locale === 'zh' ? '当前页面' : 'Current Page', href: '' }
   ];
 
   // 构建 Schema.org 结构化数据
@@ -38,7 +38,7 @@ export function Breadcrumb({ items, locale }: BreadcrumbProps) {
       '@type': 'ListItem',
       position: index + 1,
       name: item.label,
-      item: `${process.env.NEXT_PUBLIC_SITE_URL}${item.href || ''}`,
+      item: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai'}${item.href || ''}`,
     })),
   };
 

@@ -1,0 +1,266 @@
+/* 博客页面美化样式 */
+
+/* 1. 文章容器优化 */
+.blog-post-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  line-height: 1.8;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 2. 标题样式优化 */
+.blog-post-container h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1rem;
+  border-bottom: 3px solid #4299e1;
+  padding-bottom: 0.5rem;
+}
+
+.blog-post-container h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  position: relative;
+  padding-left: 1rem;
+}
+
+.blog-post-container h2::before {
+  content: "📝";
+  position: absolute;
+  left: -0.5rem;
+  top: 0;
+}
+
+.blog-post-container h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* 3. 段落和文本优化 */
+.blog-post-container p {
+  margin-bottom: 1.5rem;
+  color: #4a5568;
+  font-size: 1.1rem;
+}
+
+.blog-post-container strong {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.blog-post-container em {
+  color: #718096;
+  font-style: italic;
+}
+
+/* 4. 列表样式优化 */
+.blog-post-container ul,
+.blog-post-container ol {
+  margin-bottom: 1.5rem;
+  padding-left: 2rem;
+}
+
+.blog-post-container li {
+  margin-bottom: 0.5rem;
+  color: #4a5568;
+}
+
+.blog-post-container ul li::marker {
+  content: "✨ ";
+}
+
+/* 5. 引用块美化 */
+.blog-post-container blockquote {
+  border-left: 4px solid #4299e1;
+  background: #f7fafc;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+  color: #4a5568;
+}
+
+.blog-post-container blockquote::before {
+  content: "💡 ";
+  font-size: 1.2rem;
+}
+
+/* 6. 代码块美化 */
+.blog-post-container pre {
+  background: #2d3748;
+  color: #e2e8f0;
+  padding: 1.5rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid #4a5568;
+}
+
+.blog-post-container code {
+  background: #edf2f7;
+  color: #e53e3e;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.blog-post-container pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+/* 7. 链接样式优化 */
+.blog-post-container a {
+  color: #4299e1;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.blog-post-container a:hover {
+  color: #3182ce;
+  border-bottom-color: #3182ce;
+}
+
+/* 8. 图片优化 */
+.blog-post-container img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 1.5rem 0;
+}
+
+/* 9. 表格美化 */
+.blog-post-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.blog-post-container th,
+.blog-post-container td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.blog-post-container th {
+  background: #f7fafc;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+/* 10. 文章元信息美化 */
+.blog-meta {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.blog-meta .meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.blog-meta .meta-item::before {
+  font-size: 1.1rem;
+}
+
+.blog-meta .author::before { content: "👤"; }
+.blog-meta .date::before { content: "📅"; }
+.blog-meta .reading-time::before { content: "⏱️"; }
+.blog-meta .category::before { content: "📂"; }
+
+/* 11. 标签样式 */
+.blog-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+.blog-tag {
+  background: #edf2f7;
+  color: #4a5568;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.blog-tag:hover {
+  background: #4299e1;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* 12. 响应式设计 */
+@media (max-width: 768px) {
+  .blog-post-container {
+    padding: 1rem;
+  }
+  
+  .blog-post-container h1 {
+    font-size: 2rem;
+  }
+  
+  .blog-post-container h2 {
+    font-size: 1.5rem;
+  }
+  
+  .blog-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* 13. 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .blog-post-container {
+    color: #e2e8f0;
+  }
+  
+  .blog-post-container h1,
+  .blog-post-container h2,
+  .blog-post-container h3 {
+    color: #f7fafc;
+  }
+  
+  .blog-post-container p,
+  .blog-post-container li {
+    color: #cbd5e0;
+  }
+  
+  .blog-post-container blockquote {
+    background: #2d3748;
+    color: #cbd5e0;
+  }
+  
+  .blog-post-container code {
+    background: #4a5568;
+    color: #fbb6ce;
+  }
+}

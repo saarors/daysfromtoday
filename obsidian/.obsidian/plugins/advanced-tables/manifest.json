@@ -1,0 +1,11 @@
+{
+  "id": "table-editor-obsidian",
+  "name": "Advanced Tables",
+  "version": "0.19.4",
+  "minAppVersion": "0.15.0",
+  "description": "Improved table navigation, formatting, and manipulation in Obsidian",
+  "author": "Tony Grosinger",
+  "authorUrl": "https://grosinger.net",
+  "fundingUrl": "https://www.buymeacoffee.com/tgrosinger",
+  "isDesktopOnly": false
+}
