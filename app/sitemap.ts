@@ -27,6 +27,7 @@
  */
 import { MetadataRoute } from 'next';
 import { locales } from '@/i18n/config';
+import { allBlogs } from '@/.contentlayer/generated';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
@@ -70,11 +71,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 0.7,
     });
-    
-    // 博客文章
+  });
+
+  // 4.1 动态添加所有博客文章
+  allBlogs.forEach(blog => {
     sitemapEntries.push({
-      url: `${baseUrl}/${locale}/blog/why-i-built-daysfromtoday`,
-      lastModified: new Date(),
+      url: `${baseUrl}/${blog.locale}/blog/${blog.slug}`,
+      lastModified: new Date(blog.date),
       changeFrequency: 'monthly',
       priority: 0.6,
     });
