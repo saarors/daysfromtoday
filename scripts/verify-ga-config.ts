@@ -100,7 +100,7 @@ class GAConfigValidator {
       }
       
     } catch (error) {
-      this.report.issues.push(`布局文件检查失败: ${error.message}`);
+      this.report.issues.push(`布局文件检查失败: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -130,7 +130,7 @@ class GAConfigValidator {
       }
       
     } catch (error) {
-      this.report.issues.push(`GA 脚本检查失败: ${error.message}`);
+      this.report.issues.push(`GA 脚本检查失败: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
