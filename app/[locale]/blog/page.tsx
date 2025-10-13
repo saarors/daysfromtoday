@@ -15,6 +15,27 @@ interface PageProps {
 // 博客文章列表（未来可以从数据库或文件系统读取）
 const blogPosts = [
   {
+    slug: '21-days-to-build-a-new-you',
+    title: {
+      en: '21 Days to Build a New You: The Magic Time Between Humans and Habits',
+      zh: '21天养成一个好习惯：你会遇见一个全新的自己'
+    },
+    excerpt: {
+      en: 'Discover how 21 days can be a powerful starting point for forming new habits and transforming your life. Based on scientific research and real-world examples.',
+      zh: '发现21天如何成为养成新习惯和改变生活的强大起点。基于科学研究和真实案例。'
+    },
+    date: '2025-10-12',
+    readTime: {
+      en: '7 min read',
+      zh: '7 分钟阅读'
+    },
+    category: {
+      en: 'Habits',
+      zh: '习惯养成'
+    },
+    featured: true
+  },
+  {
     slug: 'why-i-created-daysfromtoday',
     title: {
       en: 'Why I Created DaysFromToday',
@@ -32,8 +53,7 @@ const blogPosts = [
     category: {
       en: 'Personal',
       zh: '个人'
-    },
-    featured: true
+    }
   },
   {
     slug: 'why-we-need-to-remember-a-future-day',
