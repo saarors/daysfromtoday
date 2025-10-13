@@ -127,7 +127,7 @@ class SEOValidator {
       }
 
     } catch (error) {
-      report.issues.push(`Meta 标签检查失败: ${error.message}`);
+      report.issues.push(`Meta 标签检查失败: ${error instanceof Error ? error.message : String(error)}`);
       report.score -= 10;
     }
   }
@@ -151,7 +151,7 @@ class SEOValidator {
       }
 
     } catch (error) {
-      report.issues.push(`结构化数据检查失败: ${error.message}`);
+      report.issues.push(`结构化数据检查失败: ${error instanceof Error ? error.message : String(error)}`);
       report.score -= 5;
     }
   }
@@ -175,7 +175,7 @@ class SEOValidator {
       }
 
     } catch (error) {
-      report.issues.push(`多语言配置检查失败: ${error.message}`);
+      report.issues.push(`多语言配置检查失败: ${error instanceof Error ? error.message : String(error)}`);
       report.score -= 5;
     }
   }
@@ -194,7 +194,7 @@ class SEOValidator {
       }
 
     } catch (error) {
-      report.issues.push(`内部链接检查失败: ${error.message}`);
+      report.issues.push(`内部链接检查失败: ${error instanceof Error ? error.message : String(error)}`);
       report.score -= 5;
     }
   }
