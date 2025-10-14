@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/blog/zh/why-i-created-daysfromtoday.md",
+                "file": "content/blog/en/21-days-to-build-a-new-you.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "why-i-created-daysfromtoday"
+              "title": "21-days-to-build-a-new-you"
             }
           }
         ]
@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 234.5
   },
   "right": {
     "id": "bcbaa81e0eda7515",
@@ -181,6 +181,7 @@
   },
   "left-ribbon": {
     "hiddenItems": {
+      "table-editor-obsidian:Advanced Tables Toolbar": false,
       "switcher:打开快速切换": false,
       "graph:查看关系图谱": false,
       "canvas:新建白板": false,
@@ -192,13 +193,22 @@
       "obsidian-excalidraw-plugin:新建绘图文件": false
     }
   },
-  "active": "590a2c4285e8b07a",
+  "active": "99db513d50570a23",
   "lastOpenFiles": [
-    "content/blog/zh/我们为什么要记住未来的某一天.md",
-    "content/blog/en/why-i-created-daysfromtoday.md",
-    "content/blog/en/why-we-need-to-remember-a-future-day.md",
+    "content/blog/en/test.md",
+    "content/blog/zh/test.md",
+    "content/blog/zh/why-we-need-to-remember-a-future-day.md",
     "content/blog/zh/why-i-created-daysfromtoday.md",
+    "content/blog/en/why-we-need-to-remember-a-future-day.md",
+    "content/blog/en/why-i-created-daysfromtoday.md",
+    "content/blog/en/21-days-to-build-a-new-you.md",
+    "content/blog/zh/images/56ec98dcdad050168fd81a3bab45fd37.jpg",
+    "content/blog/en/images",
+    "content/blog/zh/images",
+    "56ec98dcdad050168fd81a3bab45fd37.jpg",
+    "content/blog/zh/21-days-to-build-a-new-you.md",
     "未命名.canvas",
+    "content/blog/zh/我们为什么要记住未来的某一天.md",
     "content/blog/zh/why-remember-future-day.md",
     "content/blog/zh/holiday-api-integration.md",
     "content/blog/en/why-remember-future-day.md",
@@ -211,35 +221,25 @@
     "content/blog/zh/time-mastery-is-freedom.md",
     "content/blog/zh/how-to-calculate-days-from-today.md",
     "content/blog/zh/timezone-best-practices.md",
-    "Untitled.md",
     "templates/universal-blog-template.md",
     "Untitled 2.md",
     "templates/blog-template-simple.md",
     "Untitled 1.md",
-    "templates/basic-blog.md",
     "scripts/example.js",
     "scripts",
-    "未命名.md",
-    "templates/blog-template-optimized.md",
-    "content/test.md",
-    "content.backup/blog/en/测试测试.md",
     "content/blog/zh/why-remember-future-day.mdx",
     "content/blog/zh/why-i-built-daysfromtoday.mdx",
     "content/blog/zh/time-mastery-is-freedom.mdx",
     "content/blog/zh/how-to-calculate-days-from-today.mdx",
     "content/blog/en/why-remember-future-day.mdx",
     "content/blog/en/why-i-built-daysfromtoday.mdx",
-    "content/blog/en/time-mastery-is-freedom.mdx",
-    "content/blog/en/how-to-calculate-days-from-today.mdx",
     "IMG_2505.jpg",
-    "56ec98dcdad050168fd81a3bab45fd37.jpg",
     "screenshot-20251008-134318.png",
     "x9zbmtzsoisf1 2.jpeg",
     "m7k4tpd9gisf1 4.jpeg",
     "screenshot-20251010-163158.png",
     "x9zbmtzsoisf1 1.jpeg",
     "m7k4tpd9gisf1 3.jpeg",
-    "m7k4tpd9gisf1 2.jpeg",
-    "m7k4tpd9gisf1 1.jpeg"
+    "m7k4tpd9gisf1 2.jpeg"
   ]
 }
