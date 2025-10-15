@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import TopNav from '@/components/TopNav';
-import { Breadcrumb } from '@/components/Breadcrumb';
 import HolidaysList from '@/components/HolidaysList';
 
 interface PageProps {
@@ -47,8 +46,6 @@ export default async function HolidaysPage({ params }: PageProps) {
       <TopNav locale={locale} />
       
       <div className="container mx-auto px-4 py-12 pt-24 md:pt-32 max-w-7xl">
-        <Breadcrumb locale={locale} />
-        
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gradient-calendly">
             {locale === 'zh' ? '全球节假日列表' : 'Global Holidays'}

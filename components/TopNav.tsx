@@ -10,6 +10,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import LanguageSwitcher from './LanguageSwitcher';
 import CountrySelector from './CountrySelector';
@@ -51,52 +52,69 @@ export default function TopNav({ locale }: TopNavProps) {
     <div className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200/50 shadow-sm" suppressHydrationWarning>
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
-          {/* 左侧：主导航 */}
-          <nav className="flex items-center gap-1">
+          {/* 左侧：Logo + 主导航 */}
+          <div className="flex items-center gap-8">
+            {/* Logo 区域 */}
             <Link 
-              href={`/${locale}`}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                isActive(`/${locale}`)
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-              }`}
+              href={`/${locale}`} 
+              className="flex items-center hover:opacity-80 transition-opacity group"
             >
-              {t.home}
+              <Image 
+                src="/image/daysfromtoday-logo.png" 
+                alt="DaysFromToday"
+                width={135}
+                height={45}
+                className="h-12 w-auto group-hover:scale-105 transition-transform duration-200"
+              />
             </Link>
-            <span className="text-gray-300">|</span>
-            <Link 
-              href={`/${locale}/anniversaries`}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                isActive(`/${locale}/anniversaries`)
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-              }`}
-            >
-              {t.anniversaries}
-            </Link>
-            <span className="text-gray-300">|</span>
-            <Link 
-              href={`/${locale}/holidays`}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                isActive(`/${locale}/holidays`)
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-              }`}
-            >
-              {t.holidays}
-            </Link>
-            <span className="text-gray-300">|</span>
-            <Link 
-              href={`/${locale}/blog`}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                isActive(`/${locale}/blog`)
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-              }`}
-            >
-              {t.blog}
-            </Link>
-          </nav>
+            
+            {/* 主导航 - 桌面端 */}
+            <nav className="hidden md:flex items-center gap-1">
+              <Link 
+                href={`/${locale}`}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                  isActive(`/${locale}`)
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                }`}
+              >
+                {t.home}
+              </Link>
+              <span className="text-gray-300">|</span>
+              <Link 
+                href={`/${locale}/anniversaries`}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                  isActive(`/${locale}/anniversaries`)
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                }`}
+              >
+                {t.anniversaries}
+              </Link>
+              <span className="text-gray-300">|</span>
+              <Link 
+                href={`/${locale}/holidays`}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                  isActive(`/${locale}/holidays`)
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                }`}
+              >
+                {t.holidays}
+              </Link>
+              <span className="text-gray-300">|</span>
+              <Link 
+                href={`/${locale}/blog`}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                  isActive(`/${locale}/blog`)
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                }`}
+              >
+                {t.blog}
+              </Link>
+            </nav>
+          </div>
           
           {/* 右侧：语言切换器 + 国家选择器 */}
           <div className="flex items-center gap-3">
