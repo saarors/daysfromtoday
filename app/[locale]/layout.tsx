@@ -45,36 +45,58 @@ const jetbrainsMono = JetBrains_Mono({
 
 
 /**
- * 全局 metadata（适用于所有页面的默认值）
+ * 增强的 Metadata 生成
+ * 
+ * 功能：
+ * 1. 统一的 canonical URL
+ * 2. 完整的 hreflang 标签
+ * 3. 正确的 metadataBase
  */
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai'),
-  title: {
-    default: "DaysFromToday - Date Calculator",
-    template: "%s | DaysFromToday"
-  },
-  description: "Calculate dates from today with ease. Support for business days, weekends, and holidays.",
-  applicationName: "DaysFromToday",
-  authors: [{ name: 'Leon' }],
-  generator: 'Next.js',
-  referrer: 'origin-when-cross-origin',
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  icons: {
-    icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' }
-    ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
-    ]
-  },
-  manifest: '/manifest.json',
-};
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: { locale: string } 
+}): Promise<Metadata> {
+  const { locale } = params;
+  const baseUrl = 'https://www.daysfromtoday.ai';
+  
+  return {
+    metadataBase: new URL(baseUrl),
+    title: {
+      default: "DaysFromToday - Date Calculator",
+      template: "%s | DaysFromToday"
+    },
+    description: "Calculate dates from today with ease. Support for business days, weekends, and holidays.",
+    applicationName: "DaysFromToday",
+    authors: [{ name: 'Leon' }],
+    generator: 'Next.js',
+    referrer: 'origin-when-cross-origin',
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    alternates: {
+      canonical: `/${locale}`,
+      languages: {
+        en: '/en',
+        zh: '/zh',
+        'x-default': '/en',
+      },
+    },
+    icons: {
+      icon: [
+        { url: '/favicon.svg', type: 'image/svg+xml' },
+        { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+        { url: '/icon-512.png', sizes: '512x512', type: 'image/png' }
+      ],
+      apple: [
+        { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
+      ]
+    },
+    manifest: '/manifest.json',
+  };
+}
 
 export default async function LocaleLayout({
   children,
