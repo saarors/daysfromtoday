@@ -40,7 +40,8 @@ export const config = {
   // - /api/* (API 路由)
   // - /_next/* (Next.js 内部文件)
   // - /_vercel/* (Vercel 内部文件)
+  // - /sitemap*.xml (Sitemap 文件)
   // - 所有静态文件（包含点号的文件名，如 .png, .svg, .ico）
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
+  matcher: ['/((?!api|_next|_vercel|sitemap.*\\.xml|.*\\..*).*)']
 };
 
