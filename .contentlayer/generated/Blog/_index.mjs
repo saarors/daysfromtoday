@@ -2,9 +2,11 @@
 
 import blog__en__21DaysToBuildANewYouMd from './blog__en__21-days-to-build-a-new-you.md.json' assert { type: 'json' }
 import blog__en__whyICreatedDaysfromtodayMd from './blog__en__why-i-created-daysfromtoday.md.json' assert { type: 'json' }
+import blog__en__whyWeHaveStoppedDreamingAboutTheFutureMd from './blog__en__why-we-have-stopped-dreaming-about-the-future.md.json' assert { type: 'json' }
 import blog__en__whyWeNeedToRememberAFutureDayMd from './blog__en__why-we-need-to-remember-a-future-day.md.json' assert { type: 'json' }
 import blog__zh__21DaysToBuildANewYouMd from './blog__zh__21-days-to-build-a-new-you.md.json' assert { type: 'json' }
 import blog__zh__whyICreatedDaysfromtodayMd from './blog__zh__why-i-created-daysfromtoday.md.json' assert { type: 'json' }
 import blog__zh__whyWeNeedToRememberAFutureDayMd from './blog__zh__why-we-need-to-remember-a-future-day.md.json' assert { type: 'json' }
+import blog__zh__whyWeHaveStoppedDreamingAboutTheFutureMd from './blog__zh__why-we-have-stopped-dreaming-about-the-future.md.json' assert { type: 'json' }
 
-export const allBlogs = [blog__en__21DaysToBuildANewYouMd, blog__en__whyICreatedDaysfromtodayMd, blog__en__whyWeNeedToRememberAFutureDayMd, blog__zh__21DaysToBuildANewYouMd, blog__zh__whyICreatedDaysfromtodayMd, blog__zh__whyWeNeedToRememberAFutureDayMd]
+export const allBlogs = [blog__en__21DaysToBuildANewYouMd, blog__en__whyICreatedDaysfromtodayMd, blog__en__whyWeHaveStoppedDreamingAboutTheFutureMd, blog__en__whyWeNeedToRememberAFutureDayMd, blog__zh__21DaysToBuildANewYouMd, blog__zh__whyICreatedDaysfromtodayMd, blog__zh__whyWeNeedToRememberAFutureDayMd, blog__zh__whyWeHaveStoppedDreamingAboutTheFutureMd]
