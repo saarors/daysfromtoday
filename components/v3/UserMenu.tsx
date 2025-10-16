@@ -90,12 +90,24 @@ export function UserMenu({ locale }: UserMenuProps) {
         console.log('📱 Supabase client created');
         
         console.log('🔄 Calling supabase.auth.signOut()...');
-        const { error } = await supabase.auth.signOut();
-        console.log('✅ Supabase signOut completed, error:', error);
         
-        if (error) {
-          console.error('❌ SignOut error from Supabase:', error);
-          throw error;
+        try {
+          // 尝试 Supabase signOut，但设置超时
+          const signOutPromise = supabase.auth.signOut();
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('SignOut timeout after 3 seconds')), 3000)
+          );
+          
+          const { error } = await Promise.race([signOutPromise, timeoutPromise]) as any;
+          console.log('✅ Supabase signOut completed, error:', error);
+          
+          if (error) {
+            console.error('❌ SignOut error from Supabase:', error);
+            // 即使有错误，也继续执行本地清理
+          }
+        } catch (timeoutError) {
+          console.warn('⚠️ SignOut timeout, proceeding with local cleanup:', timeoutError);
+          // 超时也继续执行本地清理
         }
         
         // 更新全局状态
