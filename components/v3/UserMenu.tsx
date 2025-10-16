@@ -18,8 +18,30 @@ export function UserMenu({ locale }: UserMenuProps) {
   console.log('🎨 UserMenu component rendered');
   
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false); // 改为 false，避免首次渲染时的闪烁
+  const supabase = createClient();
+  
+  // 同步从 localStorage 读取初始 session（避免闪烁）
+  const getInitialSession = (): User | null => {
+    if (typeof window === 'undefined') return null;
+    
+    try {
+      // Supabase 在 localStorage 中存储 session 的 key
+      const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0]}-auth-token`;
+      const storedSession = localStorage.getItem(storageKey);
+      
+      if (storedSession) {
+        const parsed = JSON.parse(storedSession);
+        return parsed?.currentSession?.user ?? null;
+      }
+    } catch (error) {
+      console.error('Error reading initial session from localStorage:', error);
+    }
+    
+    return null;
+  };
+  
+  const [user, setUser] = useState<User | null>(getInitialSession()); // 同步初始化
+  const [loading, setLoading] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -27,21 +49,19 @@ export function UserMenu({ locale }: UserMenuProps) {
   useEffect(() => {
     console.log('🔄 UserMenu useEffect triggered');
 
-    const supabase = createClient();
     let mounted = true;
     
-    // 立即获取 session（同步读取 localStorage + 异步验证）
+    // 异步验证 session
     const initializeAuth = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (!mounted) return;
       
-      console.log('📦 Initial session:', session?.user?.email || 'No session', 'Error:', error);
+      console.log('📦 Verified session:', session?.user?.email || 'No session', 'Error:', error);
       setUser(session?.user ?? null);
-      // loading 已经是 false，不需要再设置
     };
     
-    // 立即执行初始化
+    // 立即执行验证
     initializeAuth();
     
     // 监听后续的状态变化
