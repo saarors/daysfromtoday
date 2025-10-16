@@ -45,7 +45,7 @@ export function UserMenu({ locale }: UserMenuProps) {
     });
     
     return () => subscription.unsubscribe();
-  }, []);
+  }, [supabase]);
   
   // 点击外部关闭菜单
   useEffect(() => {
@@ -102,14 +102,6 @@ export function UserMenu({ locale }: UserMenuProps) {
   // 获取用户头像和名称
   const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
   const displayName = user.user_metadata?.full_name || user.user_metadata?.name || user.email;
-  
-  // 调试信息
-  console.log('👤 UserMenu state:', {
-    avatarUrl,
-    displayName,
-    avatarError,
-    menuOpen,
-  });
   
   // 智能生成首字母缩写
   const getInitials = (name: string | undefined): string => {
