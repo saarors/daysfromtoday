@@ -15,6 +15,8 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ locale }: UserMenuProps) {
+  console.log('🎨 UserMenu component rendered');
+  
   const router = useRouter();
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
@@ -24,6 +26,8 @@ export function UserMenu({ locale }: UserMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
+    console.log('🔄 UserMenu useEffect triggered');
+    
     // 获取当前用户
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
