@@ -19,7 +19,7 @@ export function UserMenu({ locale }: UserMenuProps) {
   
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // 改为 false，避免首次渲染时的闪烁
   const [menuOpen, setMenuOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -28,28 +28,40 @@ export function UserMenu({ locale }: UserMenuProps) {
     console.log('🔄 UserMenu useEffect triggered');
 
     const supabase = createClient();
+    let mounted = true;
     
-    // 先立即获取一次 session 来初始化状态
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('📦 Initial session:', session?.user?.email || 'No session');
+    // 立即获取 session（同步读取 localStorage + 异步验证）
+    const initializeAuth = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (!mounted) return;
+      
+      console.log('📦 Initial session:', session?.user?.email || 'No session', 'Error:', error);
       setUser(session?.user ?? null);
-      setLoading(false);
-    });
+      // loading 已经是 false，不需要再设置
+    };
     
-    // 然后监听后续的状态变化
+    // 立即执行初始化
+    initializeAuth();
+    
+    // 监听后续的状态变化
     console.log('📞 Setting up auth listener...');
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
+      
       console.log('🔔 Auth state changed:', event, session?.user?.email || 'No session');
       
       const user = session?.user ?? null;
       setUser(user);
-      setLoading(false);
       setAvatarError(false); // 重置头像错误状态
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []); // 空依赖数组，只在组件挂载时执行一次
   
   // 点击外部关闭菜单
