@@ -76,30 +76,41 @@ export function UserMenu({ locale }: UserMenuProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
   
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
     console.log('🚪 handleSignOut started');
-    try {
-      const supabase = createClient();
-      console.log('📱 Supabase client created');
-      
-      await supabase.auth.signOut();
-      console.log('✅ Supabase signOut completed');
-      
-      // 更新全局状态
-      setUser(null);
-      console.log('👤 User state set to null');
-      
-      setMenuOpen(false);
-      console.log('📋 Menu closed');
-      
-      // 跳转到首页并刷新
-      console.log(`🔀 Redirecting to /${locale}`);
-      router.push(`/${locale}`);
-      router.refresh();
-      console.log('🔄 Router refresh called');
-    } catch (error) {
-      console.error('❌ Sign out error:', error);
-    }
+    
+    // 先关闭菜单，避免组件 unmount 中断异步操作
+    setMenuOpen(false);
+    console.log('📋 Menu closed first');
+    
+    // 使用 setTimeout 确保菜单关闭后再执行退出
+    setTimeout(async () => {
+      try {
+        const supabase = createClient();
+        console.log('📱 Supabase client created');
+        
+        console.log('🔄 Calling supabase.auth.signOut()...');
+        const { error } = await supabase.auth.signOut();
+        console.log('✅ Supabase signOut completed, error:', error);
+        
+        if (error) {
+          console.error('❌ SignOut error from Supabase:', error);
+          throw error;
+        }
+        
+        // 更新全局状态
+        setUser(null);
+        console.log('👤 User state set to null');
+        
+        // 跳转到首页并刷新
+        console.log(`🔀 Redirecting to /${locale}`);
+        router.push(`/${locale}`);
+        router.refresh();
+        console.log('🔄 Router refresh called');
+      } catch (error) {
+        console.error('❌ Sign out error:', error);
+      }
+    }, 100);
   };
   
   const text = {
