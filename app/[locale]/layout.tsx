@@ -27,6 +27,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { Inter, JetBrains_Mono } from "next/font/google";
 import GATracker from '@/app/ga-tracker';
+import { AutoSync } from '@/components/v3/AutoSync';
 import "../globals.css";
 
 const inter = Inter({
@@ -126,6 +127,9 @@ export default async function LocaleLayout({
 
       {/* GA 路由追踪（追踪 SPA 导航）*/}
       <GATracker />
+
+      {/* 自动同步本地卡片到 Supabase */}
+      <AutoSync />
     </NextIntlClientProvider>
   );
 }
