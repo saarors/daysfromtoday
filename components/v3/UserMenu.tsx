@@ -25,16 +25,24 @@ export function UserMenu({ locale }: UserMenuProps) {
     if (typeof window === 'undefined') return null;
     
     try {
-      // Supabase 在 localStorage 中存储 session 的 key
-      const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0]}-auth-token`;
+      // Supabase 在 localStorage 中存储 session 的 key 格式为：
+      // sb-<project-ref>-auth-token
+      const projectRef = process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0];
+      const storageKey = `sb-${projectRef}-auth-token`;
+      
+      console.log('🔑 Looking for localStorage key:', storageKey);
       const storedSession = localStorage.getItem(storageKey);
+      console.log('📦 Stored session data:', storedSession ? 'Found' : 'Not found');
       
       if (storedSession) {
         const parsed = JSON.parse(storedSession);
-        return parsed?.currentSession?.user ?? null;
+        console.log('📋 Parsed session structure:', Object.keys(parsed));
+        const user = parsed?.currentSession?.user ?? null;
+        console.log('👤 Extracted user:', user?.email || 'No user');
+        return user;
       }
     } catch (error) {
-      console.error('Error reading initial session from localStorage:', error);
+      console.error('❌ Error reading initial session from localStorage:', error);
     }
     
     return null;
