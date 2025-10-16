@@ -20,6 +20,7 @@ export function UserMenu({ locale }: UserMenuProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -40,6 +41,7 @@ export function UserMenu({ locale }: UserMenuProps) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      setAvatarError(false); // 重置头像错误状态
     });
     
     return () => subscription.unsubscribe();
@@ -130,11 +132,17 @@ export function UserMenu({ locale }: UserMenuProps) {
         onClick={() => setMenuOpen(!menuOpen)}
         className="flex items-center gap-2 hover:opacity-80 transition-opacity"
       >
-        {avatarUrl ? (
+        {avatarUrl && !avatarError ? (
           <img
             src={avatarUrl}
             alt={displayName || 'User'}
-            className="w-10 h-10 rounded-full border-2 border-gray-200"
+            className="w-10 h-10 rounded-full border-2 border-gray-200 object-cover"
+            onError={() => {
+              console.warn('❌ Avatar failed to load:', avatarUrl);
+              setAvatarError(true);
+            }}
+            referrerPolicy="no-referrer"
+            crossOrigin="anonymous"
           />
         ) : (
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold border-2 border-gray-200">
