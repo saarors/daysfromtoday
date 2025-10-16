@@ -26,47 +26,41 @@ export function UserMenu({ locale }: UserMenuProps) {
   
   useEffect(() => {
     console.log('🔄 UserMenu useEffect triggered');
-    
+
     const supabase = createClient();
-    console.log('🔌 Supabase client:', supabase);
-    console.log('🔑 Supabase auth:', supabase.auth);
     
-    // 获取当前用户 - 改用 getSession
-    console.log('📞 Calling getSession...');
+    // 只使用 onAuthStateChange，不直接调用 getSession
+    console.log('📞 Setting up auth listener...');
     
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      console.log('📦 Supabase getSession response:', { session, error });
-      
-      if (error) {
-        console.error('❌ Error getting session:', error);
-      }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('🔔 Auth state changed:', event, session?.user?.email);
       
       const user = session?.user ?? null;
       
       if (user) {
-        console.log('👤 User data:', {
+        console.log('✅ User logged in:', {
           email: user.email,
-          user_metadata: user.user_metadata,
+          metadata: user.user_metadata,
         });
       } else {
-        console.log('⚠️ No user found in session');
+        console.log('⚠️ No user session');
       }
       
       setUser(user);
       setLoading(false);
-    }).catch((err) => {
-      console.error('💥 getSession failed:', err);
-      setLoading(false);
-    });
-    
-    // 监听认证状态变化
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
       setAvatarError(false); // 重置头像错误状态
     });
     
+    // 手动触发一次 getSession 来初始化状态
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      // onAuthStateChange 会自动处理，这里只是为了触发初始加载
+      if (!session) {
+        setLoading(false);
+      }
+    });
+
     return () => subscription.unsubscribe();
   }, []); // 空依赖数组，只在组件挂载时执行一次
   
