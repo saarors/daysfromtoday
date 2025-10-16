@@ -244,7 +244,8 @@ export function UserMenu({ locale }: UserMenuProps) {
           {/* Sign Out */}
           <div className="border-t border-gray-200 pt-2">
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation(); // 阻止事件冒泡到 Menu container
                 console.log('🚪 Sign Out button clicked!');
                 handleSignOut();
               }}
