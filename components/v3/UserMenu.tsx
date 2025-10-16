@@ -103,28 +103,46 @@ export function UserMenu({ locale }: UserMenuProps) {
       
       // 3. 清除所有本地存储的认证数据
       if (typeof window !== 'undefined') {
-        // 清除 Supabase 相关的 localStorage
-        Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('sb-') || key.includes('supabase')) {
+        console.log('🧹 Starting aggressive storage cleanup...');
+        
+        // 清除所有 localStorage
+        const localStorageKeys = Object.keys(localStorage);
+        console.log('📦 localStorage keys:', localStorageKeys);
+        localStorageKeys.forEach(key => {
+          if (key.startsWith('sb-') || key.includes('supabase') || key.includes('auth')) {
             localStorage.removeItem(key);
             console.log(`🗑️ Cleared localStorage: ${key}`);
           }
         });
         
-        // 清除 sessionStorage
-        Object.keys(sessionStorage).forEach(key => {
-          if (key.startsWith('sb-') || key.includes('supabase')) {
+        // 清除所有 sessionStorage
+        const sessionStorageKeys = Object.keys(sessionStorage);
+        console.log('📦 sessionStorage keys:', sessionStorageKeys);
+        sessionStorageKeys.forEach(key => {
+          if (key.startsWith('sb-') || key.includes('supabase') || key.includes('auth')) {
             sessionStorage.removeItem(key);
             console.log(`🗑️ Cleared sessionStorage: ${key}`);
           }
         });
+        
+        // 清除所有 cookies (如果可能)
+        document.cookie.split(";").forEach(cookie => {
+          const eqPos = cookie.indexOf("=");
+          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+          if (name.startsWith('sb-') || name.includes('supabase') || name.includes('auth')) {
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+            console.log(`🗑️ Cleared cookie: ${name}`);
+          }
+        });
+        
+        console.log('✅ Storage cleanup completed');
       }
       
-      // 4. 跳转并刷新页面
-      console.log(`🔀 Redirecting to /${locale}`);
-      router.push(`/${locale}`);
-      router.refresh();
-      console.log('🔄 Router refresh called');
+      // 4. 强制重新加载页面，确保完全重置
+      console.log(`🔀 Force reloading page to /${locale}`);
+      window.location.href = `/${locale}`;
+      console.log('🔄 Page reload initiated');
       
     } catch (error) {
       console.error('❌ Sign out error:', error);
