@@ -139,10 +139,11 @@ export function UserMenu({ locale }: UserMenuProps) {
         console.log('✅ Storage cleanup completed');
       }
       
-      // 4. 强制重新加载页面，确保完全重置
-      console.log(`🔀 Force reloading page to /${locale}`);
-      window.location.href = `/${locale}`;
-      console.log('🔄 Page reload initiated');
+    // 4. 强制重新加载页面，保持在当前页面
+    const currentPath = window.location.pathname;
+    console.log(`🔀 Force reloading page to current path: ${currentPath}`);
+    window.location.href = currentPath;
+    console.log('🔄 Page reload initiated');
       
     } catch (error) {
       console.error('❌ Sign out error:', error);
