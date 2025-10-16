@@ -40,6 +40,12 @@ export async function syncCardsToSupabase(
 
   for (const card of localCards) {
     try {
+      console.log(`🔍 检查卡片: ${card.goalText}`, {
+        templateId: card.templateId,
+        targetDate: card.targetDate,
+        daysCount: card.daysCount,
+      });
+      
       // 检查卡片是否已存在（基于 templateId + goalText + targetDate 去重）
       const { data: existing, error: checkError } = await supabase
         .from('goal_cards')
@@ -49,6 +55,8 @@ export async function syncCardsToSupabase(
         .eq('goal_text', card.goalText)
         .eq('target_date', card.targetDate)
         .maybeSingle();
+      
+      console.log(`🔎 检查结果:`, { existing, checkError });
 
       if (checkError) {
         console.error('❌ 检查卡片重复失败:', checkError);
@@ -63,7 +71,16 @@ export async function syncCardsToSupabase(
       }
 
       // 插入新卡片
-      const { error: insertError } = await supabase
+      console.log(`📝 准备插入卡片:`, {
+        user_id: userId,
+        template_id: card.templateId,
+        goal_text: card.goalText,
+        target_date: card.targetDate,
+        days_count: card.daysCount,
+        user_name: card.userName || '',
+      });
+      
+      const { data: insertData, error: insertError } = await supabase
         .from('goal_cards')
         .insert({
           user_id: userId,
@@ -73,7 +90,10 @@ export async function syncCardsToSupabase(
           days_count: card.daysCount,
           user_name: card.userName || '',
           is_public: false, // 默认私有
-        });
+        })
+        .select();
+
+      console.log(`📥 插入结果:`, { insertData, insertError });
 
       if (insertError) {
         console.error('❌ 插入卡片失败:', insertError);
@@ -139,4 +159,5 @@ export function checkLocalCards(): number {
     return 0;
   }
 }
+
 
