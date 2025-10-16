@@ -244,22 +244,12 @@ export function UserMenu({ locale }: UserMenuProps) {
           {/* Sign Out */}
           <div className="border-t border-gray-200 pt-2">
             <button
-              onClick={(e) => {
-                e.stopPropagation(); // 阻止事件冒泡
-                e.preventDefault(); // 阻止默认行为
+              onClick={() => {
                 console.log('🚪 Sign Out button clicked!');
-                console.log('Event:', e);
                 handleSignOut();
               }}
-              onMouseDown={(e) => {
-                console.log('👆 Sign Out mousedown');
-              }}
-              onMouseUp={(e) => {
-                console.log('👆 Sign Out mouseup');
-              }}
               type="button"
-              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-3 cursor-pointer"
-              style={{ pointerEvents: 'auto' }}
+              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-3"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
