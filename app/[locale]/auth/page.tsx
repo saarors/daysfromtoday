@@ -13,6 +13,7 @@ import { createClient } from '@/lib/supabase/client';
 export default function AuthPage({ params }: { params: { locale: string } }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  // 获取重定向路径，优先使用 URL 参数，否则使用当前页面路径
   const redirectTo = searchParams.get('redirect') || `/${params.locale}`;
   
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');

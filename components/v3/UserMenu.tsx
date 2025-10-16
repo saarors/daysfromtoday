@@ -176,7 +176,11 @@ export function UserMenu({ locale }: UserMenuProps) {
   if (!user) {
     return (
       <button
-        onClick={() => router.push(`/${locale}/auth`)}
+        onClick={() => {
+          // 获取当前页面路径，传递给认证页面
+          const currentPath = typeof window !== 'undefined' ? window.location.pathname : `/${locale}`;
+          router.push(`/${locale}/auth?redirect=${encodeURIComponent(currentPath)}`);
+        }}
         className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200"
       >
         {t.signIn}
