@@ -31,14 +31,17 @@ export function UserMenu({ locale }: UserMenuProps) {
     console.log('🔌 Supabase client:', supabase);
     console.log('🔑 Supabase auth:', supabase.auth);
     
-    // 获取当前用户
-    console.log('📞 Calling getUser...');
-    supabase.auth.getUser().then(({ data: { user }, error }) => {
-      console.log('📦 Supabase getUser response:', { user, error });
+    // 获取当前用户 - 改用 getSession
+    console.log('📞 Calling getSession...');
+    
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log('📦 Supabase getSession response:', { session, error });
       
       if (error) {
-        console.error('❌ Error getting user:', error);
+        console.error('❌ Error getting session:', error);
       }
+      
+      const user = session?.user ?? null;
       
       if (user) {
         console.log('👤 User data:', {
@@ -46,13 +49,13 @@ export function UserMenu({ locale }: UserMenuProps) {
           user_metadata: user.user_metadata,
         });
       } else {
-        console.log('⚠️ No user found');
+        console.log('⚠️ No user found in session');
       }
       
       setUser(user);
       setLoading(false);
     }).catch((err) => {
-      console.error('💥 getUser failed:', err);
+      console.error('💥 getSession failed:', err);
       setLoading(false);
     });
     
