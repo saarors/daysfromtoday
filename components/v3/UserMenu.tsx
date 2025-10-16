@@ -29,13 +29,22 @@ export function UserMenu({ locale }: UserMenuProps) {
     console.log('🔄 UserMenu useEffect triggered');
     
     // 获取当前用户
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(({ data: { user }, error }) => {
+      console.log('📦 Supabase getUser response:', { user, error });
+      
+      if (error) {
+        console.error('❌ Error getting user:', error);
+      }
+      
       if (user) {
         console.log('👤 User data:', {
           email: user.email,
           user_metadata: user.user_metadata,
         });
+      } else {
+        console.log('⚠️ No user found');
       }
+      
       setUser(user);
       setLoading(false);
     });
