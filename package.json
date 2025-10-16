@@ -9,6 +9,7 @@
     "lint": "eslint",
     "postinstall": "contentlayer build",
     "test:supabase": "tsx scripts/test-supabase-connection.ts",
+    "verify:supabase": "tsx scripts/verify-supabase-setup.ts",
     "holidays:init": "tsx scripts/generate-holidays.ts init",
     "holidays:update": "tsx scripts/generate-holidays.ts update",
     "holidays:validate": "tsx scripts/validate-holidays.ts",
