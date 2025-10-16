@@ -103,6 +103,14 @@ export function UserMenu({ locale }: UserMenuProps) {
   const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
   const displayName = user.user_metadata?.full_name || user.user_metadata?.name || user.email;
   
+  // 调试信息
+  console.log('👤 UserMenu state:', {
+    avatarUrl,
+    displayName,
+    avatarError,
+    menuOpen,
+  });
+  
   // 智能生成首字母缩写
   const getInitials = (name: string | undefined): string => {
     if (!name) return '?';
@@ -129,8 +137,12 @@ export function UserMenu({ locale }: UserMenuProps) {
     <div className="relative" ref={menuRef}>
       {/* User Avatar Button */}
       <button
-        onClick={() => setMenuOpen(!menuOpen)}
-        className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+        onClick={() => {
+          console.log('🔘 UserMenu clicked, current state:', menuOpen);
+          setMenuOpen(!menuOpen);
+        }}
+        className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+        aria-label="User menu"
       >
         {avatarUrl && !avatarError ? (
           <img
