@@ -80,33 +80,45 @@ export function UserMenu({ locale }: UserMenuProps) {
     console.log('🚪 handleSignOut started');
     
     try {
-      // 1. 先关闭菜单
+      // 1. 立即清除本地状态和关闭菜单
+      setUser(null);
       setMenuOpen(false);
+      console.log('👤 User state cleared immediately');
       console.log('📋 Menu closed');
       
-      // 2. 执行 Supabase signOut 并等待完成
+      // 2. 尝试 Supabase signOut（不阻塞，后台执行）
       const supabase = createClient();
       console.log('📱 Supabase client created');
       
-      console.log('🔄 Calling supabase.auth.signOut()...');
+      // 异步执行 signOut，不等待结果
+      supabase.auth.signOut().then(({ error }) => {
+        if (error) {
+          console.error('❌ Supabase signOut error:', error);
+        } else {
+          console.log('✅ Supabase signOut completed successfully');
+        }
+      }).catch((error) => {
+        console.error('❌ Supabase signOut failed:', error);
+      });
       
-      // 添加超时处理，防止 signOut 卡住
-      const signOutPromise = supabase.auth.signOut();
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('SignOut timeout after 5 seconds')), 5000)
-      );
-      
-      const { error } = await Promise.race([signOutPromise, timeoutPromise]) as any;
-      
-      if (error) {
-        console.error('❌ Supabase signOut error:', error);
-      } else {
-        console.log('✅ Supabase signOut completed successfully');
+      // 3. 清除所有本地存储的认证数据
+      if (typeof window !== 'undefined') {
+        // 清除 Supabase 相关的 localStorage
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('sb-') || key.includes('supabase')) {
+            localStorage.removeItem(key);
+            console.log(`🗑️ Cleared localStorage: ${key}`);
+          }
+        });
+        
+        // 清除 sessionStorage
+        Object.keys(sessionStorage).forEach(key => {
+          if (key.startsWith('sb-') || key.includes('supabase')) {
+            sessionStorage.removeItem(key);
+            console.log(`🗑️ Cleared sessionStorage: ${key}`);
+          }
+        });
       }
-      
-      // 3. 清除本地状态
-      setUser(null);
-      console.log('👤 User state cleared');
       
       // 4. 跳转并刷新页面
       console.log(`🔀 Redirecting to /${locale}`);
