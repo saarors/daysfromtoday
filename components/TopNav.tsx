@@ -14,6 +14,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import LanguageSwitcher from './LanguageSwitcher';
 import CountrySelector from './CountrySelector';
+import { UserMenu } from './v3/UserMenu';
 
 interface TopNavProps {
   locale: string;
@@ -116,8 +117,11 @@ export default function TopNav({ locale }: TopNavProps) {
             </nav>
           </div>
           
-          {/* 右侧：语言切换器 + 国家选择器 */}
+          {/* 右侧：用户菜单 + 语言切换器 + 国家选择器 */}
           <div className="flex items-center gap-3">
+            {/* 用户菜单 */}
+            <UserMenu locale={locale} />
+            
             {/* 语言切换器 */}
             <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-md border border-gray-200/50">
               <span className="text-gray-600 text-sm">🌍</span>
