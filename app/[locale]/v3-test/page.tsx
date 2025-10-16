@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TemplateSelector } from '@/components/v3/TemplateSelector';
 import { CardPreview } from '@/components/v3/CardPreview';
 import { GoalInput } from '@/components/v3/GoalInput';
@@ -23,6 +23,12 @@ export default function V3TestPage() {
   const [goalText, setGoalText] = useState('');
   const [targetDate] = useState(addDays(new Date(), 30).toISOString());
   const [daysCount] = useState(30);
+  const [mounted, setMounted] = useState(false);
+  
+  // 解决 SSR hydration 问题
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   // 卡片内容
   const cardContent: Partial<CardContent> = {
@@ -95,7 +101,7 @@ export default function V3TestPage() {
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600">
-                已保存: {getAllCards().length} 张卡片
+                已保存: {mounted ? getAllCards().length : 0} 张卡片
               </span>
               <a 
                 href="/"

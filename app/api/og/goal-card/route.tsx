@@ -62,8 +62,7 @@ export async function GET(request: NextRequest) {
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
-            gap: '16px',
-            zIndex: 1 
+            gap: '16px'
           }}>
             {template.decorations?.icon && (
               <span style={{ fontSize: '40px' }}>
@@ -91,7 +90,6 @@ export async function GET(request: NextRequest) {
               flexDirection: 'column',
               alignItems: 'center',
               gap: `${template.layout.gap}px`,
-              zIndex: 1,
               flex: 1,
               justifyContent: 'center',
             }}
@@ -99,6 +97,7 @@ export async function GET(request: NextRequest) {
             {/* 目标日期 */}
             <div
               style={{
+                display: 'flex',
                 fontSize: `${template.typography.date.fontSize}px`,
                 fontWeight: template.typography.date.fontWeight,
                 color: template.typography.date.color,
@@ -113,6 +112,7 @@ export async function GET(request: NextRequest) {
             {/* 倒计时 */}
             <div
               style={{
+                display: 'flex',
                 fontSize: `${template.typography.countdown.fontSize}px`,
                 fontWeight: template.typography.countdown.fontWeight,
                 color: template.typography.countdown.color,
@@ -126,6 +126,7 @@ export async function GET(request: NextRequest) {
             </div>
             <div
               style={{
+                display: 'flex',
                 fontSize: `${template.typography.date.fontSize}px`,
                 color: template.typography.metadata.color,
                 marginTop: '-12px',
@@ -138,13 +139,13 @@ export async function GET(request: NextRequest) {
             {template.decorations?.glassmorphism ? (
               <div
                 style={{
+                  display: 'flex',
                   background: 'rgba(255,255,255,0.15)',
                   backdropFilter: 'blur(10px)',
                   borderRadius: '20px',
                   padding: '28px 40px',
                   maxWidth: '85%',
                   border: '1px solid rgba(255,255,255,0.2)',
-                  display: 'flex',
                   marginTop: '20px',
                 }}
               >
@@ -190,7 +191,6 @@ export async function GET(request: NextRequest) {
               justifyContent: 'space-between',
               fontSize: `${template.typography.metadata.fontSize}px`,
               color: template.typography.metadata.color,
-              zIndex: 1,
             }}
           >
             <span>📅 Started: {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
@@ -207,7 +207,6 @@ export async function GET(request: NextRequest) {
                 transform: 'translateX(-50%)',
                 fontSize: '13px',
                 color: `rgba(255,255,255,${template.decorations.watermark.opacity})`,
-                zIndex: 1,
                 display: 'flex',
                 alignItems: 'center',
               }}
