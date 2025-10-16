@@ -77,10 +77,20 @@ export function UserMenu({ locale }: UserMenuProps) {
   }, []);
   
   const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push(`/${locale}`);
-    router.refresh();
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      
+      // 更新全局状态
+      setUser(null);
+      setMenuOpen(false);
+      
+      // 跳转到首页并刷新
+      router.push(`/${locale}`);
+      router.refresh();
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
   };
   
   const text = {
@@ -187,7 +197,8 @@ export function UserMenu({ locale }: UserMenuProps) {
           {/* Menu Items */}
           <div className="py-2">
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 router.push(`/${locale}/my-cards`);
                 setMenuOpen(false);
               }}
@@ -200,7 +211,8 @@ export function UserMenu({ locale }: UserMenuProps) {
             </button>
             
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 router.push(`/${locale}/settings`);
                 setMenuOpen(false);
               }}
@@ -217,7 +229,11 @@ export function UserMenu({ locale }: UserMenuProps) {
           {/* Sign Out */}
           <div className="border-t border-gray-200 pt-2">
             <button
-              onClick={handleSignOut}
+              onClick={(e) => {
+                e.stopPropagation(); // 阻止事件冒泡
+                console.log('🚪 Sign Out clicked');
+                handleSignOut();
+              }}
               className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-3"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
