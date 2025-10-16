@@ -25,6 +25,12 @@ export function UserMenu({ locale }: UserMenuProps) {
   useEffect(() => {
     // 获取当前用户
     supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        console.log('👤 User data:', {
+          email: user.email,
+          user_metadata: user.user_metadata,
+        });
+      }
       setUser(user);
       setLoading(false);
     });
@@ -92,14 +98,30 @@ export function UserMenu({ locale }: UserMenuProps) {
   }
   
   // 获取用户头像和名称
-  const avatarUrl = user.user_metadata?.avatar_url;
-  const displayName = user.user_metadata?.display_name || user.user_metadata?.name || user.email;
-  const initials = displayName
-    ?.split(' ')
-    .map((n: string) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || '?';
+  const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+  const displayName = user.user_metadata?.full_name || user.user_metadata?.name || user.email;
+  
+  // 智能生成首字母缩写
+  const getInitials = (name: string | undefined): string => {
+    if (!name) return '?';
+    
+    // 如果是邮箱，取邮箱用户名的前两个字母
+    if (name.includes('@')) {
+      const username = name.split('@')[0];
+      return username.slice(0, 2).toUpperCase();
+    }
+    
+    // 如果是名称，取每个单词的首字母
+    const words = name.trim().split(/\s+/);
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    
+    // 单个单词，取前两个字母
+    return name.slice(0, 2).toUpperCase();
+  };
+  
+  const initials = getInitials(displayName);
   
   return (
     <div className="relative" ref={menuRef}>
