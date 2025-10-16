@@ -27,8 +27,11 @@ export function UserMenu({ locale }: UserMenuProps) {
   
   useEffect(() => {
     console.log('🔄 UserMenu useEffect triggered');
+    console.log('🔌 Supabase client:', supabase);
+    console.log('🔑 Supabase auth:', supabase.auth);
     
     // 获取当前用户
+    console.log('📞 Calling getUser...');
     supabase.auth.getUser().then(({ data: { user }, error }) => {
       console.log('📦 Supabase getUser response:', { user, error });
       
@@ -46,6 +49,9 @@ export function UserMenu({ locale }: UserMenuProps) {
       }
       
       setUser(user);
+      setLoading(false);
+    }).catch((err) => {
+      console.error('💥 getUser failed:', err);
       setLoading(false);
     });
     
