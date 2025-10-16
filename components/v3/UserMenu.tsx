@@ -29,36 +29,24 @@ export function UserMenu({ locale }: UserMenuProps) {
 
     const supabase = createClient();
     
-    // 只使用 onAuthStateChange，不直接调用 getSession
-    console.log('📞 Setting up auth listener...');
+    // 先立即获取一次 session 来初始化状态
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('📦 Initial session:', session?.user?.email || 'No session');
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
     
+    // 然后监听后续的状态变化
+    console.log('📞 Setting up auth listener...');
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('🔔 Auth state changed:', event, session?.user?.email);
+      console.log('🔔 Auth state changed:', event, session?.user?.email || 'No session');
       
       const user = session?.user ?? null;
-      
-      if (user) {
-        console.log('✅ User logged in:', {
-          email: user.email,
-          metadata: user.user_metadata,
-        });
-      } else {
-        console.log('⚠️ No user session');
-      }
-      
       setUser(user);
       setLoading(false);
       setAvatarError(false); // 重置头像错误状态
-    });
-    
-    // 手动触发一次 getSession 来初始化状态
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      // onAuthStateChange 会自动处理，这里只是为了触发初始加载
-      if (!session) {
-        setLoading(false);
-      }
     });
 
     return () => subscription.unsubscribe();
