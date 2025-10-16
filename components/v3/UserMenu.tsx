@@ -76,53 +76,39 @@ export function UserMenu({ locale }: UserMenuProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
   
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     console.log('🚪 handleSignOut started');
     
-    // 先关闭菜单，避免组件 unmount 中断异步操作
-    setMenuOpen(false);
-    console.log('📋 Menu closed first');
-    
-    // 使用 setTimeout 确保菜单关闭后再执行退出
-    setTimeout(async () => {
-      try {
-        const supabase = createClient();
-        console.log('📱 Supabase client created');
-        
-        console.log('🔄 Calling supabase.auth.signOut()...');
-        
-        try {
-          // 尝试 Supabase signOut，但设置超时
-          const signOutPromise = supabase.auth.signOut();
-          const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('SignOut timeout after 3 seconds')), 3000)
-          );
-          
-          const { error } = await Promise.race([signOutPromise, timeoutPromise]) as any;
-          console.log('✅ Supabase signOut completed, error:', error);
-          
-          if (error) {
-            console.error('❌ SignOut error from Supabase:', error);
-            // 即使有错误，也继续执行本地清理
-          }
-        } catch (timeoutError) {
-          console.warn('⚠️ SignOut timeout, proceeding with local cleanup:', timeoutError);
-          // 超时也继续执行本地清理
+    try {
+      // 1. 立即更新本地状态 - 让用户感觉立即退出
+      setUser(null);
+      setMenuOpen(false);
+      console.log('👤 User state cleared immediately');
+      
+      // 2. 尝试 Supabase signOut（不阻塞用户体验）
+      const supabase = createClient();
+      console.log('📱 Supabase client created');
+      
+      // 异步执行 signOut，不等待结果
+      supabase.auth.signOut().then(({ error }) => {
+        if (error) {
+          console.error('❌ Supabase signOut error:', error);
+        } else {
+          console.log('✅ Supabase signOut completed');
         }
-        
-        // 更新全局状态
-        setUser(null);
-        console.log('👤 User state set to null');
-        
-        // 跳转到首页并刷新
-        console.log(`🔀 Redirecting to /${locale}`);
-        router.push(`/${locale}`);
-        router.refresh();
-        console.log('🔄 Router refresh called');
-      } catch (error) {
-        console.error('❌ Sign out error:', error);
-      }
-    }, 100);
+      }).catch((error) => {
+        console.error('❌ Supabase signOut failed:', error);
+      });
+      
+      // 3. 立即跳转并刷新页面
+      console.log(`🔀 Redirecting to /${locale}`);
+      router.push(`/${locale}`);
+      router.refresh();
+      console.log('🔄 Router refresh called');
+      
+    } catch (error) {
+      console.error('❌ Sign out error:', error);
+    }
   };
   
   const text = {
