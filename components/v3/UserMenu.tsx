@@ -5,10 +5,11 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import type { User } from '@supabase/supabase-js';
+import { useAuthStore } from '@/store/auth-store';
+import { useState } from 'react';
 
 interface UserMenuProps {
   locale: string;
@@ -20,36 +21,8 @@ export function UserMenu({ locale }: UserMenuProps) {
   const router = useRouter();
   const supabase = createClient();
   
-  // 同步从 localStorage 读取初始 session（避免闪烁）
-  const getInitialSession = (): User | null => {
-    if (typeof window === 'undefined') return null;
-    
-    try {
-      // Supabase 在 localStorage 中存储 session 的 key 格式为：
-      // sb-<project-ref>-auth-token
-      const projectRef = process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0];
-      const storageKey = `sb-${projectRef}-auth-token`;
-      
-      console.log('🔑 Looking for localStorage key:', storageKey);
-      const storedSession = localStorage.getItem(storageKey);
-      console.log('📦 Stored session data:', storedSession ? 'Found' : 'Not found');
-      
-      if (storedSession) {
-        const parsed = JSON.parse(storedSession);
-        console.log('📋 Parsed session structure:', Object.keys(parsed));
-        const user = parsed?.currentSession?.user ?? null;
-        console.log('👤 Extracted user:', user?.email || 'No user');
-        return user;
-      }
-    } catch (error) {
-      console.error('❌ Error reading initial session from localStorage:', error);
-    }
-    
-    return null;
-  };
-  
-  const [user, setUser] = useState<User | null>(getInitialSession()); // 同步初始化
-  const [loading, setLoading] = useState(false);
+  // 使用全局认证状态
+  const { user, loading, setUser, setLoading } = useAuthStore();
   const [menuOpen, setMenuOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -65,7 +38,7 @@ export function UserMenu({ locale }: UserMenuProps) {
       
       if (!mounted) return;
       
-      console.log('📦 Verified session:', session?.user?.email || 'No session', 'Error:', error);
+      console.log('📦 Session:', session?.user?.email || 'No session');
       setUser(session?.user ?? null);
     };
     
@@ -81,8 +54,7 @@ export function UserMenu({ locale }: UserMenuProps) {
       
       console.log('🔔 Auth state changed:', event, session?.user?.email || 'No session');
       
-      const user = session?.user ?? null;
-      setUser(user);
+      setUser(session?.user ?? null);
       setAvatarError(false); // 重置头像错误状态
     });
 
