@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Clear Supabase Session</title>
+</head>
+<body>
+  <h1>Clearing Supabase Session...</h1>
+  <p id="status">Processing...</p>
+  
+  <script>
+    // 清除所有 Supabase 相关的数据
+    const keys = Object.keys(localStorage);
+    const sessionKeys = Object.keys(sessionStorage);
+    
+    // 清除 localStorage
+    keys.forEach(key => {
+      if (key.includes('supabase') || key.includes('sb-')) {
+        localStorage.removeItem(key);
+        console.log('Removed from localStorage:', key);
+      }
+    });
+    
+    // 清除 sessionStorage
+    sessionKeys.forEach(key => {
+      if (key.includes('supabase') || key.includes('sb-')) {
+        sessionStorage.removeItem(key);
+        console.log('Removed from sessionStorage:', key);
+      }
+    });
+    
+    // 清除所有 cookies
+    document.cookie.split(";").forEach(function(c) {
+      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+    
+    document.getElementById('status').innerHTML = `
+      <h2 style="color: green;">✅ Session Cleared!</h2>
+      <p>Removed ${keys.filter(k => k.includes('supabase') || k.includes('sb-')).length} localStorage items</p>
+      <p>Removed ${sessionKeys.filter(k => k.includes('supabase') || k.includes('sb-')).length} sessionStorage items</p>
+      <p>Cleared all cookies</p>
+      <br>
+      <a href="/en" style="font-size: 20px; color: blue;">← Go back to home</a>
+    `;
+  </script>
+</body>
+</html>
+

@@ -18,7 +18,6 @@ export function UserMenu({ locale }: UserMenuProps) {
   console.log('🎨 UserMenu component rendered');
   
   const router = useRouter();
-  const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -27,6 +26,8 @@ export function UserMenu({ locale }: UserMenuProps) {
   
   useEffect(() => {
     console.log('🔄 UserMenu useEffect triggered');
+    
+    const supabase = createClient();
     console.log('🔌 Supabase client:', supabase);
     console.log('🔑 Supabase auth:', supabase.auth);
     
@@ -64,7 +65,7 @@ export function UserMenu({ locale }: UserMenuProps) {
     });
     
     return () => subscription.unsubscribe();
-  }, [supabase]);
+  }, []); // 空依赖数组，只在组件挂载时执行一次
   
   // 点击外部关闭菜单
   useEffect(() => {
