@@ -77,6 +77,7 @@ export function UserMenu({ locale }: UserMenuProps) {
   }, []);
   
   const handleSignOut = async () => {
+    const supabase = createClient();
     await supabase.auth.signOut();
     router.push(`/${locale}`);
     router.refresh();
