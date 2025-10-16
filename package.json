@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "contentlayer build",
+    "test:supabase": "tsx scripts/test-supabase-connection.ts",
     "holidays:init": "tsx scripts/generate-holidays.ts init",
     "holidays:update": "tsx scripts/generate-holidays.ts update",
     "holidays:validate": "tsx scripts/validate-holidays.ts",
