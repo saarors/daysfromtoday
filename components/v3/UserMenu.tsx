@@ -77,19 +77,28 @@ export function UserMenu({ locale }: UserMenuProps) {
   }, []);
   
   const handleSignOut = async () => {
+    console.log('🚪 handleSignOut started');
     try {
       const supabase = createClient();
+      console.log('📱 Supabase client created');
+      
       await supabase.auth.signOut();
+      console.log('✅ Supabase signOut completed');
       
       // 更新全局状态
       setUser(null);
+      console.log('👤 User state set to null');
+      
       setMenuOpen(false);
+      console.log('📋 Menu closed');
       
       // 跳转到首页并刷新
+      console.log(`🔀 Redirecting to /${locale}`);
       router.push(`/${locale}`);
       router.refresh();
+      console.log('🔄 Router refresh called');
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error('❌ Sign out error:', error);
     }
   };
   
