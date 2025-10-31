@@ -20,6 +20,7 @@ import HomeAnniversaryCards from '@/components/HomeAnniversaryCards';
 import { CardGallery } from '@/components/v3/CardGallery';
 import { EmptyState } from '@/components/v3/EmptyState';
 import { CreateCardFAB } from '@/components/v3/CreateCardFAB';
+import { HeroSection } from '@/components/v3/Hero/HeroSection';
 import { useGoalCards } from '@/store/goal-cards';
 
 interface HomePageClientProps {
@@ -157,42 +158,35 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
+    <div className="min-h-screen bg-white relative overflow-hidden">
       {/* 顶部导航栏 */}
       <TopNav locale={locale} />
       
-      {/* Phase 2.6: 卡片墙或空状态 */}
-      {mounted && (
-        <section className="container mx-auto px-4 py-16 pt-24 md:pt-32 relative z-10">
-          {cards.length > 0 ? (
-            <CardGallery cards={cards} locale={locale} />
-          ) : (
-            <EmptyState locale={locale} />
-          )}
+      {/* V3.0 Hero Section - 主入口 */}
+      <HeroSection locale={locale} />
+      
+      {/* Phase 2.6: 卡片墙（如果有卡片则显示） */}
+      {mounted && cards.length > 0 && (
+        <section className="container mx-auto px-4 py-16 relative z-10">
+          <h2 className="text-3xl font-bold mb-8 text-center text-gray-900">
+            {locale === 'zh' ? '我的愿望清单' : 'My Wishlist'}
+          </h2>
+          <CardGallery cards={cards} locale={locale} />
         </section>
       )}
       
       {/* Phase 2.6: 创建卡片 FAB */}
       {mounted && cards.length > 0 && <CreateCardFAB locale={locale} />}
-      
-      {/* 装饰性背景元素 */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="decoration-blob decoration-blob-pink w-96 h-96 -top-48 -right-48"></div>
-        <div className="decoration-blob decoration-blob-purple w-80 h-80 -bottom-40 -left-40"></div>
-        <div className="decoration-blob decoration-blob-blue w-64 h-64 top-1/2 right-1/4"></div>
-      </div>
 
-      {/* Hero Section - 添加顶部间距以避免被顶部导航遮挡 */}
-      <section className="container mx-auto px-4 py-16 md:py-24 pt-24 md:pt-32 relative z-10">
+      {/* V2.6 功能区域 - 暂时隐藏，保留代码以备后用 */}
+      {false && (
+      <section className="container mx-auto px-4 py-16 md:py-24 relative z-10">
         <div className="text-center max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gradient-calendly">
-            {t.slogan}
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-4 font-medium">
-            {t.subtitle}
-          </p>
-          <p className="text-gray-500 mb-8 leading-relaxed">
-            {t.description}
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-blue-600">
+            {locale === 'zh' ? '快速日期计算' : 'Quick Date Calculator'}
+          </h2>
+          <p className="text-lg text-gray-600 mb-4">
+            {locale === 'zh' ? '(保留的旧功能，供 SEO 和高级用户使用)' : '(Legacy feature for SEO and power users)'}
           </p>
         </div>
 
@@ -396,6 +390,7 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
           </Card>
         </div>
       </section>
+      )}
 
       {/* Anniversaries Section - 使用动态卡片组件 */}
       <HomeAnniversaryCards locale={locale} />

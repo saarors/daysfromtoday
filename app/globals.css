@@ -1,26 +1,28 @@
 @import "tailwindcss";
 
 /**
- * DaysFromToday Design System
- * 基于 Calendly 设计语言优化
+ * DaysFromToday V3.0 Design System
+ * AI 陪伴式目标实现平台
  * 
- * 配色方案：
- * - Primary: 鲜艳蓝色（#0069FF）
- * - Gradient: 紫粉蓝渐变
+ * 配色方案：干净整洁的蓝色系（无渐变）
+ * - Primary: 现代蓝色（#2563EB）
+ * - Secondary: 深蓝色（#1E40AF）
+ * - Light: 浅蓝色（#DBEAFE）
  * - Background: 纯白 + 浅灰
  * - Text: 深蓝灰色
  */
 
 :root {
-  /* === 主色调（Calendly 风格）=== */
-  --color-primary: #0069FF;
-  --color-primary-hover: #0052CC;
-  --color-primary-light: #E6F2FF;
+  /* === 主色调（纯蓝色系）=== */
+  --color-primary: #2563EB;           /* 现代蓝 */
+  --color-primary-hover: #1D4ED8;     /* 深蓝 */
+  --color-primary-light: #DBEAFE;     /* 浅蓝 */
+  --color-primary-lighter: #EFF6FF;   /* 超浅蓝 */
   
-  /* === 渐变色系 === */
-  --color-gradient-start: #D946EF;    /* 粉紫 */
-  --color-gradient-mid: #8B5CF6;      /* 紫色 */
-  --color-gradient-end: #0069FF;      /* 蓝色 */
+  /* === AI 助手专属色（保持纯色）=== */
+  --color-ai-twinkle: #F59E0B;        /* 金色（无渐变） */
+  --color-ai-labubu: #EC4899;         /* 粉色（无渐变） */
+  --color-ai-jobs: #1F2937;           /* 深灰（无渐变） */
   
   /* === 背景色系 === */
   --color-bg-primary: #FFFFFF;        /* 纯白 */
@@ -70,11 +72,10 @@
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
   
-  /* 自定义 Tailwind 颜色 */
-  --color-calendly-blue: var(--color-primary);
-  --color-calendly-gradient-start: var(--color-gradient-start);
-  --color-calendly-gradient-mid: var(--color-gradient-mid);
-  --color-calendly-gradient-end: var(--color-gradient-end);
+  /* V3.0 自定义 Tailwind 颜色（纯色） */
+  --color-blue-primary: var(--color-primary);
+  --color-blue-dark: var(--color-primary-hover);
+  --color-blue-light: var(--color-primary-light);
 }
 
 /* 深色模式（保留但优先使用浅色） */
@@ -96,19 +97,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* === 自定义工具类 === */
+/* === 自定义工具类（V3.0 纯色版本）=== */
 
-/* Calendly 风格渐变背景 */
-.gradient-calendly {
-  background: linear-gradient(135deg, var(--color-gradient-start) 0%, var(--color-gradient-mid) 50%, var(--color-gradient-end) 100%);
+/* 纯蓝色背景 */
+.bg-blue-primary {
+  background: var(--color-primary);
 }
 
-/* 渐变文字 */
-.text-gradient-calendly {
-  background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* 纯蓝色文字 */
+.text-blue-primary {
+  color: var(--color-primary);
 }
 
 /* 玻璃拟态卡片（Calendly 风格） */
@@ -168,37 +166,13 @@ body {
   border-color: var(--color-text-secondary);
 }
 
-/* 数字显示（大号） */
+/* 数字显示（大号，纯蓝色） */
 .number-display {
   font-family: var(--font-jetbrains-mono);
   font-size: 72px;
   font-weight: 700;
   line-height: 1;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-gradient-mid));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* 渐变装饰元素 */
-.decoration-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.decoration-blob-pink {
-  background: var(--color-gradient-start);
-}
-
-.decoration-blob-purple {
-  background: var(--color-gradient-mid);
-}
-
-.decoration-blob-blue {
-  background: var(--color-gradient-end);
+  color: var(--color-primary);
 }
 
 /* 平滑滚动 */
