@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import TopNav from '@/components/TopNav';
 import DateCalculator from '@/components/DateCalculator';
 
@@ -92,6 +93,24 @@ export default async function DaysAgoPage({ params }: PageProps) {
           type="past" 
           mode="calendar" 
         />
+        
+        {/* Phase 2.6: 创建记忆卡片 CTA */}
+        <div className="mt-12 p-6 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl text-center">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            {locale === 'zh' ? '💭 创建记忆卡片' : '💭 Create Memory Card'}
+          </h3>
+          <p className="text-gray-600 mb-4">
+            {locale === 'zh' 
+              ? '为这个日期创建一张纪念卡片，记录重要的时刻' 
+              : 'Create a memory card for this date to commemorate important moments'}
+          </p>
+          <Link
+            href={`/${locale}/create-card?type=past&days=${days}`}
+            className="inline-block px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all hover:scale-105"
+          >
+            {locale === 'zh' ? '✨ 创建记忆卡片' : '✨ Create Memory Card'}
+          </Link>
+        </div>
         
         {/* Navigation */}
         <div className="text-center space-x-4 mt-8">

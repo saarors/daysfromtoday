@@ -147,6 +147,21 @@ export interface CardTemplate {
 }
 
 /**
+ * 卡片类型（Phase 2.6）
+ */
+export type CardType = 'future' | 'past';
+
+/**
+ * 计算模式（Phase 2.6）
+ */
+export type CalculationMode = 'date-first' | 'days-first';
+
+/**
+ * 天数类型（Phase 2.6）
+ */
+export type DaysType = 'natural' | 'working';
+
+/**
  * 用户卡片内容数据
  */
 export interface CardContent {
@@ -156,6 +171,8 @@ export interface CardContent {
   targetDate: string;
   /** 倒计时天数 */
   daysCount: number;
+  /** 工作日天数（Phase 2.6） */
+  workingDaysCount?: number;
   /** 用户短语（200字以内） */
   goalText: string;
   /** 开始日期 */
@@ -187,6 +204,13 @@ export interface CardData {
   
   /** 内容数据 */
   content: CardContent;
+  
+  /** 卡片类型（Phase 2.6） */
+  cardType: CardType;
+  /** 计算模式（Phase 2.6） */
+  calculationMode: CalculationMode;
+  /** 天数类型（Phase 2.6） */
+  daysType: DaysType;
   
   /** 样式覆盖（可选，覆盖模板默认样式） */
   styleOverrides?: Partial<CardTemplate>;
@@ -228,5 +252,19 @@ export interface TemplateFilter {
   category?: 'goal' | 'anniversary' | 'custom';
   /** 仅预设模板 */
   presetsOnly?: boolean;
+}
+
+/**
+ * 日期计算结果（Phase 2.6）
+ */
+export interface DateCalculationResult {
+  /** 目标日期 */
+  targetDate: string;
+  /** 自然日天数 */
+  naturalDays: number;
+  /** 工作日天数 */
+  workingDays: number;
+  /** 计算的国家代码 */
+  countryCode: string;
 }
 

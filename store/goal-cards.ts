@@ -6,7 +6,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { CardData } from '@/types/card-template';
-import { nanoid } from 'nanoid';
 
 interface GoalCardStore {
   /** 所有卡片 */
@@ -32,6 +31,9 @@ interface GoalCardStore {
   
   /** 获取卡片总数 */
   getCardCount: () => number;
+  
+  /** 获取所有卡片（按创建时间倒序）- Phase 2.6 */
+  getAllCardsSortedByDate: () => CardData[];
 }
 
 export const useGoalCards = create<GoalCardStore>()(
@@ -42,7 +44,12 @@ export const useGoalCards = create<GoalCardStore>()(
       addCard: (card) => {
         const newCard: CardData = {
           ...card,
-          id: nanoid(),
+          // 使用标准 UUID v4 格式（兼容 Supabase UUID 类型）
+          id: crypto.randomUUID(),
+          // Phase 2.6: 添加默认值
+          cardType: card.cardType || 'future',
+          calculationMode: card.calculationMode || 'date-first',
+          daysType: card.daysType || 'natural',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -88,6 +95,13 @@ export const useGoalCards = create<GoalCardStore>()(
       
       getCardCount: () => {
         return get().cards.length;
+      },
+      
+      getAllCardsSortedByDate: () => {
+        const cards = get().cards;
+        return [...cards].sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
       },
     }),
     {

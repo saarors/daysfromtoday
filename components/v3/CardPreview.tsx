@@ -6,31 +6,43 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { CardTemplate, CardContent } from '@/types/card-template';
+import type { CardTemplate, CardContent, CardData } from '@/types/card-template';
 
 interface CardPreviewProps {
-  template: CardTemplate;
-  content: Partial<CardContent>;
+  // 方式1：传递完整的 card 对象（Phase 2.6）
+  card?: CardData;
+  // 方式2：分别传递 template 和 content（原有方式）
+  template?: CardTemplate;
+  content?: Partial<CardContent>;
   customBackground?: string;
+  locale?: string;
 }
 
-export function CardPreview({ template, content, customBackground }: CardPreviewProps) {
+export function CardPreview({ card, template, content, customBackground, locale = 'en' }: CardPreviewProps) {
   const [imageUrl, setImageUrl] = useState<string>('');
   const [loading, setLoading] = useState(false);
   
+  // 从 card 或单独参数中提取数据
+  const templateId = card ? card.templateId : template?.id;
+  const cardContent = card ? card.content : content;
+  
   useEffect(() => {
-    generatePreview();
-  }, [template, content, customBackground]);
+    if (templateId && cardContent) {
+      generatePreview();
+    }
+  }, [templateId, cardContent, customBackground]);
   
   async function generatePreview() {
+    if (!templateId || !cardContent) return;
+    
     setLoading(true);
     
     const params = new URLSearchParams({
-      template: template.id,
-      text: content.goalText || 'Your goal here...',
-      date: content.targetDate || new Date().toISOString(),
-      days: String(content.daysCount || 0),
-      name: content.title || '',
+      template: templateId,
+      text: cardContent.goalText || 'Your goal here...',
+      date: cardContent.targetDate || new Date().toISOString(),
+      days: String(cardContent.daysCount || 0),
+      name: cardContent.title || '',
     });
     
     const url = `/api/og/goal-card?${params}`;
@@ -40,17 +52,34 @@ export function CardPreview({ template, content, customBackground }: CardPreview
     setTimeout(() => setLoading(false), 500);
   }
   
+  const text = {
+    en: {
+      preview: 'Preview',
+      generating: 'Generating...',
+      selectTemplate: 'Select template and enter content to preview',
+      dimensions: '📐 Size: 1200x630 • Perfect for social media sharing',
+    },
+    zh: {
+      preview: '预览',
+      generating: '生成中...',
+      selectTemplate: '选择模板并输入内容后预览',
+      dimensions: '📐 尺寸：1200x630 • 适合社交媒体分享',
+    },
+  };
+  
+  const t = text[locale as keyof typeof text] || text.en;
+  
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">预览</h3>
+        <h3 className="text-lg font-semibold text-gray-900">{t.preview}</h3>
         {loading && (
           <span className="text-sm text-gray-500 flex items-center gap-2">
             <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
-            生成中...
+            {t.generating}
           </span>
         )}
       </div>
@@ -76,14 +105,14 @@ export function CardPreview({ template, content, customBackground }: CardPreview
               <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 16m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <p className="text-sm">选择模板并输入内容后预览</p>
+              <p className="text-sm">{t.selectTemplate}</p>
             </div>
           </div>
         )}
       </div>
       
       <div className="text-xs text-gray-500 text-center">
-        📐 尺寸：1200x630 • 适合社交媒体分享
+        {t.dimensions}
       </div>
     </div>
   );

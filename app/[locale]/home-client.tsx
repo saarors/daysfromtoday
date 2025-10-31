@@ -2,6 +2,7 @@
  * DaysFromToday 首页 Client Component
  * 
  * 功能：
+ * - Phase 2.6: 卡片墙展示
  * - 2个主卡片：未来日期 + 过去日期
  * - 每个卡片内区分自然日和工作日
  * - 自定义输入功能
@@ -9,13 +10,17 @@
  */
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import TopNav from '@/components/TopNav';
 import HomeAnniversaryCards from '@/components/HomeAnniversaryCards';
+import { CardGallery } from '@/components/v3/CardGallery';
+import { EmptyState } from '@/components/v3/EmptyState';
+import { CreateCardFAB } from '@/components/v3/CreateCardFAB';
+import { useGoalCards } from '@/store/goal-cards';
 
 interface HomePageClientProps {
   locale: string;
@@ -26,6 +31,16 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
   const [futureDays, setFutureDays] = useState('');
   const [pastDays, setPastDays] = useState('');
   const router = useRouter();
+  
+  // Phase 2.6: 卡片墙状态
+  const [mounted, setMounted] = useState(false);
+  const { getAllCardsSortedByDate } = useGoalCards();
+  const [cards, setCards] = useState<ReturnType<typeof getAllCardsSortedByDate>>([]);
+  
+  useEffect(() => {
+    setMounted(true);
+    setCards(getAllCardsSortedByDate());
+  }, [getAllCardsSortedByDate]);
   
   // 多语言内容
   const text = {
@@ -145,6 +160,20 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
       {/* 顶部导航栏 */}
       <TopNav locale={locale} />
+      
+      {/* Phase 2.6: 卡片墙或空状态 */}
+      {mounted && (
+        <section className="container mx-auto px-4 py-16 pt-24 md:pt-32 relative z-10">
+          {cards.length > 0 ? (
+            <CardGallery cards={cards} locale={locale} />
+          ) : (
+            <EmptyState locale={locale} />
+          )}
+        </section>
+      )}
+      
+      {/* Phase 2.6: 创建卡片 FAB */}
+      {mounted && cards.length > 0 && <CreateCardFAB locale={locale} />}
       
       {/* 装饰性背景元素 */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

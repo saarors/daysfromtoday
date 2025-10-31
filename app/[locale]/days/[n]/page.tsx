@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import TopNav from '@/components/TopNav';
 import DateCalculator from '@/components/DateCalculator';
 
@@ -92,6 +93,24 @@ export default async function DaysFromTodayPage({ params }: PageProps) {
           type="future" 
           mode="calendar" 
         />
+        
+        {/* Phase 2.6: 创建目标卡片 CTA */}
+        <div className="mt-12 p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl text-center">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            {locale === 'zh' ? '💡 创建目标卡片' : '💡 Create Goal Card'}
+          </h3>
+          <p className="text-gray-600 mb-4">
+            {locale === 'zh' 
+              ? '为这个日期创建一张精美的目标卡片，随时追踪你的倒计时' 
+              : 'Create a beautiful goal card for this date and track your countdown'}
+          </p>
+          <Link
+            href={`/${locale}/create-card?type=future&days=${days}`}
+            className="inline-block px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all hover:scale-105"
+          >
+            {locale === 'zh' ? '✨ 创建目标卡片' : '✨ Create Goal Card'}
+          </Link>
+        </div>
         
         {/* Navigation */}
         <div className="text-center space-x-4 mt-8">

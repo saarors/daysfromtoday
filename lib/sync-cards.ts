@@ -4,7 +4,7 @@
  */
 
 import { createClient } from '@/lib/supabase/client';
-import type { CardContent } from '@/types/card-template';
+import type { CardData } from '@/types/card-template';
 
 interface SyncResult {
   success: boolean;
@@ -20,7 +20,7 @@ interface SyncResult {
  * @returns 同步结果
  */
 export async function syncCardsToSupabase(
-  localCards: CardContent[],
+  localCards: CardData[],
   userId: string
 ): Promise<SyncResult> {
   const supabase = createClient();
@@ -40,56 +40,71 @@ export async function syncCardsToSupabase(
 
   for (const card of localCards) {
     try {
-      console.log(`🔍 检查卡片: ${card.goalText}`, {
+      console.log(`🔍 检查卡片: ${card.content.goalText}`, {
+        id: card.id,
         templateId: card.templateId,
-        targetDate: card.targetDate,
-        daysCount: card.daysCount,
+        targetDate: card.content.targetDate,
+        daysCount: card.content.daysCount,
+        cardType: card.cardType,
+        calculationMode: card.calculationMode,
+        daysType: card.daysType,
       });
       
-      // 检查卡片是否已存在（基于 templateId + goalText + targetDate 去重）
+      // 检查卡片是否已存在（基于 ID 或 templateId + goalText + targetDate 去重）
       const { data: existing, error: checkError } = await supabase
         .from('goal_cards')
         .select('id')
         .eq('user_id', userId)
-        .eq('template_id', card.templateId)
-        .eq('goal_text', card.goalText)
-        .eq('target_date', card.targetDate)
+        .or(`id.eq.${card.id},and(template_id.eq.${card.templateId},goal_text.eq.${card.content.goalText},target_date.eq.${card.content.targetDate})`)
         .maybeSingle();
       
       console.log(`🔎 检查结果:`, { existing, checkError });
 
       if (checkError) {
         console.error('❌ 检查卡片重复失败:', checkError);
-        result.errors.push(`检查重复失败: ${card.goalText}`);
+        result.errors.push(`检查重复失败: ${card.content.goalText}`);
         continue;
       }
 
       if (existing) {
-        console.log(`⏭️  跳过重复卡片: ${card.goalText}`);
+        console.log(`⏭️  跳过重复卡片: ${card.content.goalText}`);
         result.skipped++;
         continue;
       }
 
-      // 插入新卡片
+      // 插入新卡片（包含 Phase 2.6 新字段）
       console.log(`📝 准备插入卡片:`, {
+        id: card.id,
         user_id: userId,
         template_id: card.templateId,
-        goal_text: card.goalText,
-        target_date: card.targetDate,
-        days_count: card.daysCount,
-        user_name: card.userName || '',
+        card_type: card.cardType,
+        calculation_mode: card.calculationMode,
+        days_type: card.daysType,
+        goal_text: card.content.goalText,
+        target_date: card.content.targetDate,
+        days_count: card.content.daysCount,
+        working_days_count: card.content.workingDaysCount,
       });
       
       const { data: insertData, error: insertError } = await supabase
         .from('goal_cards')
         .insert({
+          id: card.id,
           user_id: userId,
           template_id: card.templateId,
-          goal_text: card.goalText,
-          target_date: card.targetDate,
-          days_count: card.daysCount,
-          user_name: card.userName || '',
+          // Phase 2.6 新增字段
+          card_type: card.cardType || 'future',
+          calculation_mode: card.calculationMode || 'date-first',
+          days_type: card.daysType || 'natural',
+          working_days_count: card.content.workingDaysCount || null,
+          // 原有字段
+          goal_text: card.content.goalText,
+          target_date: card.content.targetDate,
+          days_count: card.content.daysCount,
+          user_name: card.content.title || '',
           is_public: false, // 默认私有
+          created_at: card.createdAt,
+          updated_at: card.updatedAt,
         })
         .select();
 
@@ -97,15 +112,15 @@ export async function syncCardsToSupabase(
 
       if (insertError) {
         console.error('❌ 插入卡片失败:', insertError);
-        result.errors.push(`插入失败: ${card.goalText}`);
+        result.errors.push(`插入失败: ${card.content.goalText}`);
         result.success = false;
       } else {
-        console.log(`✅ 同步成功: ${card.goalText}`);
+        console.log(`✅ 同步成功: ${card.content.goalText}`);
         result.synced++;
       }
     } catch (error: any) {
       console.error('❌ 同步卡片异常:', error);
-      result.errors.push(`异常: ${card.goalText} - ${error.message}`);
+      result.errors.push(`异常: ${card.content.goalText} - ${error.message}`);
       result.success = false;
     }
   }
