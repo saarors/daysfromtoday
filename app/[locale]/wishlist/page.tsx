@@ -8,7 +8,7 @@
  * - 显示愿望卡片列表
  */
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import TopNav from '@/components/TopNav';
 import { EmptyWishlist } from '@/components/v3/Wishlist/EmptyWishlist';
@@ -36,12 +36,17 @@ function WishlistContent({ locale }: { locale: string }) {
     targetDate: string;
     goalText: string;
     assistant: AIAssistantType;
+    viewOnly?: boolean;  // 查看模式
+    existingAnalysis?: string;  // 已有的 AI 分析
   } | null>(null);
 
   // 显示状态
   const [showChat, setShowChat] = useState(false);
   const [wishCards, setWishCards] = useState<any[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);  // 添加加载状态
+  const [isSaving, setIsSaving] = useState(false);  // 防止重复保存
+  const savingRef = useRef(false);  // 使用 ref 立即锁定，避免状态更新延迟
 
   useEffect(() => {
     // 检查登录状态
@@ -57,14 +62,28 @@ function WishlistContent({ locale }: { locale: string }) {
     const targetDate = searchParams.get('targetDate');
     const goalText = searchParams.get('goalText');
     const assistant = searchParams.get('assistant') as AIAssistantType;
+    const viewOnly = searchParams.get('viewOnly');
+    const cardId = searchParams.get('cardId');
 
     if (days && targetDate && goalText && assistant) {
-      setHasNewGoal(true);
+      let existingAnalysis: string | undefined;
+      
+      // 如果是查看模式，从卡片中读取已有的 AI 分析
+      if (viewOnly === 'true' && cardId) {
+        const card = cards.find(c => c.id === cardId);
+        if (card) {
+          existingAnalysis = (card.content as any).aiAnalysis;
+        }
+      }
+      
+      setHasNewGoal(!viewOnly);
       setGoalData({
         days: parseInt(days),
         targetDate,
         goalText,
         assistant,
+        viewOnly: viewOnly === 'true',
+        existingAnalysis,
       });
       setShowChat(true);
     }
@@ -73,12 +92,37 @@ function WishlistContent({ locale }: { locale: string }) {
     setWishCards(cards.sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     ));
+    
+    // 数据加载完成
+    setIsLoading(false);
   }, [searchParams, cards]);
 
   const handleChatComplete = async (aiAnalysis: string, aiSummary: string) => {
-    if (!goalData) return;
+    // 使用 ref 立即检查，避免状态更新延迟
+    if (!goalData || savingRef.current) {
+      return;
+    }
+    
+    // 检查是否已经存在相同的卡片（防止重复创建）
+    const existingCard = cards.find(
+      (card) =>
+        card.content.goalText === goalData.goalText &&
+        card.content.targetDate === goalData.targetDate &&
+        card.content.daysCount === goalData.days
+    );
+    
+    if (existingCard) {
+      // 直接跳转到列表页面
+      router.push(`/${locale}/wishlist`);
+      setShowChat(false);
+      return;
+    }
+    
+    // 立即锁定
+    savingRef.current = true;
+    setIsSaving(true);
 
-    // 创建新卡片
+    // 创建新卡片（存储 AI 分析）
     const newCard = addCard({
       templateId: 'gradient-growth', // 默认模板
       cardType: 'future',
@@ -90,7 +134,11 @@ function WishlistContent({ locale }: { locale: string }) {
         daysCount: goalData.days,
         workingDaysCount: 0, // 后续计算
         title: '',
-      },
+        // 存储 AI 相关数据（临时方案，后续迁移到专门字段）
+        aiAnalysis: aiAnalysis,
+        aiSummary: aiSummary,
+        aiAssistant: goalData.assistant,
+      } as any,
     });
 
     // 如果登录，同步到数据库
@@ -122,22 +170,51 @@ function WishlistContent({ locale }: { locale: string }) {
       }
     }
 
-    // 隐藏对话，显示卡片列表
-    setShowChat(false);
-    setHasNewGoal(false);
-    
-    // 清除 URL 参数
+    // 先清除 URL 参数（这会触发重新渲染）
     router.push(`/${locale}/wishlist`);
     
     // 刷新卡片列表
     setWishCards([...cards].sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     ));
+    
+    // 隐藏对话，显示卡片列表
+    setShowChat(false);
+    setHasNewGoal(false);
+    
+    // 延迟重置保存状态，确保所有渲染和路由跳转完成
+    setTimeout(() => {
+      savingRef.current = false;
+      setIsSaving(false);
+    }, 1000);
   };
 
-  const handleDeleteCard = (id: string) => {
-    // TODO: 实现删除功能
-    console.log('Delete card:', id);
+  const handleDeleteCard = async (id: string) => {
+    const { deleteCard, getAllCardsSortedByDate } = useGoalCards.getState();
+    
+    // 从本地移除
+    deleteCard(id);
+    
+    // 如果登录，从数据库删除
+    if (isLoggedIn) {
+      try {
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          await supabase
+            .from('goal_cards')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', session.user.id);
+        }
+      } catch (error) {
+        console.error('从数据库删除失败:', error);
+      }
+    }
+    
+    // 刷新卡片列表（从 store 获取最新数据）
+    setWishCards(getAllCardsSortedByDate());
   };
 
   const text = {
@@ -174,13 +251,29 @@ function WishlistContent({ locale }: { locale: string }) {
             assistant={goalData.assistant}
             onComplete={handleChatComplete}
             locale={locale}
+            viewOnly={goalData.viewOnly}
+            existingAnalysis={goalData.existingAnalysis}
+            isSaving={isSaving}
           />
         )}
 
         {/* 愿望卡片列表 */}
         {!showChat && (
           <>
-            {wishCards.length === 0 ? (
+            {isLoading ? (
+              // 加载骨架屏
+              <div className="max-w-4xl mx-auto">
+                <div className="space-y-6">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="bg-white rounded-xl shadow-md border border-gray-200 p-6 animate-pulse">
+                      <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : wishCards.length === 0 ? (
               <EmptyWishlist locale={locale} />
             ) : (
               <div className="max-w-4xl mx-auto">
@@ -194,21 +287,22 @@ function WishlistContent({ locale }: { locale: string }) {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-6">
                   {wishCards.map((card) => (
-                    <WishCard
-                      key={card.id}
-                      id={card.id}
-                      goalText={card.content.goalText}
-                      targetDate={card.content.targetDate}
-                      days={card.content.daysCount}
-                      workingDays={card.content.workingDaysCount}
-                      assistant="twinkle" // 默认，后续从卡片数据读取
-                      aiSummary="AI 建议摘要（待实现）"
-                      createdAt={card.createdAt}
-                      onDelete={handleDeleteCard}
-                      locale={locale}
-                    />
+                  <WishCard
+                    key={card.id}
+                    id={card.id}
+                    goalText={card.content.goalText}
+                    targetDate={card.content.targetDate}
+                    days={card.content.daysCount}
+                    workingDays={card.content.workingDaysCount}
+                    assistant={(card.content as any).aiAssistant || 'twinkle'}
+                    aiAnalysis={(card.content as any).aiAnalysis || 'AI 分析内容'}
+                    aiSummary={(card.content as any).aiSummary || 'AI 建议摘要'}
+                    createdAt={card.createdAt}
+                    onDelete={handleDeleteCard}
+                    locale={locale}
+                  />
                   ))}
                 </div>
               </div>

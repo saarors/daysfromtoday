@@ -7,6 +7,8 @@
  */
 
 import { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { getAssistant } from '@/lib/ai-assistants';
 import type { AIAssistantType } from '@/types/ai-assistant';
 
@@ -18,6 +20,9 @@ interface AIChatDialogProps {
   assistant: AIAssistantType;
   onComplete: (aiAnalysis: string, aiSummary: string) => void;
   locale: string;
+  viewOnly?: boolean;  // 查看模式
+  existingAnalysis?: string;  // 已有的 AI 分析
+  isSaving?: boolean;  // 外部保存状态
 }
 
 export function AIChatDialog({
@@ -28,9 +33,12 @@ export function AIChatDialog({
   assistant,
   onComplete,
   locale,
+  viewOnly = false,
+  existingAnalysis = '',
+  isSaving = false,
 }: AIChatDialogProps) {
-  const [isAnalyzing, setIsAnalyzing] = useState(true);
-  const [aiResponse, setAiResponse] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(!viewOnly);  // 查看模式不需要 loading
+  const [aiResponse, setAiResponse] = useState(existingAnalysis);  // 如果有已有分析，直接使用
 
   const currentAssistant = getAssistant(assistant);
 
@@ -59,6 +67,11 @@ export function AIChatDialog({
 
   // Mock AI 响应（Phase 2）
   useEffect(() => {
+    // 如果是查看模式，不需要重新生成
+    if (viewOnly) {
+      return;
+    }
+    
     const generateMockResponse = () => {
       // 根据不同助手生成不同风格的 Mock 响应
       let mockResponse = '';
@@ -73,8 +86,8 @@ export function AIChatDialog({
           : `Haha, ${days} days? It's like giving you a super long runway to gradually accelerate! 😄\n\nI have a bold idea: Imagine achieving your goal as leveling up in a game, gaining a level for each small task completed.\n\n🎮 **Level-up Roadmap:**\nBeginner Zone (First 30 days): Learn the rules, gain experience\nIntermediate Zone (Mid-term): Upgrade skills, challenge bosses\nFinal Boss (Last sprint): Max level challenge, perfect completion\n\n🎯 **Fun Suggestions:**\n- Set "achievement badges" to reward yourself\n- Find a "teammate" to play together\n- Don't forget to "save" (track progress)\n\nGame on, ready? 🚀`;
       } else {
         mockResponse = locale === 'zh'
-          ? `${days} 天，时间充足。重点是系统化执行。\n\n我给你一个清晰的路线图：\n\n**阶段 1（前 30%）：** 建立基础框架\n- 明确核心指标\n- 制定详细计划\n- 建立反馈机制\n\n**阶段 2（中间 40%）：** 持续优化迭代\n- 每周复盘调整\n- 关注关键数据\n- 保持执行节奏\n\n**阶段 3（最后 30%）：** 冲刺收尾\n- 检查完成度\n- 查漏补缺\n- 准备交付\n\n⚠️ **关键提醒：**\n1. 专注执行，避免完美主义\n2. 定期评估，及时调整\n3. 保持节奏，避免拖延\n\n现在开始执行。`
-          : `${days} days, sufficient time. Focus on systematic execution.\n\nHere's a clear roadmap:\n\n**Phase 1 (First 30%):** Build foundation\n- Define core metrics\n- Create detailed plan\n- Establish feedback loop\n\n**Phase 2 (Middle 40%):** Continuous optimization\n- Weekly review and adjustment\n- Monitor key data\n- Maintain execution rhythm\n\n**Phase 3 (Final 30%):** Sprint to finish\n- Check completion status\n- Fill gaps\n- Prepare delivery\n\n⚠️ **Key Reminders:**\n1. Focus on execution, avoid perfectionism\n2. Regular evaluation, timely adjustment\n3. Keep rhythm, avoid procrastination\n\nStart executing now.`;
+          ? `${days} 天，时间充足。重点是系统化执行。\n\n我给你一个清晰的路线图：\n\n**阶段 1（前 30%）：** 建立基础框架\n- 明确核心指标\n- 制定详细计划\n- 建立反馈机制\n\n**阶段 2（中间 40%）：** 持续优化迭代\n- 每周复盘调整\n- 关注关键数据\n- 保持执行节奏\n\n**阶段 3（最后 30%）：** 冲刺收尾\n- 检查完成度\n- 查漏补缺\n- 准备交付\n\n### 执行时间表\n\n| 阶段 | 时间段 | 关键任务 | 成功指标 |\n|------|--------|---------|----------|\n| 准备期 | 第 1-3 天 | 制定计划、准备资源 | 计划文档完成 |\n| 执行期 | 第 4-${Math.floor(days * 0.8)} 天 | 核心任务推进 | 完成 80% 目标 |\n| 冲刺期 | 最后 ${Math.ceil(days * 0.2)} 天 | 查漏补缺、优化 | 100% 完成 |\n\n⚠️ **关键提醒：**\n1. 专注执行，避免完美主义\n2. 定期评估，及时调整\n3. 保持节奏，避免拖延\n\n现在开始执行。`
+          : `${days} days, sufficient time. Focus on systematic execution.\n\nHere's a clear roadmap:\n\n**Phase 1 (First 30%):** Build foundation\n- Define core metrics\n- Create detailed plan\n- Establish feedback loop\n\n**Phase 2 (Middle 40%):** Continuous optimization\n- Weekly review and adjustment\n- Monitor key data\n- Maintain execution rhythm\n\n**Phase 3 (Final 30%):** Sprint to finish\n- Check completion status\n- Fill gaps\n- Prepare delivery\n\n### Execution Timeline\n\n| Phase | Time Period | Key Tasks | Success Metrics |\n|-------|-------------|-----------|----------------|\n| Preparation | Day 1-3 | Plan & Resource Setup | Planning Complete |\n| Execution | Day 4-${Math.floor(days * 0.8)} | Core Task Progress | 80% Complete |\n| Sprint | Last ${Math.ceil(days * 0.2)} days | Polish & Optimize | 100% Complete |\n\n⚠️ **Key Reminders:**\n1. Focus on execution, avoid perfectionism\n2. Regular evaluation, timely adjustment\n3. Keep rhythm, avoid procrastination\n\nStart executing now.`;
       }
       
       return mockResponse;
@@ -91,6 +104,8 @@ export function AIChatDialog({
   }, [assistant, days, locale]);
 
   const handleComplete = () => {
+    if (isSaving) return;  // 使用外部状态防止重复点击
+    
     // 生成 AI 建议摘要（前200字）
     const summary = aiResponse.split('\n\n')[0].substring(0, 200) + '...';
     onComplete(aiResponse, summary);
@@ -144,10 +159,28 @@ export function AIChatDialog({
                   <span>{currentAssistant.name} {t.analyzing}</span>
                 </div>
               ) : (
-                <div className="prose prose-sm max-w-none">
-                  <div className="text-gray-800 whitespace-pre-wrap leading-relaxed">
+                <div className="prose prose-sm max-w-none text-gray-800 leading-relaxed">
+                  <ReactMarkdown 
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      // 自定义样式
+                      h3: ({node, ...props}) => <h3 className="text-lg font-bold text-gray-900 mt-4 mb-2" {...props} />,
+                      p: ({node, ...props}) => <p className="mb-3 text-gray-800" {...props} />,
+                      strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />,
+                      ul: ({node, ...props}) => <ul className="list-disc list-inside mb-3 space-y-1" {...props} />,
+                      ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-3 space-y-1" {...props} />,
+                      table: ({node, ...props}) => (
+                        <div className="overflow-x-auto my-4">
+                          <table className="min-w-full border-collapse border border-gray-300" {...props} />
+                        </div>
+                      ),
+                      thead: ({node, ...props}) => <thead className="bg-gray-100" {...props} />,
+                      th: ({node, ...props}) => <th className="border border-gray-300 px-4 py-2 text-left font-semibold" {...props} />,
+                      td: ({node, ...props}) => <td className="border border-gray-300 px-4 py-2" {...props} />,
+                    }}
+                  >
                     {aiResponse}
-                  </div>
+                  </ReactMarkdown>
                 </div>
               )}
             </div>
@@ -155,19 +188,31 @@ export function AIChatDialog({
         </div>
 
         {/* 完成按钮 */}
-        {!isAnalyzing && (
+        {!isAnalyzing && !viewOnly && (
           <div className="text-center pt-4">
             <button
               onClick={handleComplete}
+              disabled={isSaving}
               className="
                 px-10 py-3 text-lg font-semibold rounded-lg
                 bg-blue-600 text-white
                 hover:bg-blue-700 hover:shadow-lg
+                disabled:bg-gray-400 disabled:cursor-not-allowed
                 transition-all duration-200
                 active:scale-95
               "
             >
-              ✅ {t.complete}
+              {isSaving ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  {locale === 'zh' ? '保存中...' : 'Saving...'}
+                </span>
+              ) : (
+                <>✅ {t.complete}</>
+              )}
             </button>
           </div>
         )}
