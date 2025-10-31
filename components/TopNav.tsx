@@ -26,13 +26,15 @@ export default function TopNav({ locale }: TopNavProps) {
   const text = {
     en: {
       home: 'Home',
-      anniversaries: 'Anniversaries',
+      wishlist: 'Wishlist',
+      calculator: 'Date Calculator',
       holidays: 'Holidays',
       blog: 'Blog'
     },
     zh: {
       home: '首页',
-      anniversaries: '纪念日',
+      wishlist: '愿望清单',
+      calculator: '日期计算',
       holidays: '节假日',
       blog: '博客'
     }
@@ -83,14 +85,25 @@ export default function TopNav({ locale }: TopNavProps) {
               </Link>
               <span className="text-gray-300">|</span>
               <Link 
-                href={`/${locale}/anniversaries`}
+                href={`/${locale}/wishlist`}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  isActive(`/${locale}/anniversaries`)
+                  isActive(`/${locale}/wishlist`)
                     ? 'text-blue-600 bg-blue-50'
                     : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                 }`}
               >
-                {t.anniversaries}
+                {t.wishlist}
+              </Link>
+              <span className="text-gray-300">|</span>
+              <Link 
+                href={`/${locale}/calculator`}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                  isActive(`/${locale}/calculator`)
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                }`}
+              >
+                {t.calculator}
               </Link>
               <span className="text-gray-300">|</span>
               <Link 

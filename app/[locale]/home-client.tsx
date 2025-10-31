@@ -165,8 +165,8 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
       {/* V3.0 Hero Section - 主入口 */}
       <HeroSection locale={locale} />
       
-      {/* Phase 2.6: 卡片墙（如果有卡片则显示） */}
-      {mounted && cards.length > 0 && (
+      {/* Phase 2.6: 卡片墙 - V3 隐藏，移至愿望清单页面 */}
+      {false && mounted && cards.length > 0 && (
         <section className="container mx-auto px-4 py-16 relative z-10">
           <h2 className="text-3xl font-bold mb-8 text-center text-gray-900">
             {locale === 'zh' ? '我的愿望清单' : 'My Wishlist'}
@@ -175,8 +175,8 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
         </section>
       )}
       
-      {/* Phase 2.6: 创建卡片 FAB */}
-      {mounted && cards.length > 0 && <CreateCardFAB locale={locale} />}
+      {/* Phase 2.6: 创建卡片 FAB - V3 隐藏 */}
+      {false && mounted && cards.length > 0 && <CreateCardFAB locale={locale} />}
 
       {/* V2.6 功能区域 - 暂时隐藏，保留代码以备后用 */}
       {false && (
@@ -392,14 +392,14 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
       </section>
       )}
 
-      {/* Anniversaries Section - 使用动态卡片组件 */}
-      <HomeAnniversaryCards locale={locale} />
+      {/* Anniversaries Section - V3 隐藏 */}
+      {false && <HomeAnniversaryCards locale={locale} />}
 
-      {/* Blog Section - 置顶创始人故事 */}
+      {/* Blog Section - 改名为 Stories */}
       <section className="container mx-auto px-4 py-16 bg-white relative z-10">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold mb-8 text-center text-gray-900">
-            {t.blog.title}
+            {locale === 'zh' ? '故事' : 'Stories'}
           </h2>
           
           <Link href={`/${locale}/blog/why-i-created-daysfromtoday`} className="block">

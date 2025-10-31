@@ -41,11 +41,7 @@ export function QuickDateSelector({ onSelect, locale = 'en' }: QuickDateSelector
   };
 
   return (
-    <div className="space-y-3">
-      <label className="block text-sm font-medium text-gray-700">
-        {locale === 'zh' ? '快速选择' : 'Quick Select'}
-      </label>
-      
+    <div className="space-y-2">
       <div className="flex flex-wrap gap-2">
         {QUICK_OPTIONS.map((option) => (
           <button
@@ -65,12 +61,6 @@ export function QuickDateSelector({ onSelect, locale = 'en' }: QuickDateSelector
           </button>
         ))}
       </div>
-
-      <p className="text-xs text-gray-500">
-        {locale === 'zh' 
-          ? '点击任意选项，系统会自动计算目标日期' 
-          : 'Click any option to auto-calculate target date'}
-      </p>
     </div>
   );
 }

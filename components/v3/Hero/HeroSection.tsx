@@ -37,7 +37,7 @@ export function HeroSection({ locale }: HeroSectionProps) {
       title: 'Days From Today',
       subtitle: 'Let AI accompany you to achieve your future goals',
       description: 'Simple and powerful date calculator with fun AI to help you succeed',
-      submitButton: '🚀 Start Achieving',
+      submitButton: 'Start',
       submittingButton: 'Preparing...',
       errorDays: 'Please select a date or enter days',
       errorGoal: 'Please describe your goal',
@@ -46,7 +46,7 @@ export function HeroSection({ locale }: HeroSectionProps) {
       title: 'Days From Today',
       subtitle: '让 AI 陪伴你实现未来的目标',
       description: '简单和强大的日期计算工具，有趣的 AI 陪伴你实现目标',
-      submitButton: '🚀 开始实现目标',
+      submitButton: '开始',
       submittingButton: '准备中...',
       errorDays: '请选择日期或输入天数',
       errorGoal: '请描述你的目标',
@@ -89,27 +89,30 @@ export function HeroSection({ locale }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center py-16 px-4">
-      {/* 背景装饰（简洁版，无渐变） */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-50 to-white -z-10" />
+    <section className="relative min-h-[85vh] flex items-center justify-center py-12 px-4 pt-24">
+      {/* 背景底纹（参考 getdraft.ai 风格） */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(147,197,253,0.08),transparent_50%)] bg-white" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+      </div>
 
       <div className="w-full max-w-5xl">
-        {/* 主标题区域 */}
-        <div className="text-center mb-12 space-y-4">
-          <h1 className="text-5xl md:text-6xl font-bold text-blue-600 mb-4">
+        {/* 主标题区域 - 增加上边距，避免被导航栏遮挡 */}
+        <div className="text-center mb-10 space-y-3">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
             {t.title}
           </h1>
-          <p className="text-xl md:text-2xl text-gray-700 font-medium">
+          <p className="text-xl md:text-2xl text-gray-700">
             {t.subtitle}
           </p>
-          <p className="text-sm md:text-base text-gray-500 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
             {t.description}
           </p>
         </div>
 
         {/* 表单 */}
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* 日期+目标输入 */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* 日期+目标输入（紧凑版） */}
           <DateGoalInput
             days={days}
             setDays={setDays}
@@ -117,17 +120,10 @@ export function HeroSection({ locale }: HeroSectionProps) {
             setTargetDate={setTargetDate}
             goalText={goalText}
             setGoalText={setGoalText}
+            selectedAssistant={selectedAssistant}
+            setSelectedAssistant={setSelectedAssistant}
             locale={locale}
           />
-
-          {/* AI 助手选择 */}
-          <div className="max-w-4xl mx-auto p-8 bg-white rounded-2xl shadow-lg border border-gray-100">
-            <AIAssistantSelector
-              selected={selectedAssistant}
-              onSelect={setSelectedAssistant}
-              locale={locale}
-            />
-          </div>
 
           {/* 提交按钮 */}
           <div className="text-center">
@@ -135,7 +131,7 @@ export function HeroSection({ locale }: HeroSectionProps) {
               type="submit"
               disabled={isSubmitting || days <= 0 || !goalText.trim()}
               className="
-                px-12 py-4 text-lg font-semibold rounded-xl
+                px-10 py-3 text-lg font-semibold rounded-lg
                 bg-blue-600 text-white
                 hover:bg-blue-700 hover:shadow-lg
                 disabled:bg-gray-400 disabled:cursor-not-allowed
