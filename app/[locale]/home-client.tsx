@@ -422,7 +422,7 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
           </div>
           
           <Link href={`/${locale}/blog/why-i-created-daysfromtoday`} className="block">
-            <Card className="card-glass hover:shadow-xl transition-shadow duration-300 cursor-pointer overflow-hidden relative">
+            <Card className="card-glass cursor-pointer overflow-hidden relative">
               {/* Featured 标识 */}
               <div className="absolute top-4 right-4 z-10">
                 <Badge className="bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold px-4 py-1.5 text-sm shadow-lg">
