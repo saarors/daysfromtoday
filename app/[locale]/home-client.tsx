@@ -401,20 +401,28 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
       {/* Anniversaries Section - V3 隐藏 */}
       {false && <HomeAnniversaryCards locale={locale} />}
 
-      {/* 分隔线 - 固定间距 */}
-      <div className="max-w-4xl mx-auto px-4 my-16">
+      {/* 分隔线 - 缩减间距 */}
+      <div className="max-w-4xl mx-auto px-4 my-12">
         <div className="border-t border-dashed border-gray-300"></div>
       </div>
 
-      {/* Blog Section - 改名为 Stories */}
+      {/* Blog Section - 改名为 Stories Discovery */}
       <section className="container mx-auto px-4 pb-16 relative z-10">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-8 text-center text-gray-900">
-            {locale === 'zh' ? '故事' : 'Stories'}
-          </h2>
+          {/* 标题区域 */}
+          <div className="text-center mb-10 space-y-2">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+              {locale === 'zh' ? '故事发现' : 'Stories Discovery'}
+            </h2>
+            <p className="text-base text-gray-600 max-w-2xl mx-auto">
+              {locale === 'zh' 
+                ? '在这里看看别人实现目标的故事，你也能达成你的心愿' 
+                : 'Discover how others achieve their goals, and you can achieve yours too'}
+            </p>
+          </div>
           
           <Link href={`/${locale}/blog/why-i-created-daysfromtoday`} className="block">
-            <Card className="card-glass hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden relative">
+            <Card className="card-glass hover:shadow-xl transition-shadow duration-300 cursor-pointer overflow-hidden relative">
               {/* Featured 标识 */}
               <div className="absolute top-4 right-4 z-10">
                 <Badge className="bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold px-4 py-1.5 text-sm shadow-lg">
