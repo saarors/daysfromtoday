@@ -89,14 +89,8 @@ export function HeroSection({ locale }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative min-h-[85vh] flex items-center justify-center py-12 px-4 pt-24">
-      {/* 背景底纹（参考 getdraft.ai 风格） */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(147,197,253,0.08),transparent_50%)] bg-white" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
-      </div>
-
-      <div className="w-full max-w-5xl">
+    <section className="relative px-4 pt-32 pb-16">
+      <div className="w-full max-w-4xl mx-auto">
         {/* 主标题区域 - 增加上边距，避免被导航栏遮挡 */}
         <div className="text-center mb-10 space-y-3">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">

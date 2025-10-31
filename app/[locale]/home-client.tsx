@@ -158,7 +158,13 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
   };
   
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* 背景底纹（参考 getdraft.ai 风格） */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.06),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(147,197,253,0.06),transparent_50%)] bg-white" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(59,130,246,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(59,130,246,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+      </div>
+
       {/* 顶部导航栏 */}
       <TopNav locale={locale} />
       
@@ -395,9 +401,14 @@ export default function HomePageClient({ locale }: HomePageClientProps) {
       {/* Anniversaries Section - V3 隐藏 */}
       {false && <HomeAnniversaryCards locale={locale} />}
 
+      {/* 分隔线 - 固定间距 */}
+      <div className="max-w-4xl mx-auto px-4 my-16">
+        <div className="border-t border-dashed border-gray-300"></div>
+      </div>
+
       {/* Blog Section - 改名为 Stories */}
-      <section className="container mx-auto px-4 py-16 bg-white relative z-10">
-        <div className="max-w-6xl mx-auto">
+      <section className="container mx-auto px-4 pb-16 relative z-10">
+        <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold mb-8 text-center text-gray-900">
             {locale === 'zh' ? '故事' : 'Stories'}
           </h2>

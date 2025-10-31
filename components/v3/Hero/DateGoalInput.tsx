@@ -151,7 +151,7 @@ export function DateGoalInput({
   const currentAssistant = getAssistant(selectedAssistant);
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-4 p-6 bg-white rounded-xl shadow-md border border-gray-200">
+    <div className="w-full space-y-4 p-6 bg-white rounded-xl shadow-md border border-gray-200">
       {/* 快速选择 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
