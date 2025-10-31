@@ -1,22 +1,26 @@
 'use client';
 
 /**
- * 愿望清单页面
- * - 接收来自首页的 URL 参数
- * - 显示 AI 对话界面
- * - 保存愿望到本地/数据库
- * - 显示愿望卡片列表
+ * 愿望清单页面 V3 - 集成 AI 智能匹配系统
+ * 
+ * 新功能：
+ * - 自动识别目标类型
+ * - 显示难度评估
+ * - AI 人格智能匹配
+ * - 调用真实 DeepSeek API
  */
 
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import TopNav from '@/components/TopNav';
 import { EmptyWishlist } from '@/components/v3/Wishlist/EmptyWishlist';
-import { AIChatDialog } from '@/components/v3/Wishlist/AIChatDialog';
 import { WishCard } from '@/components/v3/Wishlist/WishCard';
 import { useGoalCards } from '@/store/goal-cards';
 import { createClient } from '@/lib/supabase/client';
-import type { AIAssistantType } from '@/types/ai-assistant';
+import { matchGoalToAI } from '@/lib/ai-matching';
+import type { CompleteAIMatchResult } from '@/lib/ai-matching';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface WishlistPageProps {
   params: {
@@ -35,18 +39,25 @@ function WishlistContent({ locale }: { locale: string }) {
     days: number;
     targetDate: string;
     goalText: string;
-    assistant: AIAssistantType;
-    viewOnly?: boolean;  // 查看模式
-    existingAnalysis?: string;  // 已有的 AI 分析
+    viewOnly?: boolean;
+    existingAnalysis?: string;
   } | null>(null);
 
-  // 显示状态
+  // AI 匹配结果
+  const [matchResult, setMatchResult] = useState<CompleteAIMatchResult | null>(null);
+  const [isMatching, setIsMatching] = useState(false);
+
+  // AI 对话状态
   const [showChat, setShowChat] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [aiResponse, setAiResponse] = useState('');
+
+  // 显示状态
   const [wishCards, setWishCards] = useState<any[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);  // 添加加载状态
-  const [isSaving, setIsSaving] = useState(false);  // 防止重复保存
-  const savingRef = useRef(false);  // 使用 ref 立即锁定，避免状态更新延迟
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const savingRef = useRef(false);
 
   useEffect(() => {
     // 检查登录状态
@@ -61,11 +72,10 @@ function WishlistContent({ locale }: { locale: string }) {
     const days = searchParams.get('days');
     const targetDate = searchParams.get('targetDate');
     const goalText = searchParams.get('goalText');
-    const assistant = searchParams.get('assistant') as AIAssistantType;
     const viewOnly = searchParams.get('viewOnly');
     const cardId = searchParams.get('cardId');
 
-    if (days && targetDate && goalText && assistant) {
+    if (days && targetDate && goalText) {
       let existingAnalysis: string | undefined;
       
       // 如果是查看模式，从卡片中读取已有的 AI 分析
@@ -81,11 +91,17 @@ function WishlistContent({ locale }: { locale: string }) {
         days: parseInt(days),
         targetDate,
         goalText,
-        assistant,
         viewOnly: viewOnly === 'true',
         existingAnalysis,
       });
-      setShowChat(true);
+
+      // 如果不是查看模式，执行智能匹配
+      if (viewOnly !== 'true') {
+        performAIMatching(goalText, parseInt(days), targetDate);
+      } else {
+        setShowChat(true);
+        setAiResponse(existingAnalysis || '');
+      }
     }
 
     // 加载现有卡片
@@ -97,229 +113,405 @@ function WishlistContent({ locale }: { locale: string }) {
     setIsLoading(false);
   }, [searchParams, cards]);
 
+  /**
+   * 执行 AI 智能匹配
+   */
+  const performAIMatching = async (
+    goalText: string,
+    daysCount: number,
+    targetDate: string
+  ) => {
+    setIsMatching(true);
+    
+    try {
+      // 1. 调用匹配服务
+      const result = await matchGoalToAI({
+        goalText,
+        daysCount
+      });
+
+      setMatchResult(result);
+      console.log('🎯 AI 匹配结果:', result);
+
+      // 2. 短暂延迟后显示对话界面
+      setTimeout(() => {
+        setIsMatching(false);
+        setShowChat(true);
+        // 3. 立即调用 AI API 生成建议
+        generateAIResponse(goalText, daysCount, targetDate, result);
+      }, 1000);
+
+    } catch (error) {
+      console.error('❌ AI 匹配失败:', error);
+      setIsMatching(false);
+      setShowChat(true);
+      // 降级方案：使用默认配置
+      generateAIResponse(goalText, daysCount, targetDate, null);
+    }
+  };
+
+  /**
+   * 调用 DeepSeek API 生成 AI 建议
+   */
+  const generateAIResponse = async (
+    goalText: string,
+    daysCount: number,
+    targetDate: string,
+    matchResult: CompleteAIMatchResult | null
+  ) => {
+    setIsGenerating(true);
+
+    try {
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          goalText,
+          daysCount,
+          targetDate,
+          personaCode: matchResult?.persona.code || 'companion',
+          goalTypeCode: matchResult?.goalType.code || 'life',
+          difficultyLevel: matchResult?.difficulty.level || 'medium',
+          language: matchResult?.metadata.language || 'zh'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('API 调用失败');
+      }
+
+      const data = await response.json();
+      setAiResponse(data.analysis);
+      console.log('✅ AI 生成完成:', {
+        tokensUsed: data.tokensUsed,
+        model: data.model
+      });
+
+    } catch (error) {
+      console.error('❌ AI 生成失败:', error);
+      // 显示错误信息
+      setAiResponse('抱歉，AI 服务暂时不可用。请稍后再试。');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleChatComplete = async (aiAnalysis: string, aiSummary: string) => {
-    // 使用 ref 立即检查，避免状态更新延迟
-    if (!goalData || savingRef.current) {
+    if (savingRef.current || !goalData) {
+      console.log('⚠️ 阻止重复保存');
       return;
     }
-    
-    // 检查是否已经存在相同的卡片（防止重复创建）
-    const existingCard = cards.find(
-      (card) =>
+
+    console.log('🔔 handleChatComplete called', {
+      isSaving,
+      savingRef: savingRef.current,
+      goalData: !!goalData
+    });
+
+    setIsSaving(true);
+    savingRef.current = true;
+
+    console.log('✅ Starting save process...');
+
+    try {
+      // 检查是否已存在相同的卡片
+      const isDuplicate = cards.some(card => 
         card.content.goalText === goalData.goalText &&
         card.content.targetDate === goalData.targetDate &&
         card.content.daysCount === goalData.days
-    );
-    
-    if (existingCard) {
-      // 直接跳转到列表页面
-      router.push(`/${locale}/wishlist`);
-      setShowChat(false);
-      return;
-    }
-    
-    // 立即锁定
-    savingRef.current = true;
-    setIsSaving(true);
+      );
 
-    // 创建新卡片（存储 AI 分析）
-    const newCard = addCard({
-      templateId: 'gradient-growth', // 默认模板
-      cardType: 'future',
-      calculationMode: 'days-first',
-      daysType: 'natural',
-      content: {
-        goalText: goalData.goalText,
-        targetDate: goalData.targetDate,
-        daysCount: goalData.days,
-        workingDaysCount: 0, // 后续计算
-        title: '',
-        // 存储 AI 相关数据（临时方案，后续迁移到专门字段）
-        aiAnalysis: aiAnalysis,
-        aiSummary: aiSummary,
-        aiAssistant: goalData.assistant,
-      } as any,
-    });
+      if (isDuplicate) {
+        console.log('⚠️ 检测到重复卡片，跳过保存');
+        return;
+      }
 
-    // 如果登录，同步到数据库
-    if (isLoggedIn) {
-      try {
+      // 准备卡片数据
+      const cardData = {
+        cardType: 'future' as const,
+        content: {
+          goalText: goalData.goalText,
+          targetDate: goalData.targetDate,
+          daysCount: goalData.days,
+          workingDaysCount: 0,
+          aiAssistant: matchResult?.persona.code || 'companion',
+          aiAnalysis,
+          aiSummary,
+        },
+        // 新增 Phase 3 字段
+        goalTypeCode: matchResult?.goalType.code,
+        detectedDifficulty: matchResult?.difficulty.level,
+        aiPersonaCode: matchResult?.persona.code,
+        matchingMetadata: matchResult ? {
+          detected_keywords: matchResult.goalType.matchedKeywords,
+          confidence_score: matchResult.goalType.confidence,
+          difficulty_score: matchResult.difficulty.score,
+          persona_reasoning: matchResult.persona.reasoning,
+          matched_at: matchResult.metadata.timestamp
+        } : null
+      };
+
+      // 1. 添加到本地 store
+      addCard(cardData);
+
+      // 2. 如果已登录，同步到数据库
+      if (isLoggedIn) {
         const supabase = createClient();
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
-          await supabase.from('goal_cards').insert({
-            id: newCard.id,
-            user_id: session.user.id,
-            template_id: newCard.templateId,
-            card_type: newCard.cardType,
-            calculation_mode: newCard.calculationMode,
-            days_type: newCard.daysType,
-            goal_text: goalData.goalText,
-            target_date: goalData.targetDate,
-            days_count: goalData.days,
-            working_days_count: 0,
-            user_name: '',
-            is_public: false,
-            created_at: newCard.createdAt,
-            updated_at: newCard.updatedAt,
-          });
-        }
-      } catch (error) {
-        console.error('保存到数据库失败:', error);
-      }
-    }
+          const { error: insertError } = await supabase
+            .from('goal_cards')
+            .insert({
+              user_id: session.user.id,
+              goal_text: cardData.content.goalText,
+              target_date: cardData.content.targetDate,
+              days_count: cardData.content.daysCount,
+              card_type: cardData.cardType,
+              // Phase 3 新字段
+              goal_type_code: cardData.goalTypeCode,
+              detected_difficulty: cardData.detectedDifficulty,
+              ai_persona_code: cardData.aiPersonaCode,
+              ai_analysis: aiAnalysis,
+              ai_summary: aiSummary,
+              ai_model_used: 'deepseek-chat',
+              input_language: matchResult?.metadata.language || 'zh',
+              matching_metadata: cardData.matchingMetadata
+            });
 
-    // 先清除 URL 参数（这会触发重新渲染）
-    router.push(`/${locale}/wishlist`);
-    
-    // 刷新卡片列表
-    setWishCards([...cards].sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    ));
-    
-    // 隐藏对话，显示卡片列表
-    setShowChat(false);
-    setHasNewGoal(false);
-    
-    // 延迟重置保存状态，确保所有渲染和路由跳转完成
-    setTimeout(() => {
+          if (insertError) {
+            console.error('❌ Supabase 插入失败:', insertError);
+          } else {
+            console.log('✅ 已同步到数据库');
+          }
+        }
+      }
+
+      console.log('✅ Save complete, resetting state...');
+
+      // 延迟重置状态，确保所有异步操作完成
+      setTimeout(() => {
+        savingRef.current = false;
+        setIsSaving(false);
+        
+        // 刷新卡片列表
+        const latestCards = useGoalCards.getState().getAllCardsSortedByDate();
+        setWishCards(latestCards);
+        
+        // 跳转回清单页面
+        router.push(`/${locale}/wishlist`);
+      }, 500);
+
+    } catch (error) {
+      console.error('❌ 保存失败:', error);
       savingRef.current = false;
       setIsSaving(false);
-    }, 1000);
+    }
   };
 
   const handleDeleteCard = async (id: string) => {
-    const { deleteCard, getAllCardsSortedByDate } = useGoalCards.getState();
-    
-    // 从本地移除
+    if (!confirm('确定要删除这个愿望吗？')) {
+      return;
+    }
+
+    const { deleteCard } = useGoalCards.getState();
     deleteCard(id);
-    
-    // 如果登录，从数据库删除
+
     if (isLoggedIn) {
-      try {
-        const supabase = createClient();
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session) {
-          await supabase
-            .from('goal_cards')
-            .delete()
-            .eq('id', id)
-            .eq('user_id', session.user.id);
-        }
-      } catch (error) {
-        console.error('从数据库删除失败:', error);
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('goal_cards')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('删除失败:', error);
       }
     }
-    
-    // 刷新卡片列表（从 store 获取最新数据）
-    setWishCards(getAllCardsSortedByDate());
+
+    const latestCards = useGoalCards.getState().getAllCardsSortedByDate();
+    setWishCards(latestCards);
   };
 
-  const text = {
-    en: {
-      title: 'My Wishlist',
-      createNew: '+ Create New Wish',
-    },
-    zh: {
-      title: '我的愿望清单',
-      createNew: '+ 创建新愿望',
-    },
-  };
-
-  const t = text[locale as keyof typeof text] || text.en;
-
-  return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* 背景底纹 */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.06),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(147,197,253,0.06),transparent_50%)] bg-white" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(59,130,246,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(59,130,246,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+  // 加载中状态
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <TopNav locale={locale} />
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        </div>
       </div>
+    );
+  }
 
-      <TopNav locale={locale} />
-
-      <main className="container mx-auto px-4 pt-24 pb-16">
-        {/* AI 对话界面 */}
-        {showChat && goalData && (
-          <AIChatDialog
-            goalText={goalData.goalText}
-            targetDate={goalData.targetDate}
-            days={goalData.days}
-            workingDays={0}
-            assistant={goalData.assistant}
-            onComplete={handleChatComplete}
-            locale={locale}
-            viewOnly={goalData.viewOnly}
-            existingAnalysis={goalData.existingAnalysis}
-            isSaving={isSaving}
-          />
-        )}
-
-        {/* 愿望卡片列表 */}
-        {!showChat && (
-          <>
-            {isLoading ? (
-              // 加载骨架屏
-              <div className="max-w-4xl mx-auto">
-                <div className="space-y-6">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-white rounded-xl shadow-md border border-gray-200 p-6 animate-pulse">
-                      <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
-                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                    </div>
-                  ))}
-                </div>
+  // AI 匹配中
+  if (isMatching && goalData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <TopNav locale={locale} />
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-lg p-8">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  🧠 AI 正在分析你的目标...
+                </h3>
+                <p className="text-gray-600">
+                  识别目标类型 → 评估难度 → 匹配最佳 AI 助手
+                </p>
               </div>
-            ) : wishCards.length === 0 ? (
-              <EmptyWishlist locale={locale} />
-            ) : (
-              <div className="max-w-4xl mx-auto">
-                <div className="flex items-center justify-between mb-8">
-                  <h1 className="text-3xl font-bold text-gray-900">{t.title}</h1>
-                  <button
-                    onClick={() => router.push(`/${locale}`)}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
-                  >
-                    {t.createNew}
-                  </button>
-                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-                <div className="space-y-6">
-                  {wishCards.map((card) => (
-                  <WishCard
-                    key={card.id}
-                    id={card.id}
-                    goalText={card.content.goalText}
-                    targetDate={card.content.targetDate}
-                    days={card.content.daysCount}
-                    workingDays={card.content.workingDaysCount}
-                    assistant={(card.content as any).aiAssistant || 'twinkle'}
-                    aiAnalysis={(card.content as any).aiAnalysis || 'AI 分析内容'}
-                    aiSummary={(card.content as any).aiSummary || 'AI 建议摘要'}
-                    createdAt={card.createdAt}
-                    onDelete={handleDeleteCard}
-                    locale={locale}
-                  />
-                  ))}
+  // AI 对话界面
+  if (showChat && goalData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <TopNav locale={locale} />
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            {/* AI 匹配信息（Phase 3 新增） */}
+            {matchResult && !goalData.viewOnly && (
+              <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <div className="text-sm text-gray-500 mb-1">目标类型</div>
+                    <div className="font-semibold text-gray-900">
+                      {matchResult.goalType.name}
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      置信度: {(matchResult.goalType.confidence * 100).toFixed(0)}%
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-sm text-gray-500 mb-1">难度评估</div>
+                    <div className="font-semibold text-gray-900">
+                      {matchResult.difficulty.level.toUpperCase()}
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      评分: {matchResult.difficulty.score}/100
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-sm text-gray-500 mb-1">AI 助手</div>
+                    <div className="font-semibold text-gray-900">
+                      {matchResult.persona.emoji} {matchResult.persona.name}
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      {matchResult.persona.type}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
-          </>
+
+            {/* AI 对话卡片 */}
+            <div className="bg-white rounded-2xl shadow-lg p-8">
+              {/* 用户输入 */}
+              <div className="mb-8">
+                <h3 className="text-sm font-medium text-gray-500 mb-2">你的目标</h3>
+                <p className="text-lg font-semibold text-gray-900 mb-4">
+                  {goalData.goalText}
+                </p>
+                <div className="flex gap-4 text-sm text-gray-600">
+                  <span>📅 {goalData.targetDate}</span>
+                  <span>⏰ 距今 {goalData.days} 天</span>
+                </div>
+              </div>
+
+              {/* AI 响应 */}
+              <div className="border-t pt-8">
+                <h3 className="text-sm font-medium text-gray-500 mb-4">
+                  {matchResult?.persona.emoji} {matchResult?.persona.name || 'AI'} 的建议
+                </h3>
+                
+                {isGenerating ? (
+                  <div className="flex items-center gap-3 text-gray-600">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                    <span>正在生成建议...</span>
+                  </div>
+                ) : (
+                  <div className="prose prose-blue max-w-none">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {aiResponse}
+                    </ReactMarkdown>
+                  </div>
+                )}
+              </div>
+
+              {/* 完成按钮 */}
+              {!goalData.viewOnly && aiResponse && !isGenerating && (
+                <div className="mt-8 pt-8 border-t">
+                  <button
+                    onClick={() => handleChatComplete(aiResponse, aiResponse.substring(0, 200))}
+                    disabled={isSaving}
+                    className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isSaving ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <span>保存中...</span>
+                      </>
+                    ) : (
+                      '完成'
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 愿望清单
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <TopNav locale={locale} />
+      
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          我的愿望清单
+        </h1>
+
+        {wishCards.length === 0 ? (
+          <EmptyWishlist locale={locale} />
+        ) : (
+          <div className="space-y-6">
+            {wishCards.map((card) => (
+              <WishCard
+                key={card.id}
+                card={card}
+                onDelete={handleDeleteCard}
+                locale={locale}
+              />
+            ))}
+          </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }
 
 export default function WishlistPage({ params }: WishlistPageProps) {
-  const { locale } = params;
-
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
-      <WishlistContent locale={locale} />
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <WishlistContent locale={params.locale} />
     </Suspense>
   );
 }
