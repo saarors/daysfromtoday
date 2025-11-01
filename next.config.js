@@ -80,7 +80,5 @@ const nextConfig = {
 };
 
 // 导出包装后的配置（先 Contentlayer，再 next-intl）
-// Phase 3.5: 临时禁用 Contentlayer 和 next-intl 以修复路由问题
-// module.exports = withNextIntl(withContentlayer(nextConfig));
-// module.exports = withNextIntl(nextConfig);
-module.exports = nextConfig;
+// Phase 3.5: 恢复 next-intl（Contentlayer 暂时禁用，博客功能后续恢复）
+module.exports = withNextIntl(nextConfig);

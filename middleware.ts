@@ -1,48 +1,61 @@
 /**
- * 简化版中间件 - Phase 3.5 临时版本
- * 移除 next-intl 依赖，手动处理语言路由
+ * Next.js 中间件
+ * 
+ * 功能：
+ * 1. 国际化路由（next-intl）
+ * 2. Supabase 会话管理
+ * 3. 受保护路由检查（需登录）
  */
 
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import createMiddleware from 'next-intl/middleware';
+import { NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
+// 国际化配置
 const locales = ['en', 'zh'];
 const defaultLocale = 'en';
 
+// 需要登录才能访问的路径（Phase 3.5 暂时注释掉，先确保路由正常）
+// const PROTECTED_PATHS = ['/wishlist'];
+
+// 创建 next-intl 中间件
+const intlMiddleware = createMiddleware({
+  locales,
+  defaultLocale,
+  localePrefix: 'always' // 所有路径都带语言前缀
+});
+
 export default async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  // 1. 处理国际化路由
+  const response = intlMiddleware(request);
   
-  // 1. 更新 Supabase 会话
+  // 2. 更新 Supabase 会话（保持用户登录状态）
   const supabaseResponse = await updateSession(request);
   
-  // 2. 跳过静态文件和 API 路由
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    pathname.startsWith('/auth/callback') ||
-    pathname.includes('.') ||
-    pathname === '/test'  // 临时测试页面
-  ) {
-    return supabaseResponse;
+  // 3. 合并响应头（保留 Supabase 的 cookie 更新）
+  if (supabaseResponse.headers.get('set-cookie')) {
+    response.headers.set('set-cookie', supabaseResponse.headers.get('set-cookie')!);
   }
   
-  // 3. 检查路径是否已包含语言前缀
-  const pathnameHasLocale = locales.some(
-    locale => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-  );
+  // 4. 受保护路由检查（Phase 3.5 暂时禁用）
+  // const { pathname } = request.nextUrl;
+  // const isProtectedPath = PROTECTED_PATHS.some(path => 
+  //   pathname.includes(path)
+  // );
   
-  // 4. 如果没有语言前缀，重定向到默认语言
-  if (!pathnameHasLocale) {
-    const url = request.nextUrl.clone();
-    url.pathname = `/${defaultLocale}${pathname}`;
-    return NextResponse.redirect(url);
-  }
+  // if (isProtectedPath) {
+  //   const user = supabaseResponse.headers.get('x-user-id');
+  //   if (!user) {
+  //     const url = request.nextUrl.clone();
+  //     url.pathname = `/${url.pathname.split('/')[1]}/login`;
+  //     return NextResponse.redirect(url);
+  //   }
+  // }
   
-  return supabaseResponse;
+  return response;
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)']
+  // 匹配所有路径，除了以下静态资源
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)']
 };
-
