@@ -1,5 +1,5 @@
 /**
- * i18n 配置文件
+ * i18n 配置文件（next-intl v4）
  * 
  * 功能：
  * 1. 定义支持的语言列表（en, zh）
@@ -10,9 +10,9 @@
  * - TypeScript 严格模式
  * - 类型安全的语言定义
  * - SEO 友好的语言代码
+ * - next-intl v4 API
  */
 import { getRequestConfig } from 'next-intl/server';
-import { notFound } from 'next/navigation';
 
 // 支持的语言列表
 export const locales = ['en', 'zh'] as const;
@@ -23,14 +23,18 @@ export const defaultLocale = 'en' as const;
 // 语言类型定义
 export type Locale = typeof locales[number];
 
-// next-intl 配置
-export default getRequestConfig(async ({ locale }) => {
-  // 验证语言是否支持
+// next-intl v4 配置
+export default getRequestConfig(async ({ requestLocale }) => {
+  // 等待获取 locale（v4 新 API）
+  let locale = await requestLocale;
+  
+  // 验证并降级到默认语言
   if (!locale || !locales.includes(locale as Locale)) {
-    notFound();
+    locale = defaultLocale;
   }
 
   return {
+    locale,
     messages: (await import(`../messages/${locale}.json`)).default
   };
 });

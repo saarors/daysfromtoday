@@ -1,8 +1,8 @@
 /**
- * Next.js 中间件
+ * Next.js 中间件（next-intl v4）
  * 
  * 功能：
- * 1. 国际化路由（next-intl）
+ * 1. 国际化路由（next-intl v4）
  * 2. Supabase 会话管理
  * 3. 受保护路由检查（需登录）
  */
@@ -10,15 +10,12 @@
 import createMiddleware from 'next-intl/middleware';
 import { NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
-
-// 国际化配置
-const locales = ['en', 'zh'];
-const defaultLocale = 'en';
+import { locales, defaultLocale } from './i18n/config';
 
 // 需要登录才能访问的路径（Phase 3.5 暂时注释掉，先确保路由正常）
 // const PROTECTED_PATHS = ['/wishlist'];
 
-// 创建 next-intl 中间件
+// 创建 next-intl v4 中间件
 const intlMiddleware = createMiddleware({
   locales,
   defaultLocale,
