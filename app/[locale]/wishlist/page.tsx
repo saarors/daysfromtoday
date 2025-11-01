@@ -367,21 +367,18 @@ function WishlistContent({ locale }: { locale: string }) {
       let thinkingBuffer = '';
       let contentBuffer = '';
       
-      // 优化：使用更大的缓冲区，减少更新频率
+      // 流式渲染策略：纯文本 + 适度节流
+      // 因为不再解析 Markdown，可以更频繁地更新
       let thinkingChunkBuffer = '';
       let contentChunkBuffer = '';
-      const CHUNK_SIZE = 50; // 每 50 个字符更新一次（约 2-3 个词）
-      const UPDATE_INTERVAL = 80; // 最小更新间隔 80ms（约 12 次/秒）
+      const CHUNK_SIZE = 20; // 每 20 个字符更新（约 1 个词组）
+      const UPDATE_INTERVAL = 50; // 最小间隔 50ms（约 20 次/秒，流畅但不频繁）
       let lastUpdateTime = 0;
 
       const flushUpdate = (force = false) => {
         const now = Date.now();
         const timeSinceLastUpdate = now - lastUpdateTime;
         
-        // 只有满足以下条件之一才更新：
-        // 1. 强制更新（流结束）
-        // 2. 缓冲区足够大
-        // 3. 距离上次更新已经超过最小间隔
         const shouldUpdate = force || 
                             thinkingChunkBuffer.length >= CHUNK_SIZE ||
                             contentChunkBuffer.length >= CHUNK_SIZE ||
@@ -825,8 +822,9 @@ function WishlistContent({ locale }: { locale: string }) {
                           )}
                           <span className="text-xs text-gray-400 ml-auto">（点击展开）</span>
                         </summary>
-                        <div className="mt-4 text-sm text-gray-600 leading-relaxed whitespace-pre-wrap border-t border-gray-200 pt-4">
-                          {aiThinking}
+                        <div className="mt-4 text-sm text-gray-600 leading-relaxed border-t border-gray-200 pt-4">
+                          {/* 纯文本显示，不解析（思考过程通常没有 Markdown）*/}
+                          <pre className="whitespace-pre-wrap font-sans">{aiThinking}</pre>
                         </div>
                       </details>
                     )}
@@ -834,12 +832,17 @@ function WishlistContent({ locale }: { locale: string }) {
                     {/* AI 建议内容 */}
                     {aiResponse ? (
                       <div className="prose prose-blue max-w-none markdown-content min-h-[100px]">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {aiResponse}
-                        </ReactMarkdown>
-                        {/* 生成中的光标效果 */}
-                        {isGenerating && (
-                          <span className="inline-block w-2 h-4 bg-blue-600 ml-1 animate-pulse"></span>
+                        {/* 生成中：显示纯文本（不解析 Markdown），避免频闪 */}
+                        {isGenerating ? (
+                          <pre className="whitespace-pre-wrap font-sans text-gray-700 leading-relaxed">
+                            {aiResponse}
+                            <span className="inline-block w-2 h-4 bg-blue-600 ml-1 animate-pulse"></span>
+                          </pre>
+                        ) : (
+                          /* 完成后：渲染 Markdown */
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {aiResponse}
+                          </ReactMarkdown>
                         )}
                       </div>
                     ) : isGenerating ? (
