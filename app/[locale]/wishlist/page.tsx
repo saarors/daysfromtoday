@@ -87,9 +87,25 @@ function WishlistContent({ locale }: { locale: string }) {
             templateId: card.template_id,
             targetDate: card.target_date,
             cardType: card.card_type as 'future' | 'past',
-            calculationMode: card.calculation_mode as 'date-first' | 'days-first',
-            daysType: card.days_type as 'natural' | 'working',
-            content: card.content,
+            calculationMode: 'date-first' as const,
+            daysType: 'natural' as const,
+            // 构建 content 对象（从平铺的字段）
+            content: {
+              goalText: card.goal_text,
+              targetDate: card.target_date,
+              daysCount: card.days_count,
+              workingDaysCount: 0, // Phase 3 暂时不支持工作日计算
+              aiAnalysis: card.ai_analysis,
+              aiPersona: card.ai_persona_code,
+              aiPersonaName: '', // 从 matching_metadata 或 ai_personas 表获取
+              matchedGoalType: card.goal_type_code,
+              detectedDifficulty: card.detected_difficulty,
+            },
+            // Phase 3 新字段
+            goalTypeCode: card.goal_type_code,
+            detectedDifficulty: card.detected_difficulty,
+            aiPersonaCode: card.ai_persona_code,
+            matchingMetadata: card.matching_metadata,
             createdAt: card.created_at,
             updatedAt: card.updated_at,
           }));
@@ -448,9 +464,24 @@ function WishlistContent({ locale }: { locale: string }) {
           templateId: card.template_id,
           targetDate: card.target_date,
           cardType: card.card_type as 'future' | 'past',
-          calculationMode: card.calculation_mode as 'date-first' | 'days-first',
-          daysType: card.days_type as 'natural' | 'working',
-          content: card.content,
+          calculationMode: 'date-first' as const,
+          daysType: 'natural' as const,
+          // 构建 content 对象（从平铺的字段）
+          content: {
+            goalText: card.goal_text,
+            targetDate: card.target_date,
+            daysCount: card.days_count,
+            workingDaysCount: 0,
+            aiAnalysis: card.ai_analysis,
+            aiPersona: card.ai_persona_code,
+            aiPersonaName: '',
+            matchedGoalType: card.goal_type_code,
+            detectedDifficulty: card.detected_difficulty,
+          },
+          goalTypeCode: card.goal_type_code,
+          detectedDifficulty: card.detected_difficulty,
+          aiPersonaCode: card.ai_persona_code,
+          matchingMetadata: card.matching_metadata,
           createdAt: card.created_at,
           updatedAt: card.updated_at,
         }));
