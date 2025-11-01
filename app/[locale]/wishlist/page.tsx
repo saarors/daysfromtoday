@@ -369,7 +369,10 @@ function WishlistContent({ locale }: { locale: string }) {
 
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
+        if (done) {
+          console.log('✅ 流读取完成');
+          break;
+        }
 
         // 解码数据块
         buffer += decoder.decode(value, { stream: true });
@@ -382,6 +385,8 @@ function WishlistContent({ locale }: { locale: string }) {
             try {
               const data = JSON.parse(dataStr);
               
+              console.log('📦 收到数据:', data.type, data.delta?.substring(0, 20));
+              
               if (data.type === 'thinking') {
                 // 思考过程
                 thinkingBuffer += data.delta;
@@ -392,16 +397,18 @@ function WishlistContent({ locale }: { locale: string }) {
                 setAiResponse(contentBuffer);
               } else if (data.type === 'done') {
                 // 完成
-                console.log('✅ 流式输出完成');
-                setIsGenerating(false);
+                console.log('✅ 收到完成信号');
               }
             } catch (e) {
-              console.error('解析 SSE 数据失败:', e);
+              console.error('解析 SSE 数据失败:', e, dataStr);
             }
           }
         }
       }
 
+      // 流读取完成，关闭加载状态
+      setIsGenerating(false);
+      
       console.log('✅ AI 生成完成:', {
         thinkingLength: thinkingBuffer.length,
         contentLength: contentBuffer.length
@@ -773,35 +780,40 @@ function WishlistContent({ locale }: { locale: string }) {
                   
                   {/* AI 消息内容 */}
                   <div className="bg-white rounded-2xl rounded-tl-sm p-5 shadow-md border border-gray-100">
-                    {isGenerating ? (
+                    {/* 思考过程（可展开/收起）*/}
+                    {aiThinking && (
+                      <details className="mb-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <summary className="cursor-pointer font-medium text-gray-700 flex items-center gap-2 hover:text-blue-600 transition-colors">
+                          <span>🧠</span>
+                          <span>思考过程</span>
+                          {isGenerating && (
+                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600 ml-2"></div>
+                          )}
+                          <span className="text-xs text-gray-400 ml-auto">（点击展开）</span>
+                        </summary>
+                        <div className="mt-4 text-sm text-gray-600 leading-relaxed whitespace-pre-wrap border-t border-gray-200 pt-4">
+                          {aiThinking}
+                        </div>
+                      </details>
+                    )}
+                    
+                    {/* AI 建议内容 */}
+                    {aiResponse ? (
+                      <div className="prose prose-blue max-w-none markdown-content">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {aiResponse}
+                        </ReactMarkdown>
+                        {/* 生成中的光标效果 */}
+                        {isGenerating && (
+                          <span className="inline-block w-2 h-4 bg-blue-600 ml-1 animate-pulse"></span>
+                        )}
+                      </div>
+                    ) : isGenerating ? (
                       <div className="flex items-center gap-3 text-gray-600">
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
                         <span>正在思考和生成建议...</span>
                       </div>
-                    ) : (
-                      <>
-                        {/* 思考过程（可展开/收起）*/}
-                        {aiThinking && (
-                          <details className="mb-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
-                            <summary className="cursor-pointer font-medium text-gray-700 flex items-center gap-2 hover:text-blue-600 transition-colors">
-                              <span>🧠</span>
-                              <span>思考过程</span>
-                              <span className="text-xs text-gray-400 ml-auto">（点击展开）</span>
-                            </summary>
-                            <div className="mt-4 text-sm text-gray-600 leading-relaxed whitespace-pre-wrap border-t border-gray-200 pt-4">
-                              {aiThinking}
-                            </div>
-                          </details>
-                        )}
-                        
-                        {/* AI 建议内容 */}
-                        <div className="prose prose-blue max-w-none markdown-content">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {aiResponse}
-                          </ReactMarkdown>
-                        </div>
-                      </>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               </div>
