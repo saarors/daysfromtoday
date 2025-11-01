@@ -85,14 +85,20 @@ export function useStreamedText({
         rafRef.current = null;
       }
       
-      // 把剩余的全部显示
+      // 把剩余的全部显示（只清空队列，不直接替换显示文本）
       if (bufferRef.current.length > 0) {
         setDisplayText((prev) => prev + bufferRef.current.join(''));
         bufferRef.current = [];
-      } else {
-        // 确保显示完整内容
-        setDisplayText(sourceText);
       }
+      
+      // 如果 displayText 还没完整显示 sourceText，补全剩余部分
+      // （这种情况极少发生，只在某些边界情况下需要）
+      setDisplayText((prev) => {
+        if (prev.length < sourceText.length) {
+          return sourceText;
+        }
+        return prev;
+      });
       
       lastSourceLengthRef.current = sourceText.length;
       onComplete?.();
