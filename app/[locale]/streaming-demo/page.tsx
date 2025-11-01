@@ -23,12 +23,6 @@ export default function StreamingDemoPage() {
   const [chunkCount, setChunkCount] = useState(0);
   const [finalMarkdown, setFinalMarkdown] = useState('');
 
-  useEffect(() => {
-    if (!streaming.isStreaming && streaming.content) {
-      setFinalMarkdown(streaming.content);
-    }
-  }, [streaming.isStreaming, streaming.content]);
-
   useEffect(() => () => {
     controllerRef.current?.abort();
   }, []);
@@ -158,7 +152,7 @@ export default function StreamingDemoPage() {
         }
       }
 
-      streaming.finishStreaming();
+      // 先处理剩余的 pendingText
       if (pendingTextRef.current) {
         if (insideThinkingRef.current) {
           streaming.appendChunk('thinking', pendingTextRef.current);
@@ -167,8 +161,17 @@ export default function StreamingDemoPage() {
         }
         pendingTextRef.current = '';
       }
-      setStatus('done');
-      setFinalMarkdown(streaming.snapshotContent());
+      
+      // 再调用 finishStreaming，确保所有 pending chunks 都被 flush
+      streaming.finishStreaming();
+      
+      // 使用 setTimeout 确保 React 状态更新完成后再获取最终内容
+      setTimeout(() => {
+        const finalContent = streaming.content || '';
+        console.log('[streaming-demo] 最终内容长度:', finalContent.length);
+        setFinalMarkdown(finalContent);
+        setStatus('done');
+      }, 100);
     } catch (error: any) {
       if (error?.name === 'AbortError') {
         setStatus('idle');
