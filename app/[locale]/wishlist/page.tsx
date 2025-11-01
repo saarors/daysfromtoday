@@ -190,16 +190,33 @@ function WishlistContent({ locale }: { locale: string }) {
       const fallbackResult: CompleteAIMatchResult = {
         goalType: { 
           code: 'general', 
-          name: '通用型' 
+          name: '通用型',
+          confidence: 0.5,
+          matchedKeywords: []
         },
         difficulty: {
           score: 50,
           level: 'medium',
-          factors: ['时间跨度中等']
+          factors: {
+            timeSpan: 50,
+            complexity: 50,
+            ambiguity: 50,
+            challenge: 50
+          }
         },
-        personaCode: 'coach',
-        personaName: '教练型',
-        confidence: 0.5
+        persona: {
+          code: 'coach',
+          name: '教练型',
+          type: 'core',
+          emoji: '🎓',
+          confidence: 0.5,
+          reasoning: '默认配置（Supabase 超时）'
+        },
+        metadata: {
+          language: 'zh',
+          timestamp: new Date().toISOString(),
+          fallbackUsed: true
+        }
       };
       
       setMatchResult(fallbackResult);
