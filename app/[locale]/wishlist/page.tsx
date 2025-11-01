@@ -322,7 +322,7 @@ function WishlistContent({ locale }: { locale: string }) {
   };
 
   /**
-   * 调用 DeepSeek API 生成 AI 建议（流式输出，优化版：减少频闪）
+   * 调用 DeepSeek API 生成 AI 建议（流式输出，优化版：自然流式渐进）
    */
   const generateAIResponse = async (
     goalText: string,
@@ -367,34 +367,46 @@ function WishlistContent({ locale }: { locale: string }) {
       let thinkingBuffer = '';
       let contentBuffer = '';
       
-      // 使用 requestAnimationFrame 批量更新，减少重绘
-      let rafId: number | null = null;
-      let pendingThinkingUpdate = false;
-      let pendingContentUpdate = false;
+      // 优化：使用更大的缓冲区，减少更新频率
+      let thinkingChunkBuffer = '';
+      let contentChunkBuffer = '';
+      const CHUNK_SIZE = 50; // 每 50 个字符更新一次（约 2-3 个词）
+      const UPDATE_INTERVAL = 80; // 最小更新间隔 80ms（约 12 次/秒）
+      let lastUpdateTime = 0;
 
-      const scheduleUpdate = () => {
-        if (rafId !== null) return; // 已有待处理的更新
+      const flushUpdate = (force = false) => {
+        const now = Date.now();
+        const timeSinceLastUpdate = now - lastUpdateTime;
         
-        rafId = requestAnimationFrame(() => {
-          if (pendingThinkingUpdate) {
+        // 只有满足以下条件之一才更新：
+        // 1. 强制更新（流结束）
+        // 2. 缓冲区足够大
+        // 3. 距离上次更新已经超过最小间隔
+        const shouldUpdate = force || 
+                            thinkingChunkBuffer.length >= CHUNK_SIZE ||
+                            contentChunkBuffer.length >= CHUNK_SIZE ||
+                            timeSinceLastUpdate >= UPDATE_INTERVAL;
+        
+        if (shouldUpdate && (thinkingChunkBuffer || contentChunkBuffer)) {
+          if (thinkingChunkBuffer) {
+            thinkingBuffer += thinkingChunkBuffer;
             setAiThinking(thinkingBuffer);
-            pendingThinkingUpdate = false;
+            thinkingChunkBuffer = '';
           }
-          if (pendingContentUpdate) {
+          if (contentChunkBuffer) {
+            contentBuffer += contentChunkBuffer;
             setAiResponse(contentBuffer);
-            pendingContentUpdate = false;
+            contentChunkBuffer = '';
           }
-          rafId = null;
-        });
+          lastUpdateTime = now;
+        }
       };
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) {
-          // 确保最后一次更新
-          if (rafId !== null) cancelAnimationFrame(rafId);
-          setAiThinking(thinkingBuffer);
-          setAiResponse(contentBuffer);
+          // 确保最后的内容被更新
+          flushUpdate(true);
           console.log('✅ 流读取完成');
           break;
         }
@@ -411,15 +423,13 @@ function WishlistContent({ locale }: { locale: string }) {
               const data = JSON.parse(dataStr);
               
               if (data.type === 'thinking') {
-                // 思考过程
-                thinkingBuffer += data.delta;
-                pendingThinkingUpdate = true;
-                scheduleUpdate();
+                // 思考过程 - 累加到缓冲区
+                thinkingChunkBuffer += data.delta;
+                flushUpdate();
               } else if (data.type === 'content') {
-                // 主要内容
-                contentBuffer += data.delta;
-                pendingContentUpdate = true;
-                scheduleUpdate();
+                // 主要内容 - 累加到缓冲区
+                contentChunkBuffer += data.delta;
+                flushUpdate();
               } else if (data.type === 'done') {
                 console.log('✅ 收到完成信号');
               }
