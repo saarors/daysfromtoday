@@ -186,10 +186,17 @@ function WishlistContent({ locale }: { locale: string }) {
       // 降级处理：如果超时，使用默认配置继续
       console.warn('⚠️ AI 匹配超时，使用默认配置:', error.message);
       
-      // 使用默认的匹配结果（健康型 + 教练型）
+      // 使用默认的匹配结果（通用型 + 教练型）
       const fallbackResult: CompleteAIMatchResult = {
-        goalType: { code: 'general', name: '通用型' },
-        difficulty: 3,
+        goalType: { 
+          code: 'general', 
+          name: '通用型' 
+        },
+        difficulty: {
+          score: 50,
+          level: 'medium',
+          factors: ['时间跨度中等']
+        },
         personaCode: 'coach',
         personaName: '教练型',
         confidence: 0.5
