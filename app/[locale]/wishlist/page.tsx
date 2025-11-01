@@ -549,7 +549,16 @@ function WishlistContent({ locale }: { locale: string }) {
             {wishCards.map((card) => (
               <WishCard
                 key={card.id}
-                card={card}
+                id={card.id}
+                goalText={card.content.goalText}
+                targetDate={card.content.targetDate}
+                days={card.content.daysCount || 0}
+                workingDays={card.content.workingDaysCount}
+                assistant={(card.content as any).aiAssistant || 'companion'}
+                aiAnalysis={(card.content as any).aiAnalysis || ''}
+                aiSummary={(card.content as any).aiSummary || ''}
+                aiGeneratedImageUrl={(card.content as any).aiGeneratedImageUrl}
+                createdAt={card.createdAt}
                 onDelete={handleDeleteCard}
                 locale={locale}
               />
