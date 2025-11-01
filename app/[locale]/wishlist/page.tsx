@@ -229,8 +229,19 @@ function WishlistContent({ locale }: { locale: string }) {
       }
 
       const data = await response.json();
+      
+      console.log('📦 API 响应数据:', {
+        hasAnalysis: !!data.analysis,
+        hasThinking: !!data.thinking,
+        hasSummary: !!data.summary,
+        thinking: data.thinking,
+        thinkingLength: data.thinking?.length || 0,
+        model: data.model
+      });
+      
       setAiResponse(data.analysis);
       setAiThinking(data.thinking); // 保存思考过程
+      
       console.log('✅ AI 生成完成:', {
         tokensUsed: data.tokensUsed,
         model: data.model,

@@ -358,8 +358,17 @@ export async function POST(request: NextRequest) {
     const rawResponse = apiData.choices[0].message.content;
     const tokensUsed = apiData.usage.total_tokens;
 
+    console.log('🔍 DeepSeek 原始响应（前 500 字符）:', rawResponse.substring(0, 500));
+
     // 7. 解析响应，提取思考过程和主要内容
     const { thinking, content: analysis } = parseAIResponse(rawResponse);
+    
+    console.log('🔍 解析结果:', {
+      hasThinkTag: rawResponse.includes('<think>'),
+      thinkingExtracted: !!thinking,
+      thinkingLength: thinking?.length || 0,
+      analysisLength: analysis.length
+    });
     
     // 8. 提取简短摘要
     const summary = extractSummary(analysis, language);
@@ -378,7 +387,8 @@ export async function POST(request: NextRequest) {
       hasThinking: !!thinking,
       thinkingLength: thinking?.length || 0,
       analysisLength: analysis.length,
-      tokensUsed
+      tokensUsed,
+      model: apiData.model
     });
 
     return NextResponse.json(response);
