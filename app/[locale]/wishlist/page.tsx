@@ -122,13 +122,20 @@ function WishlistContent({ locale }: { locale: string }) {
     targetDate: string
   ) => {
     setIsMatching(true);
+    console.log('🚀 开始 AI 匹配...', { goalText, daysCount });
     
     try {
       // 1. 调用匹配服务
+      console.log('⏱️ 调用 matchGoalToAI...');
+      const startTime = Date.now();
+      
       const result = await matchGoalToAI({
         goalText,
         daysCount
       });
+      
+      const duration = Date.now() - startTime;
+      console.log(`✅ AI 匹配完成！耗时: ${duration}ms`);
 
       setMatchResult(result);
       console.log('🎯 AI 匹配结果:', result);
@@ -141,8 +148,13 @@ function WishlistContent({ locale }: { locale: string }) {
         generateAIResponse(goalText, daysCount, targetDate, result);
       }, 1000);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ AI 匹配失败:', error);
+      console.error('错误详情:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       setIsMatching(false);
       setShowChat(true);
       // 降级方案：使用默认配置
