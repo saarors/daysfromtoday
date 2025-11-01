@@ -122,6 +122,66 @@ body {
   overscroll-behavior-y: none;
 }
 
+/* === 全局性能优化（防闪烁）=== */
+
+/* 所有元素默认使用 GPU 加速的 transform */
+* {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000;
+  perspective: 1000;
+}
+
+/* 动画元素优化 */
+.animate-spin,
+.animate-pulse,
+.animate-bounce,
+.animate-ping,
+.animate-spin-reverse,
+.animate-fade-in {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* 文本渲染优化（防止字体跳动）*/
+body, input, textarea, button, select {
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+  font-feature-settings: "kern" 1;
+}
+
+/* 图片加载优化 */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* 防止 FOUC (Flash of Unstyled Content) */
+.prose, .markdown-content {
+  contain: content;
+  will-change: contents;
+}
+
+/* 优化滚动性能 */
+* {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 防止内容跳动 */
+.prose, 
+.prose-blue, 
+.markdown-content {
+  min-height: 0;
+  overflow-anchor: auto;
+}
+
+/* React 严格模式下的渲染优化 */
+[data-reactroot], 
+#__next > * {
+  isolation: isolate;
+}
+
 /* === 自定义工具类（V3.0 纯色版本）=== */
 
 /* 纯蓝色背景 */
