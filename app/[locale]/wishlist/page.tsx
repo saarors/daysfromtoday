@@ -15,6 +15,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import TopNav from '@/components/TopNav';
 import { EmptyWishlist } from '@/components/v3/Wishlist/EmptyWishlist';
 import { WishCard } from '@/components/v3/Wishlist/WishCard';
+import { StreamingText } from '@/components/v3/Wishlist/StreamingText';
 // Phase 3.5: 不再使用 localStorage，纯 Supabase
 // import { useGoalCards } from '@/store/goal-cards';
 import { createClient } from '@/lib/supabase/client';
@@ -831,20 +832,11 @@ function WishlistContent({ locale }: { locale: string }) {
                     
                     {/* AI 建议内容 */}
                     {aiResponse ? (
-                      <div className="prose prose-blue max-w-none markdown-content min-h-[100px]">
-                        {/* 生成中：显示纯文本（不解析 Markdown），避免频闪 */}
-                        {isGenerating ? (
-                          <pre className="whitespace-pre-wrap font-sans text-gray-700 leading-relaxed">
-                            {aiResponse}
-                            <span className="inline-block w-2 h-4 bg-blue-600 ml-1 animate-pulse"></span>
-                          </pre>
-                        ) : (
-                          /* 完成后：渲染 Markdown */
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {aiResponse}
-                          </ReactMarkdown>
-                        )}
-                      </div>
+                      <StreamingText 
+                        content={aiResponse}
+                        isStreaming={isGenerating}
+                        className="min-h-[100px]"
+                      />
                     ) : isGenerating ? (
                       <div className="flex items-center gap-3 text-gray-600 min-h-[100px]">
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
