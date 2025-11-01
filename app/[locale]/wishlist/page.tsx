@@ -15,7 +15,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import TopNav from '@/components/TopNav';
 import { EmptyWishlist } from '@/components/v3/Wishlist/EmptyWishlist';
 import { WishCard } from '@/components/v3/Wishlist/WishCard';
-import { useGoalCards } from '@/store/goal-cards';
+// Phase 3.5: 不再使用 localStorage，纯 Supabase
+// import { useGoalCards } from '@/store/goal-cards';
 import { createClient } from '@/lib/supabase/client';
 import { matchGoalToAI } from '@/lib/ai-matching';
 import type { CompleteAIMatchResult } from '@/lib/ai-matching';
@@ -31,7 +32,6 @@ interface WishlistPageProps {
 function WishlistContent({ locale }: { locale: string }) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { cards, addCard } = useGoalCards();
 
   // 从 URL 获取参数
   const [hasNewGoal, setHasNewGoal] = useState(false);
@@ -60,15 +60,54 @@ function WishlistContent({ locale }: { locale: string }) {
   const [isSaving, setIsSaving] = useState(false);
   const savingRef = useRef(false);
 
+  // Phase 3.5: 从 Supabase 加载卡片数据（替代 localStorage）
   useEffect(() => {
-    // 检查登录状态
-    const checkAuth = async () => {
+    const loadCardsFromSupabase = async () => {
       const supabase = createClient();
       const { data: { session } } = await supabase.auth.getSession();
+      
       setIsLoggedIn(!!session);
+      
+      if (session) {
+        // 用户已登录，从 Supabase 加载数据
+        console.log('📊 从 Supabase 加载愿望卡片...');
+        const { data: dbCards, error } = await supabase
+          .from('goal_cards')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          console.error('❌ 加载卡片失败:', error.message);
+        } else {
+          console.log(`✅ 加载了 ${dbCards?.length || 0} 张卡片`);
+          // 转换 Supabase 数据格式到前端格式
+          const formattedCards = (dbCards || []).map(card => ({
+            id: card.id,
+            templateId: card.template_id,
+            targetDate: card.target_date,
+            cardType: card.card_type as 'future' | 'past',
+            calculationMode: card.calculation_mode as 'date-first' | 'days-first',
+            daysType: card.days_type as 'natural' | 'working',
+            content: card.content,
+            createdAt: card.created_at,
+            updatedAt: card.updated_at,
+          }));
+          setWishCards(formattedCards);
+        }
+      } else {
+        // 用户未登录，显示空列表（不再使用 localStorage）
+        console.log('⚠️ 用户未登录，显示空列表');
+        setWishCards([]);
+      }
+      
+      setIsLoading(false);
     };
-    checkAuth();
+    
+    loadCardsFromSupabase();
+  }, []); // 只在组件挂载时执行一次
 
+  useEffect(() => {
     // 解析 URL 参数
     const days = searchParams.get('days');
     const targetDate = searchParams.get('targetDate');
@@ -90,7 +129,7 @@ function WishlistContent({ locale }: { locale: string }) {
       
       // 如果是查看模式，从卡片中读取已有的 AI 分析
       if (viewOnly === 'true' && cardId) {
-        const card = cards.find(c => c.id === cardId);
+        const card = wishCards.find(c => c.id === cardId);
         if (card) {
           existingAnalysis = (card.content as any).aiAnalysis;
         }
@@ -120,19 +159,12 @@ function WishlistContent({ locale }: { locale: string }) {
         setMatchResult(null);
         setIsMatching(false);
         setIsGenerating(false);
-        setAiResponse(null);
+        setAiResponse('');
+        setAiThinking(null);
         setShowChat(false);
       }
     }
-
-    // 加载现有卡片
-    setWishCards(cards.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    ));
-    
-    // 数据加载完成
-    setIsLoading(false);
-  }, [searchParams, cards]);
+  }, [searchParams]);
 
   /**
    * 执行 AI 智能匹配
@@ -349,44 +381,48 @@ function WishlistContent({ locale }: { locale: string }) {
         } : null
       };
 
-      // 1. 添加到本地 store
-      addCard(cardData);
-
-      // 2. 如果已登录，同步到数据库
-      if (isLoggedIn) {
-        const supabase = createClient();
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session) {
-          const { error: insertError } = await supabase
-            .from('goal_cards')
-            .insert({
-              user_id: session.user.id,
-              goal_text: cardData.content.goalText,
-              target_date: cardData.content.targetDate,
-              days_count: cardData.content.daysCount,
-              card_type: cardData.cardType,
-              // Phase 3 新字段
-              goal_type_code: cardData.goalTypeCode,
-              detected_difficulty: cardData.detectedDifficulty,
-              ai_persona_code: cardData.aiPersonaCode,
-              ai_analysis: aiAnalysis,
-              ai_summary: aiSummary,
-              ai_model_used: 'deepseek-chat',
-              input_language: matchResult?.metadata.language || 'zh',
-              matching_metadata: cardData.matchingMetadata
-            });
-
-          if (insertError) {
-            console.error('❌ Supabase 插入失败:', insertError);
-          } else {
-            console.log('✅ 已同步到数据库');
-          }
-        }
+      // Phase 3.5: 直接保存到 Supabase（不再使用 localStorage）
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        console.error('❌ 用户未登录，无法保存');
+        alert('请先登录后再保存愿望卡片');
+        savingRef.current = false;
+        setIsSaving(false);
+        return;
       }
 
+      const { error: insertError } = await supabase
+        .from('goal_cards')
+        .insert({
+          user_id: session.user.id,
+          goal_text: cardData.content.goalText,
+          target_date: cardData.content.targetDate,
+          days_count: cardData.content.daysCount,
+          card_type: cardData.cardType,
+          // Phase 3 新字段
+          goal_type_code: cardData.goalTypeCode,
+          detected_difficulty: cardData.detectedDifficulty,
+          ai_persona_code: cardData.aiPersonaCode,
+          ai_analysis: aiAnalysis,
+          ai_summary: aiSummary,
+          ai_model_used: 'deepseek-chat',
+          input_language: matchResult?.metadata.language || 'zh',
+          matching_metadata: cardData.matchingMetadata
+        });
+
+      if (insertError) {
+        console.error('❌ Supabase 插入失败:', insertError);
+        alert('保存失败，请重试');
+        savingRef.current = false;
+        setIsSaving(false);
+        return;
+      }
+      
+      console.log('✅ 已同步到数据库');
+
       console.log('✅ Save complete, resetting state...');
-      console.log('📊 当前卡片数量:', cards.length);
       console.log('🔄 准备清空状态并刷新页面...');
 
       // 🔥 关键修复：立即清空所有匹配状态和 goalData
@@ -394,14 +430,33 @@ function WishlistContent({ locale }: { locale: string }) {
       setMatchResult(null);
       setIsMatching(false);
       setIsGenerating(false);
-      setAiResponse(null);
+      setAiResponse('');
+      setAiThinking(null);
       savingRef.current = false;
       setIsSaving(false);
 
-      // 刷新卡片列表
-      const latestCards = useGoalCards.getState().getAllCardsSortedByDate();
-      console.log('📋 最新卡片数量:', latestCards.length);
-      setWishCards(latestCards);
+      // Phase 3.5: 从 Supabase 重新加载卡片列表
+      const { data: dbCards } = await supabase
+        .from('goal_cards')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false });
+      
+      if (dbCards) {
+        const formattedCards = dbCards.map(card => ({
+          id: card.id,
+          templateId: card.template_id,
+          targetDate: card.target_date,
+          cardType: card.card_type as 'future' | 'past',
+          calculationMode: card.calculation_mode as 'date-first' | 'days-first',
+          daysType: card.days_type as 'natural' | 'working',
+          content: card.content,
+          createdAt: card.created_at,
+          updatedAt: card.updated_at,
+        }));
+        setWishCards(formattedCards);
+        console.log('📋 已刷新卡片列表，当前数量:', formattedCards.length);
+      }
 
       // 🔥 使用 window.history.replaceState 强制清除 URL 参数
       console.log('🚀 强制清除 URL 参数并刷新...');
@@ -424,23 +479,30 @@ function WishlistContent({ locale }: { locale: string }) {
       return;
     }
 
-    const { deleteCard } = useGoalCards.getState();
-    deleteCard(id);
-
-    if (isLoggedIn) {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('goal_cards')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('删除失败:', error);
-      }
+    // Phase 3.5: 直接从 Supabase 删除（不再使用 localStorage）
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      alert('请先登录');
+      return;
     }
 
-    const latestCards = useGoalCards.getState().getAllCardsSortedByDate();
-    setWishCards(latestCards);
+    const { error } = await supabase
+      .from('goal_cards')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', session.user.id);
+
+    if (error) {
+      console.error('❌ 删除失败:', error);
+      alert('删除失败，请重试');
+      return;
+    }
+
+    // 从 UI 中移除
+    setWishCards(prev => prev.filter(card => card.id !== id));
+    console.log('✅ 卡片已删除');
   };
 
   // 加载中状态
