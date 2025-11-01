@@ -23,8 +23,9 @@
  */
 import type { Metadata } from "next";
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+// Phase 3.5: 临时禁用 next-intl
+// import { NextIntlClientProvider } from 'next-intl';
+// import { getMessages } from 'next-intl/server';
 import { Inter, JetBrains_Mono } from "next/font/google";
 import GATracker from '@/app/ga-tracker';
 import { AutoSync } from '@/components/v3/AutoSync';
@@ -109,13 +110,19 @@ export default async function LocaleLayout({
   // Next.js 14: params 直接使用
   const { locale } = params;
   
-  // 获取当前语言的翻译文件
-  const messages = await getMessages();
+  // Phase 3.5: 临时禁用 next-intl，直接加载消息文件
+  // const messages = await getMessages();
+  let messages = {};
+  try {
+    messages = await import(`@/messages/${locale}.json`).then(m => m.default);
+  } catch (error) {
+    console.error(`Failed to load messages for locale: ${locale}`, error);
+  }
   
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
   
   return (
-    <NextIntlClientProvider messages={messages}>
+    <>
       <main id="main-content" role="main">
         {children}
       </main>
@@ -130,7 +137,7 @@ export default async function LocaleLayout({
 
       {/* 自动同步本地卡片到 Supabase */}
       <AutoSync />
-    </NextIntlClientProvider>
+    </>
   );
 }
 
