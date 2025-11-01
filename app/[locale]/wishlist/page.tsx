@@ -581,6 +581,8 @@ function WishlistContent({ locale }: { locale: string }) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <TopNav locale={locale} />
+        {/* 添加顶部间距，避免被固定导航遮挡 */}
+        <div className="pt-20"></div>
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             {/* AI 对话界面 - ChatGPT 风格 */}
@@ -613,15 +615,15 @@ function WishlistContent({ locale }: { locale: string }) {
 
               {/* AI 助手介绍环节 */}
               {matchResult && !goalData.viewOnly && !isMatching && (
-                <div className="flex justify-center">
-                  <div className="max-w-[90%] bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-2xl p-5 border border-purple-200 shadow-sm">
-                    <p className="text-gray-700 leading-relaxed text-center">
+                <div className="flex justify-start">
+                  <div className="max-w-[85%] bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-2xl p-5 border border-purple-200 shadow-sm">
+                    <p className="text-gray-700 leading-relaxed">
                       <span className="inline-block mr-2">✨</span>
-                      你的目标很棒！经过分析，我为你匹配了一位
+                      我为你匹配了一位
                       <span className="font-bold text-purple-600 mx-1">【{matchResult.persona.type}】</span>
-                      助手来帮你实现目标，他的名字叫
+                      的助手，帮你实现目标。他的名字叫做
                       <span className="font-bold text-purple-600 mx-1">{matchResult.persona.name}</span>
-                      <span className="inline-block ml-2">🎯</span>
+                      <span className="inline-block ml-1">🎯</span>
                     </p>
                   </div>
                 </div>
@@ -635,8 +637,8 @@ function WishlistContent({ locale }: { locale: string }) {
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center text-xl shadow-md border-2 border-white">
                       {matchResult?.persona.emoji || '🤖'}
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-base font-semibold text-gray-900">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-lg font-bold text-gray-900">
                         {matchResult?.persona.name || 'AI 助手'}
                       </span>
                       <span className="text-xs text-gray-500">
