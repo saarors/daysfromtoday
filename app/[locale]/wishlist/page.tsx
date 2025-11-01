@@ -777,7 +777,11 @@ function WishlistContent({ locale }: { locale: string }) {
                   </div>
                   
                   {/* AI 消息内容 */}
-                  <div className="bg-white rounded-2xl rounded-tl-sm p-5 shadow-md border border-gray-100 will-change-contents">
+                  <div className="bg-white rounded-2xl rounded-tl-sm p-5 shadow-md border border-gray-100" style={{
+                    minHeight: '200px',
+                    contain: 'layout style',
+                    willChange: 'contents',
+                  }}>
                     {/* 思考过程（可展开/收起）*/}
                     {aiThinking && (
                       <details className="mb-4 bg-gray-50 rounded-lg p-4 border border-gray-200">

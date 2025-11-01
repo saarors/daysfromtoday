@@ -40,12 +40,19 @@ export const StreamingText = memo(function StreamingText({
     <div 
       className={`${className}`}
       style={{
-        contain: 'layout',
+        contain: 'layout style paint',
+        willChange: isStreaming ? 'contents' : 'auto',
       }}
     >
       {isStreaming ? (
-        // 流式阶段：纯文本显示（rAF 控制渐进）
-        <div className="prose max-w-none whitespace-pre-wrap leading-7 text-gray-700 font-sans">
+        // 流式阶段：纯文本显示
+        <div 
+          className="prose max-w-none whitespace-pre-wrap leading-7 text-gray-700 font-sans"
+          style={{
+            minHeight: '100px',
+            transform: 'translateZ(0)', // 🔥 GPU 加速
+          }}
+        >
           {displayText}
           <Cursor />
         </div>
