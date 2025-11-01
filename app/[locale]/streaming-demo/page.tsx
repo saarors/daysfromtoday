@@ -152,8 +152,13 @@ export default function StreamingDemoPage() {
         }
       }
 
+      console.log('[streaming-demo] 流式结束前 - streaming.content:', streaming.content.substring(0, 100));
+      console.log('[streaming-demo] 流式结束前 - streaming.thinking:', streaming.thinking.substring(0, 100));
+      console.log('[streaming-demo] 流式结束前 - pendingText:', pendingTextRef.current);
+      
       // 先处理剩余的 pendingText
       if (pendingTextRef.current) {
+        console.log('[streaming-demo] 处理剩余 pendingText:', pendingTextRef.current.length, '字符');
         if (insideThinkingRef.current) {
           streaming.appendChunk('thinking', pendingTextRef.current);
         } else {
@@ -165,10 +170,14 @@ export default function StreamingDemoPage() {
       // 再调用 finishStreaming，确保所有 pending chunks 都被 flush
       streaming.finishStreaming();
       
+      console.log('[streaming-demo] finishStreaming 后 - streaming.content:', streaming.content.substring(0, 100));
+      console.log('[streaming-demo] finishStreaming 后 - 内容长度:', streaming.content.length);
+      
       // 使用 setTimeout 确保 React 状态更新完成后再获取最终内容
       setTimeout(() => {
         const finalContent = streaming.content || '';
-        console.log('[streaming-demo] 最终内容长度:', finalContent.length);
+        console.log('[streaming-demo] setTimeout 后 - finalContent:', finalContent.substring(0, 100));
+        console.log('[streaming-demo] setTimeout 后 - 最终内容长度:', finalContent.length);
         setFinalMarkdown(finalContent);
         setStatus('done');
       }, 100);
@@ -348,9 +357,18 @@ function MarkdownPanel({
         {isStreaming ? (
           <p className="text-slate-400">流式阶段进行中，等待完成后展示 Markdown...</p>
         ) : content ? (
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+          <>
+            <div className="mb-4 text-xs text-slate-500 bg-slate-100 p-2 rounded">
+              调试信息：内容长度 {content.length} 字符，前 100 字符: {content.substring(0, 100)}...
+            </div>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+          </>
         ) : (
-          <p className="text-slate-400">暂无内容</p>
+          <p className="text-slate-400">
+            暂无内容（content 为空或 undefined）
+            <br />
+            <span className="text-xs">请查看 Console 日志获取详细信息</span>
+          </p>
         )}
       </div>
       <style jsx>{`
