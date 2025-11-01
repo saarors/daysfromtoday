@@ -368,43 +368,15 @@ function WishlistContent({ locale }: { locale: string }) {
       let thinkingBuffer = '';
       let contentBuffer = '';
       
-      // 流式渲染策略：大缓冲区 + 低频更新
-      // 核心：减少 React 渲染次数，彻底消除频闪
-      let thinkingChunkBuffer = '';
-      let contentChunkBuffer = '';
-      const CHUNK_SIZE = 150; // 每 150 个字符更新（约一句话）
-      const UPDATE_INTERVAL = 200; // 最小间隔 200ms（5 次/秒）
-      let lastUpdateTime = 0;
-
-      const flushUpdate = (force = false) => {
-        const now = Date.now();
-        const timeSinceLastUpdate = now - lastUpdateTime;
-        
-        const shouldUpdate = force || 
-                            thinkingChunkBuffer.length >= CHUNK_SIZE ||
-                            contentChunkBuffer.length >= CHUNK_SIZE ||
-                            timeSinceLastUpdate >= UPDATE_INTERVAL;
-        
-        if (shouldUpdate && (thinkingChunkBuffer || contentChunkBuffer)) {
-          if (thinkingChunkBuffer) {
-            thinkingBuffer += thinkingChunkBuffer;
-            setAiThinking(thinkingBuffer);
-            thinkingChunkBuffer = '';
-          }
-          if (contentChunkBuffer) {
-            contentBuffer += contentChunkBuffer;
-            setAiResponse(contentBuffer);
-            contentChunkBuffer = '';
-          }
-          lastUpdateTime = now;
-        }
-      };
+      // 流式渲染策略：实时更新到状态，由 useStreamedText Hook 处理渐进显示
+      // Hook 内部使用 rAF 批量渲染，这里只负责快速更新状态
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) {
-          // 确保最后的内容被更新
-          flushUpdate(true);
+          // 流读取完成
+          setAiThinking(thinkingBuffer);
+          setAiResponse(contentBuffer);
           console.log('✅ 流读取完成');
           break;
         }
@@ -421,13 +393,13 @@ function WishlistContent({ locale }: { locale: string }) {
               const data = JSON.parse(dataStr);
               
               if (data.type === 'thinking') {
-                // 思考过程 - 累加到缓冲区
-                thinkingChunkBuffer += data.delta;
-                flushUpdate();
+                // 思考过程 - 直接累加并更新
+                thinkingBuffer += data.delta;
+                setAiThinking(thinkingBuffer);
               } else if (data.type === 'content') {
-                // 主要内容 - 累加到缓冲区
-                contentChunkBuffer += data.delta;
-                flushUpdate();
+                // 主要内容 - 直接累加并更新
+                contentBuffer += data.delta;
+                setAiResponse(contentBuffer);
               } else if (data.type === 'done') {
                 console.log('✅ 收到完成信号');
               }
