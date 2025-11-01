@@ -49,6 +49,7 @@ export function WishCard({
   const text = {
     en: {
       targetDate: 'Target',
+      createdDate: 'Created',
       remaining: 'Remaining',
       elapsed: 'Elapsed',
       days: 'days',
@@ -64,6 +65,7 @@ export function WishCard({
     },
     zh: {
       targetDate: '目标日期',
+      createdDate: '设定时间',
       remaining: '距今',
       elapsed: '已过',
       days: '天',
@@ -88,6 +90,13 @@ export function WishCard({
   const elapsedDays = Math.floor((today.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
   const safeDays = days || 0; // 防止 undefined 导致 NaN
   const remainingDays = Math.max(0, safeDays - elapsedDays);
+  
+  // 格式化创建日期
+  const formattedCreatedDate = created.toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
 
   const handleViewDetail = () => {
     // 跳转回对话页面，传递完整数据
@@ -112,17 +121,27 @@ export function WishCard({
     <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
       <div className="p-6 space-y-4">
         {/* 头部：日期信息 */}
-        <div className="flex items-start justify-between border-b border-gray-100 pb-4">
-          <div>
-            <div className="text-sm text-gray-500 mb-1">{t.targetDate}</div>
-            <div className="text-xl font-bold text-gray-900">{targetDate}</div>
-          </div>
-          <div className="text-right">
-            <div className="text-sm text-gray-500">
-              {t.remaining} <span className="text-2xl font-bold text-blue-600">{remainingDays}</span> {t.days}
-              <span className="text-gray-400 ml-2">·</span>
-              <span className="text-gray-400 ml-2">{t.elapsed} {elapsedDays} {t.days}</span>
+        <div className="border-b border-gray-100 pb-4 space-y-3">
+          {/* 第一行：目标日期和倒计时 */}
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="text-sm text-gray-500 mb-1">{t.targetDate}</div>
+              <div className="text-xl font-bold text-gray-900">{targetDate}</div>
             </div>
+            <div className="text-right">
+              <div className="text-sm text-gray-500">
+                {t.remaining} <span className="text-2xl font-bold text-blue-600">{remainingDays}</span> {t.days}
+                <span className="text-gray-400 ml-2">·</span>
+                <span className="text-gray-400 ml-2">{t.elapsed} {elapsedDays} {t.days}</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* 第二行：设定时间 */}
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <span>📅</span>
+            <span>{t.createdDate}:</span>
+            <span className="text-gray-700 font-medium">{formattedCreatedDate}</span>
           </div>
         </div>
 
