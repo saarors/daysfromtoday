@@ -156,9 +156,9 @@ function WishlistContent({ locale }: { locale: string }) {
       console.log('⏱️ 调用 matchGoalToAI...');
       const startTime = Date.now();
       
-      // 增加超时保护到 15 秒（考虑 Supabase 查询 5 秒 + AI 匹配逻辑 + 网络延迟）
+      // 增加超时保护到 20 秒（考虑 Supabase 查询 10 秒 + AI 匹配逻辑 + 网络延迟）
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('匹配超时（15秒）')), 15000)
+        setTimeout(() => reject(new Error('匹配超时（20秒）')), 20000)
       );
       
       const matchPromise = matchGoalToAI({

@@ -91,9 +91,9 @@ export async function detectGoalType(
     const supabase = createClient();
     
     try {
-      // 增加超时时间到 5 秒，减少超时频率
+      // 增加超时时间到 10 秒，适应海外 Supabase 实例延迟
       const timeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Supabase query timeout')), 5000)
+        setTimeout(() => reject(new Error('Supabase query timeout')), 10000)
       );
       
       const queryPromise = supabase
