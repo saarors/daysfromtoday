@@ -51,7 +51,8 @@ function WishlistContent({ locale }: { locale: string }) {
   const [showChat, setShowChat] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiResponse, setAiResponse] = useState('');
-  const [aiThinking, setAiThinking] = useState<string | null>(null); // 新增：AI 思考过程
+  const [aiThinking, setAiThinking] = useState<string | null>(null); // AI 思考过程
+  const [aiIntroText, setAiIntroText] = useState<string>(''); // AI 介绍文案
 
   // 显示状态
   const [wishCards, setWishCards] = useState<any[]>([]);
@@ -222,11 +223,14 @@ function WishlistContent({ locale }: { locale: string }) {
       setMatchResult(result);
       console.log('🎯 AI 匹配结果:', result);
 
-      // 2. 短暂延迟后显示对话界面
+      // 2. 生成 AI 介绍文案
+      await generateAIIntro(goalText, result);
+
+      // 3. 短暂延迟后显示对话界面
       setTimeout(() => {
         setIsMatching(false);
         setShowChat(true);
-        // 3. 立即调用 AI API 生成建议
+        // 4. 立即调用 AI API 生成建议
         generateAIResponse(goalText, daysCount, targetDate, result);
       }, 1000);
 
@@ -277,6 +281,43 @@ function WishlistContent({ locale }: { locale: string }) {
         // 降级方案：使用默认配置
         generateAIResponse(goalText, daysCount, targetDate, fallbackResult);
       }, 1000);
+    }
+  };
+
+  /**
+   * 生成 AI 助手介绍文案
+   */
+  const generateAIIntro = async (
+    goalText: string,
+    matchResult: CompleteAIMatchResult
+  ) => {
+    try {
+      const response = await fetch('/api/ai/intro', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          goalText,
+          personaCode: matchResult.persona.code,
+          personaName: matchResult.persona.characterName,
+          personaType: matchResult.persona.name,
+          language: locale
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate AI intro');
+      }
+
+      const data = await response.json();
+      setAiIntroText(data.intro);
+      console.log('✅ AI 介绍文案生成完成:', data.intro);
+    } catch (error) {
+      console.error('❌ AI 介绍文案生成失败:', error);
+      // 使用默认文案
+      const defaultIntro = `我为你匹配了一位【${matchResult.persona.name}】的助手，他的名字叫${matchResult.persona.characterName}。`;
+      setAiIntroText(defaultIntro);
     }
   };
 
@@ -614,15 +655,12 @@ function WishlistContent({ locale }: { locale: string }) {
               </div>
 
               {/* AI 助手介绍环节 */}
-              {matchResult && !goalData.viewOnly && !isMatching && (
+              {matchResult && !goalData.viewOnly && !isMatching && aiIntroText && (
                 <div className="flex justify-start">
                   <div className="max-w-[85%] bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-2xl p-5 border border-purple-200 shadow-sm">
                     <p className="text-gray-700 leading-relaxed">
                       <span className="inline-block mr-2">✨</span>
-                      我为你匹配了一位
-                      <span className="font-bold text-purple-600 mx-1">【{matchResult.persona.name}】</span>
-                      的助手，帮你实现目标。
-                      {/* TODO: 未来需要添加具体的人物名字，如 "他的名字叫做 Michael" */}
+                      {aiIntroText}
                       <span className="inline-block ml-1">🎯</span>
                     </p>
                   </div>
@@ -637,10 +675,14 @@ function WishlistContent({ locale }: { locale: string }) {
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center text-xl shadow-md border-2 border-white">
                       {matchResult?.persona.emoji || '🤖'}
                     </div>
-                    <div className="flex items-baseline gap-1">
-                      {/* TODO: 未来需要添加具体的人物名字，这里暂时显示类型 */}
+                    <div className="flex items-baseline gap-1.5">
+                      {/* 显示人物名字（如：艾力）*/}
                       <span className="text-lg font-bold text-gray-900">
-                        {matchResult?.persona.name || 'AI 助手'}
+                        {matchResult?.persona.characterName || matchResult?.persona.name || 'AI 助手'}
+                      </span>
+                      {/* 显示类型（如：教练型）*/}
+                      <span className="text-xs text-gray-500">
+                        （{matchResult?.persona.name || '助手'}）
                       </span>
                     </div>
                   </div>

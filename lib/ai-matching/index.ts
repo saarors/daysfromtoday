@@ -55,6 +55,7 @@ export interface CompleteAIMatchResult {
   persona: {
     code: string;
     name: string;
+    characterName: string; // 具体人物名字
     type: 'core' | 'extended' | 'variant';
     emoji: string;
     confidence: number;
@@ -115,6 +116,7 @@ export async function matchGoalToAI(input: {
     persona: {
       code: personaResult.personaCode,
       name: personaResult.personaName,
+      characterName: personaResult.personaCharacterName,
       type: personaResult.personaType,
       emoji: personaResult.emoji,
       confidence: personaResult.confidence,

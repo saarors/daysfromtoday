@@ -13,6 +13,7 @@ import type { DifficultyLevel } from './difficulty-calculator';
 export interface PersonaMatchResult {
   personaCode: string;
   personaName: string;
+  personaCharacterName: string; // 新增：具体人物名字（如：艾力、Michael）
   personaType: 'core' | 'extended' | 'variant';
   emoji: string;
   confidence: number;
@@ -24,6 +25,8 @@ interface AIPersona {
   code: string;
   name_zh: string;
   name_en: string;
+  persona_name_zh: string;
+  persona_name_en: string;
   persona_type: 'core' | 'extended' | 'variant';
   parent_persona_code: string | null;
   avatar_emoji: string;
@@ -61,6 +64,7 @@ export async function matchAIPersona(
       return {
         personaCode: preferredPersona.code,
         personaName: language === 'zh' ? preferredPersona.name_zh : preferredPersona.name_en,
+        personaCharacterName: language === 'zh' ? preferredPersona.persona_name_zh : preferredPersona.persona_name_en,
         personaType: preferredPersona.persona_type,
         emoji: preferredPersona.avatar_emoji,
         confidence: 1.0,
@@ -120,6 +124,7 @@ export async function matchAIPersona(
   return {
     personaCode: finalPersona.code,
     personaName: language === 'zh' ? finalPersona.name_zh : finalPersona.name_en,
+    personaCharacterName: language === 'zh' ? finalPersona.persona_name_zh : finalPersona.persona_name_en,
     personaType: finalPersona.persona_type,
     emoji: finalPersona.avatar_emoji,
     confidence,
@@ -228,6 +233,7 @@ function getFallbackPersona(language: 'zh' | 'en'): PersonaMatchResult {
   return {
     personaCode: 'companion',
     personaName: language === 'zh' ? '陪伴型' : 'Companion',
+    personaCharacterName: language === 'zh' ? '小星' : 'Stella',
     personaType: 'core',
     emoji: '💬',
     confidence: 0.3,
