@@ -42,6 +42,7 @@ export function WishCard({
   locale,
 }: WishCardProps) {
   const [showFullContent, setShowFullContent] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false); // AI 建议展开状态
   const router = useRouter();
   const currentAssistant = getAssistant(assistant);
 
@@ -58,6 +59,8 @@ export function WishCard({
       confirmDelete: 'Are you sure you want to delete this wish? This action cannot be undone.',
       cancel: 'Cancel',
       confirm: 'Delete',
+      expand: 'Show More',
+      collapse: 'Show Less',
     },
     zh: {
       targetDate: '目标日期',
@@ -71,6 +74,8 @@ export function WishCard({
       confirmDelete: '确定要删除这个愿望吗？此操作无法撤销。',
       cancel: '取消',
       confirm: '删除',
+      expand: '展开全部',
+      collapse: '收起',
     },
   };
 
@@ -145,28 +150,64 @@ export function WishCard({
             </span>
             {currentAssistant.name}{t.aiSuggestion}
           </h3>
-          <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
-            <div className="prose prose-sm max-w-none text-gray-800 leading-relaxed">
-              <ReactMarkdown 
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  h3: ({node, ...props}) => <h3 className="text-base font-bold text-gray-900 mt-3 mb-2" {...props} />,
-                  p: ({node, ...props}) => <p className="mb-2 text-gray-800" {...props} />,
-                  strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />,
-                  ul: ({node, ...props}) => <ul className="list-disc list-inside mb-2 space-y-1" {...props} />,
-                  ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-2 space-y-1" {...props} />,
-                  table: ({node, ...props}) => (
-                    <div className="overflow-x-auto my-3">
-                      <table className="min-w-full border-collapse border border-gray-300 text-sm" {...props} />
-                    </div>
-                  ),
-                  thead: ({node, ...props}) => <thead className="bg-gray-100" {...props} />,
-                  th: ({node, ...props}) => <th className="border border-gray-300 px-3 py-2 text-left font-semibold" {...props} />,
-                  td: ({node, ...props}) => <td className="border border-gray-300 px-3 py-2" {...props} />,
-                }}
+          <div className="bg-blue-50 rounded-lg border border-blue-100 overflow-hidden">
+            {/* AI 建议内容区域 - 带折叠 */}
+            <div 
+              className={`p-4 transition-all duration-300 ease-in-out ${
+                isExpanded ? 'max-h-none' : 'max-h-[200px] overflow-hidden relative'
+              }`}
+            >
+              <div className="prose prose-sm max-w-none text-gray-800 leading-relaxed">
+                <ReactMarkdown 
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    h3: ({node, ...props}) => <h3 className="text-base font-bold text-gray-900 mt-3 mb-2" {...props} />,
+                    p: ({node, ...props}) => <p className="mb-2 text-gray-800" {...props} />,
+                    strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />,
+                    ul: ({node, ...props}) => <ul className="list-disc list-inside mb-2 space-y-1" {...props} />,
+                    ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-2 space-y-1" {...props} />,
+                    table: ({node, ...props}) => (
+                      <div className="overflow-x-auto my-3">
+                        <table className="min-w-full border-collapse border border-gray-300 text-sm" {...props} />
+                      </div>
+                    ),
+                    thead: ({node, ...props}) => <thead className="bg-gray-100" {...props} />,
+                    th: ({node, ...props}) => <th className="border border-gray-300 px-3 py-2 text-left font-semibold" {...props} />,
+                    td: ({node, ...props}) => <td className="border border-gray-300 px-3 py-2" {...props} />,
+                  }}
+                >
+                  {aiAnalysis}
+                </ReactMarkdown>
+              </div>
+              
+              {/* 渐变遮罩（仅在折叠状态显示） */}
+              {!isExpanded && (
+                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-blue-50 to-transparent pointer-events-none"></div>
+              )}
+            </div>
+            
+            {/* 展开/收起按钮 */}
+            <div className="border-t border-blue-100 px-4 py-2 bg-blue-50/50">
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors flex items-center gap-1"
               >
-                {aiAnalysis}
-              </ReactMarkdown>
+                {isExpanded ? (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                    {t.collapse}
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                    {t.expand}
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
