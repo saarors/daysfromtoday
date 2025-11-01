@@ -76,12 +76,13 @@ export function WishCard({
 
   const t = text[locale as keyof typeof text] || text.en;
 
-  // 计算已过天数
+  // 计算已过天数（添加防御性检查）
   const today = new Date();
   const target = new Date(targetDate);
   const created = new Date(createdAt);
   const elapsedDays = Math.floor((today.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
-  const remainingDays = Math.max(0, days - elapsedDays);
+  const safeDays = days || 0; // 防止 undefined 导致 NaN
+  const remainingDays = Math.max(0, safeDays - elapsedDays);
 
   const handleViewDetail = () => {
     // 跳转回对话页面，传递完整数据

@@ -64,33 +64,63 @@ function matchKeywords(
  * @param goalText - 用户输入的目标文本
  * @returns 检测结果，如果无法识别则返回 'general' 类型
  */
+// 🔥 临时方案：使用内存缓存避免 Supabase 查询超时
+let cachedGoalTypes: any[] | null = null;
+let cacheTimestamp: number | null = null;
+const CACHE_TTL = 5 * 60 * 1000; // 5 分钟缓存
+
 export async function detectGoalType(
   goalText: string
 ): Promise<GoalTypeDetectionResult> {
   console.log('🔍 [detectGoalType] 开始检测目标类型...');
-  const supabase = createClient();
 
   // 1. 检测语言
   const language = detectLanguage(goalText);
   console.log('🌐 [detectGoalType] 检测到语言:', language);
 
-  // 2. 从数据库获取所有活跃的目标类型
-  console.log('📊 [detectGoalType] 查询 goal_types 表...');
-  const { data: goalTypes, error } = await supabase
-    .from('goal_types')
-    .select('code, name_zh, name_en, keywords_zh, keywords_en, default_persona_code, characteristics')
-    .eq('is_active', true);
-
-  if (error || !goalTypes || goalTypes.length === 0) {
-    console.error('❌ [detectGoalType] 无法获取目标类型数据:', error);
-    // 返回默认的 'general' 类型
-    return {
-      goalTypeCode: 'life',
-      goalTypeName: '生活型',
-      confidence: 0,
-      matchedKeywords: [],
-      defaultPersonaCode: 'companion'
-    };
+  // 2. 检查缓存
+  let goalTypes: any[] | null = null;
+  const now = Date.now();
+  
+  if (cachedGoalTypes && cacheTimestamp && (now - cacheTimestamp < CACHE_TTL)) {
+    console.log('📦 [detectGoalType] 使用缓存数据');
+    goalTypes = cachedGoalTypes;
+  } else {
+    // 3. 从数据库获取所有活跃的目标类型（带超时）
+    console.log('📊 [detectGoalType] 查询 goal_types 表...');
+    const supabase = createClient();
+    
+    try {
+      const timeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Supabase query timeout')), 3000)
+      );
+      
+      const queryPromise = supabase
+        .from('goal_types')
+        .select('code, name_zh, name_en, keywords_zh, keywords_en, default_persona_code, characteristics')
+        .eq('is_active', true);
+      
+      const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
+      
+      if (error || !data || data.length === 0) {
+        console.error('❌ [detectGoalType] 无法获取目标类型数据:', error);
+        goalTypes = null;
+      } else {
+        goalTypes = data;
+        cachedGoalTypes = data;
+        cacheTimestamp = now;
+        console.log(`✅ [detectGoalType] 获取到 ${goalTypes.length} 个目标类型`);
+      }
+    } catch (err) {
+      console.error('❌ [detectGoalType] 查询超时或失败:', err);
+      goalTypes = null;
+    }
+  }
+  
+  // 4. 如果数据库查询失败，使用内置的简化匹配
+  if (!goalTypes) {
+    console.log('⚠️ [detectGoalType] 使用内置简化匹配逻辑');
+    return detectGoalTypeOffline(goalText, language);
   }
   
   console.log(`✅ [detectGoalType] 获取到 ${goalTypes.length} 个目标类型`);
@@ -135,6 +165,70 @@ export async function detectGoalType(
     matchedKeywords: bestMatch.matched,
     defaultPersonaCode: bestMatch.type.default_persona_code
   };
+}
+
+/**
+ * 离线降级方案：使用内置关键词匹配
+ */
+function detectGoalTypeOffline(
+  goalText: string,
+  language: 'zh' | 'en'
+): GoalTypeDetectionResult {
+  const text = goalText.toLowerCase();
+  
+  // 简化的关键词匹配库
+  const keywords = {
+    health: ['减肥', '健身', '锻炼', '运动', '跑步', '健康', '体重', 'workout', 'fitness', 'exercise', 'weight', 'health'],
+    habit: ['习惯', '坚持', '每天', '早起', 'habit', 'daily', 'routine', 'every day'],
+    learning: ['学习', '阅读', '读书', '知识', '课程', 'learn', 'study', 'read', 'book', 'course'],
+    work: ['工作', '项目', '任务', '完成', '汇报', 'work', 'project', 'task', 'job', 'complete'],
+    finance: ['存钱', '投资', '理财', '赚钱', '收入', 'save', 'money', 'invest', 'income', 'finance'],
+  };
+  
+  for (const [type, words] of Object.entries(keywords)) {
+    if (words.some(word => text.includes(word))) {
+      return {
+        goalTypeCode: type,
+        goalTypeName: language === 'zh' ? getTypeName(type, 'zh') : getTypeName(type, 'en'),
+        confidence: 0.7,
+        matchedKeywords: words.filter(word => text.includes(word)),
+        defaultPersonaCode: getDefaultPersona(type)
+      };
+    }
+  }
+  
+  // 默认返回 life 类型
+  return {
+    goalTypeCode: 'life',
+    goalTypeName: language === 'zh' ? '生活型' : 'Life Events',
+    confidence: 0.3,
+    matchedKeywords: [],
+    defaultPersonaCode: 'companion'
+  };
+}
+
+function getTypeName(code: string, lang: 'zh' | 'en'): string {
+  const names: Record<string, {zh: string; en: string}> = {
+    health: {zh: '健康型', en: 'Health & Fitness'},
+    habit: {zh: '习惯型', en: 'Habits & Routines'},
+    learning: {zh: '学习型', en: 'Learning & Growth'},
+    work: {zh: '工作型', en: 'Work & Productivity'},
+    finance: {zh: '财务型', en: 'Finance & Wealth'},
+    life: {zh: '生活型', en: 'Life Events'},
+  };
+  return names[code]?.[lang] || names['life'][lang];
+}
+
+function getDefaultPersona(code: string): string {
+  const personas: Record<string, string> = {
+    health: 'coach',
+    habit: 'coach',
+    learning: 'mentor',
+    work: 'analyst',
+    finance: 'advisor',
+    life: 'companion',
+  };
+  return personas[code] || 'companion';
 }
 
 /**
