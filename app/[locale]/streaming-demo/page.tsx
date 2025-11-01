@@ -46,24 +46,38 @@ export default function StreamingDemoPage() {
       
       // 累积到缓冲区
       pendingTextRef.current += delta;
-      let buffer = pendingTextRef.current;
+      const buffer = pendingTextRef.current;
       
       let processedUpTo = 0;
+      let foundTag = false;
 
       while (processedUpTo < buffer.length) {
         if (insideThinkingRef.current) {
           // 当前在 <think> 内部，查找 </think>
           const closeIndex = buffer.indexOf('</think>', processedUpTo);
           if (closeIndex === -1) {
-            // 没找到结束标签，可能标签被切断，输出已确定的部分
-            // 但保留最后 8 个字符（'</think>' 的长度），防止标签被切断
-            const safeEnd = Math.max(processedUpTo, buffer.length - 8);
-            const safeContent = buffer.slice(processedUpTo, safeEnd);
-            if (safeContent) streaming.appendChunk('thinking', safeContent);
-            pendingTextRef.current = buffer.slice(safeEnd);
+            // 没找到结束标签，检查是否可能被切断
+            const remaining = buffer.slice(processedUpTo);
+            const possibleTag = '</think>';
+            let keepBack = 0;
+            
+            // 检查末尾是否包含标签的前缀
+            for (let i = 1; i < possibleTag.length && i <= remaining.length; i++) {
+              if (remaining.endsWith(possibleTag.substring(0, i))) {
+                keepBack = i;
+              }
+            }
+            
+            // 输出安全部分
+            const safeContent = remaining.slice(0, remaining.length - keepBack);
+            if (safeContent) {
+              streaming.appendChunk('thinking', safeContent);
+            }
+            pendingTextRef.current = remaining.slice(remaining.length - keepBack);
             break;
           }
           // 找到结束标签
+          foundTag = true;
           const thinkingContent = buffer.slice(processedUpTo, closeIndex);
           if (thinkingContent) streaming.appendChunk('thinking', thinkingContent);
           insideThinkingRef.current = false;
@@ -72,15 +86,28 @@ export default function StreamingDemoPage() {
           // 当前在 <think> 外部，查找 <think>
           const openIndex = buffer.indexOf('<think>', processedUpTo);
           if (openIndex === -1) {
-            // 没找到开始标签，可能标签被切断，输出已确定的部分
-            // 但保留最后 7 个字符（'<think>' 的长度），防止标签被切断
-            const safeEnd = Math.max(processedUpTo, buffer.length - 7);
-            const safeContent = buffer.slice(processedUpTo, safeEnd);
-            if (safeContent) streaming.appendChunk('content', safeContent);
-            pendingTextRef.current = buffer.slice(safeEnd);
+            // 没找到开始标签，检查是否可能被切断
+            const remaining = buffer.slice(processedUpTo);
+            const possibleTag = '<think>';
+            let keepBack = 0;
+            
+            // 检查末尾是否包含标签的前缀
+            for (let i = 1; i < possibleTag.length && i <= remaining.length; i++) {
+              if (remaining.endsWith(possibleTag.substring(0, i))) {
+                keepBack = i;
+              }
+            }
+            
+            // 输出安全部分
+            const safeContent = remaining.slice(0, remaining.length - keepBack);
+            if (safeContent) {
+              streaming.appendChunk('content', safeContent);
+            }
+            pendingTextRef.current = remaining.slice(remaining.length - keepBack);
             break;
           }
           // 找到开始标签
+          foundTag = true;
           const contentBeforeThink = buffer.slice(processedUpTo, openIndex);
           if (contentBeforeThink) streaming.appendChunk('content', contentBeforeThink);
           insideThinkingRef.current = true;
@@ -88,8 +115,8 @@ export default function StreamingDemoPage() {
         }
       }
 
-      // 如果全部处理完，清空缓冲
-      if (processedUpTo >= buffer.length) {
+      // 如果全部处理完（找到了完整标签），清空缓冲
+      if (foundTag && processedUpTo >= buffer.length) {
         pendingTextRef.current = '';
       }
 
