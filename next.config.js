@@ -15,7 +15,7 @@
 const { withContentlayer } = require('next-contentlayer');
 const createNextIntlPlugin = require('next-intl/plugin');
 
-// 创建 next-intl 插件，指向 i18n 配置文件
+// 创建 next-intl v4 插件（指向 i18n 配置文件）
 const withNextIntl = createNextIntlPlugin('./i18n/config.ts');
 
 const nextConfig = {

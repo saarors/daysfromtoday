@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuthStore } from '@/store/auth-store';
@@ -15,7 +15,7 @@ interface UserMenuProps {
   locale: string;
 }
 
-export function UserMenu({ locale }: UserMenuProps) {
+export const UserMenu = memo(function UserMenu({ locale }: UserMenuProps) {
   console.log('🎨 UserMenu component rendered');
   
   const router = useRouter();
@@ -314,5 +314,5 @@ export function UserMenu({ locale }: UserMenuProps) {
       )}
     </div>
   );
-}
+});
 
