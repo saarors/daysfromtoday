@@ -620,7 +620,7 @@ function WishlistContent({ locale }: { locale: string }) {
   // AI 对话界面
   if (showChat && goalData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 overscroll-none">
         <TopNav locale={locale} />
         {/* 添加顶部间距，避免被固定导航遮挡 */}
         <div className="pt-24">

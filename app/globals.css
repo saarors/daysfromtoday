@@ -95,6 +95,8 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* 禁止页面过度滚动（橡皮筋效果） */
+  overscroll-behavior: none;
 }
 
 /* === 自定义工具类（V3.0 纯色版本）=== */
