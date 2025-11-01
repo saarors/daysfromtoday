@@ -85,12 +85,8 @@ export function useStreamingBuffer(): StreamingBufferState {
       if (!text) return;
       pendingChunksRef.current.push({ type, text });
 
-      const now = performance.now();
-      const timeSinceLastFlush = now - lastFlushRef.current;
-
-      if (timeSinceLastFlush >= FRAME_INTERVAL) {
-        scheduleFlush();
-      }
+      // 始终调度flush，让 requestAnimationFrame 自然合并
+      scheduleFlush();
     },
     [scheduleFlush]
   );

@@ -71,9 +71,13 @@ export default function StreamingDemoPage() {
             // 输出安全部分
             const safeContent = remaining.slice(0, remaining.length - keepBack);
             if (safeContent) {
+              console.log('[processDelta] 输出到 thinking:', safeContent.length, '字符');
               streaming.appendChunk('thinking', safeContent);
             }
             pendingTextRef.current = remaining.slice(remaining.length - keepBack);
+            if (pendingTextRef.current) {
+              console.log('[processDelta] 保留 pending:', pendingTextRef.current.length, '字符');
+            }
             break;
           }
           // 找到结束标签
@@ -101,9 +105,13 @@ export default function StreamingDemoPage() {
             // 输出安全部分
             const safeContent = remaining.slice(0, remaining.length - keepBack);
             if (safeContent) {
+              console.log('[processDelta] 输出到 content:', safeContent.length, '字符', safeContent.substring(0, 30));
               streaming.appendChunk('content', safeContent);
             }
             pendingTextRef.current = remaining.slice(remaining.length - keepBack);
+            if (pendingTextRef.current) {
+              console.log('[processDelta] 保留 pending:', pendingTextRef.current.length, '字符');
+            }
             break;
           }
           // 找到开始标签
