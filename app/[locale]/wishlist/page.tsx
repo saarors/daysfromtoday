@@ -579,10 +579,10 @@ function WishlistContent({ locale }: { locale: string }) {
   // AI 对话界面
   if (showChat && goalData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-y-auto">
         <TopNav locale={locale} />
         {/* 添加顶部间距，避免被固定导航遮挡 */}
-        <div className="pt-20"></div>
+        <div className="h-20"></div>
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             {/* AI 对话界面 - ChatGPT 风格 */}
@@ -620,9 +620,9 @@ function WishlistContent({ locale }: { locale: string }) {
                     <p className="text-gray-700 leading-relaxed">
                       <span className="inline-block mr-2">✨</span>
                       我为你匹配了一位
-                      <span className="font-bold text-purple-600 mx-1">【{matchResult.persona.type}】</span>
-                      的助手，帮你实现目标。他的名字叫做
-                      <span className="font-bold text-purple-600 mx-1">{matchResult.persona.name}</span>
+                      <span className="font-bold text-purple-600 mx-1">【{matchResult.persona.name}】</span>
+                      的助手，帮你实现目标。
+                      {/* TODO: 未来需要添加具体的人物名字，如 "他的名字叫做 Michael" */}
                       <span className="inline-block ml-1">🎯</span>
                     </p>
                   </div>
@@ -638,11 +638,9 @@ function WishlistContent({ locale }: { locale: string }) {
                       {matchResult?.persona.emoji || '🤖'}
                     </div>
                     <div className="flex items-baseline gap-1">
+                      {/* TODO: 未来需要添加具体的人物名字，这里暂时显示类型 */}
                       <span className="text-lg font-bold text-gray-900">
                         {matchResult?.persona.name || 'AI 助手'}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        （{matchResult?.persona.type || '助手'}）
                       </span>
                     </div>
                   </div>
