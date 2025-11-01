@@ -367,41 +367,10 @@ function WishlistContent({ locale }: { locale: string }) {
       let buffer = '';
       let thinkingBuffer = '';
       let contentBuffer = '';
-      
-      // 流式渲染策略：适度节流 + 渐显动画
-      let thinkingChunkBuffer = '';
-      let contentChunkBuffer = '';
-      const CHUNK_SIZE = 15; // 每 15 个字符更新一次（更频繁）
-      const UPDATE_INTERVAL = 60; // 最小间隔 60ms（约 16 次/秒）
-      let lastUpdateTime = 0;
-
-      const flushUpdate = (force = false) => {
-        const now = Date.now();
-        const shouldUpdate = force || 
-                            thinkingChunkBuffer.length >= CHUNK_SIZE ||
-                            contentChunkBuffer.length >= CHUNK_SIZE ||
-                            (now - lastUpdateTime) >= UPDATE_INTERVAL;
-        
-        if (shouldUpdate && (thinkingChunkBuffer || contentChunkBuffer)) {
-          if (thinkingChunkBuffer) {
-            thinkingBuffer += thinkingChunkBuffer;
-            setAiThinking(thinkingBuffer);
-            thinkingChunkBuffer = '';
-          }
-          if (contentChunkBuffer) {
-            contentBuffer += contentChunkBuffer;
-            setAiResponse(contentBuffer);
-            contentChunkBuffer = '';
-          }
-          lastUpdateTime = now;
-        }
-      };
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) {
-          // 流读取完成，刷新剩余内容
-          flushUpdate(true);
           console.log('✅ 流读取完成');
           break;
         }
@@ -418,11 +387,13 @@ function WishlistContent({ locale }: { locale: string }) {
               const data = JSON.parse(dataStr);
               
               if (data.type === 'thinking') {
-                thinkingChunkBuffer += data.delta;
-                flushUpdate();
+                thinkingBuffer += data.delta;
+                // 直接更新完整内容，由 useStreamedText Hook 控制显示节奏
+                setAiThinking(thinkingBuffer);
               } else if (data.type === 'content') {
-                contentChunkBuffer += data.delta;
-                flushUpdate();
+                contentBuffer += data.delta;
+                // 直接更新完整内容，由 useStreamedText Hook 控制显示节奏
+                setAiResponse(contentBuffer);
               } else if (data.type === 'done') {
                 console.log('✅ 收到完成信号');
               }
