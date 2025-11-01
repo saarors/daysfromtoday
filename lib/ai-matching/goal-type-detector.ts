@@ -92,10 +92,12 @@ export async function detectGoalType(
     
     try {
       // 增加超时时间到 10 秒，适应海外 Supabase 实例延迟
+      const queryStartTime = Date.now();
       const timeoutPromise = new Promise<never>((_, reject) => 
         setTimeout(() => reject(new Error('Supabase query timeout')), 10000)
       );
       
+      console.log('⏱️  [detectGoalType] 开始查询 Supabase...');
       const queryPromise = supabase
         .from('goal_types')
         .select('code, name_zh, name_en, keywords_zh, keywords_en, default_persona_code, characteristics')
@@ -103,6 +105,8 @@ export async function detectGoalType(
         .order('sort_order', { ascending: true }); // 添加排序，优化查询
       
       const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
+      const queryTime = Date.now() - queryStartTime;
+      console.log(`⏱️  [detectGoalType] 查询完成，耗时: ${queryTime}ms`);
       
       if (error || !data || data.length === 0) {
         console.warn('⚠️ [detectGoalType] 数据库查询失败，使用 fallback:', error?.message);
