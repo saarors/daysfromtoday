@@ -302,18 +302,23 @@ function WishlistContent({ locale }: { locale: string }) {
       }
 
       console.log('✅ Save complete, resetting state...');
+      console.log('📊 当前卡片数量:', cards.length);
+      console.log('🔄 准备跳转到:', `/${locale}/wishlist`);
 
       // 延迟重置状态，确保所有异步操作完成
       setTimeout(() => {
+        console.log('⏰ setTimeout 执行');
         savingRef.current = false;
         setIsSaving(false);
         
         // 刷新卡片列表
         const latestCards = useGoalCards.getState().getAllCardsSortedByDate();
+        console.log('📋 最新卡片数量:', latestCards.length);
         setWishCards(latestCards);
         
-        // 跳转回清单页面
-        router.push(`/${locale}/wishlist`);
+        // 跳转回清单页面（使用 replace 避免返回到匹配页面）
+        console.log('🚀 执行跳转...');
+        router.replace(`/${locale}/wishlist`);
       }, 500);
 
     } catch (error) {
