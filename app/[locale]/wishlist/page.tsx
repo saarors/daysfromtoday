@@ -620,10 +620,10 @@ function WishlistContent({ locale }: { locale: string }) {
   // AI 对话界面
   if (showChat && goalData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-y-auto">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <TopNav locale={locale} />
         {/* 添加顶部间距，避免被固定导航遮挡 */}
-        <div className="h-20"></div>
+        <div className="pt-24">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             {/* AI 对话界面 - ChatGPT 风格 */}
@@ -826,6 +826,7 @@ function WishlistContent({ locale }: { locale: string }) {
               </div>
             )}
           </div>
+        </div>
         </div>
       </div>
     );
