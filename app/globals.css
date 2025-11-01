@@ -87,6 +87,15 @@
 }
 
 /* === 全局样式 === */
+
+/* 禁止橡皮筋效果（完全禁用） */
+html {
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
+  height: 100%;
+}
+
 body {
   background: var(--color-bg-secondary);
   color: var(--color-text-primary);
@@ -96,7 +105,21 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* 禁止页面过度滚动（橡皮筋效果） */
-  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  overflow-y: auto;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  /* iOS Safari 特殊处理 */
+  position: fixed;
+  width: 100%;
+}
+
+/* Next.js 根容器 */
+#__next {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior-y: none;
 }
 
 /* === 自定义工具类（V3.0 纯色版本）=== */
