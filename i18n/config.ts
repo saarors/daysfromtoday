@@ -24,17 +24,13 @@ export const defaultLocale = 'en' as const;
 export type Locale = typeof locales[number];
 
 // next-intl 配置
-export default getRequestConfig(async ({ requestLocale }) => {
-  // 获取请求的语言
-  const locale = await requestLocale;
-  
+export default getRequestConfig(async ({ locale }) => {
   // 验证语言是否支持
   if (!locale || !locales.includes(locale as Locale)) {
     notFound();
   }
 
   return {
-    locale,
     messages: (await import(`../messages/${locale}.json`)).default
   };
 });
