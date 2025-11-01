@@ -360,8 +360,8 @@ function WishlistContent({ locale }: { locale: string }) {
     console.log('✅ Starting save process...');
 
     try {
-      // 检查是否已存在相同的卡片
-      const isDuplicate = cards.some(card => 
+      // 检查是否已存在相同的卡片（避免双重提交）
+      const isDuplicate = wishCards.some(card => 
         card.content.goalText === goalData.goalText &&
         card.content.targetDate === goalData.targetDate &&
         card.content.daysCount === goalData.days
@@ -369,6 +369,8 @@ function WishlistContent({ locale }: { locale: string }) {
 
       if (isDuplicate) {
         console.log('⚠️ 检测到重复卡片，跳过保存');
+        savingRef.current = false;
+        setIsSaving(false);
         return;
       }
 
