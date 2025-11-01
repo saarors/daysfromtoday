@@ -156,9 +156,9 @@ function WishlistContent({ locale }: { locale: string }) {
       console.log('⏱️ 调用 matchGoalToAI...');
       const startTime = Date.now();
       
-      // 添加超时保护（10秒）
+      // 增加超时保护到 15 秒（考虑 Supabase 查询 5 秒 + AI 匹配逻辑 + 网络延迟）
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('匹配超时')), 10000)
+        setTimeout(() => reject(new Error('匹配超时（15秒）')), 15000)
       );
       
       const matchPromise = matchGoalToAI({
@@ -183,16 +183,28 @@ function WishlistContent({ locale }: { locale: string }) {
       }, 1000);
 
     } catch (error: any) {
-      console.error('❌ AI 匹配失败:', error);
-      console.error('错误详情:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      });
-      setIsMatching(false);
-      setShowChat(true);
-      // 降级方案：使用默认配置
-      generateAIResponse(goalText, daysCount, targetDate, null);
+      // 降级处理：如果超时，使用默认配置继续
+      console.warn('⚠️ AI 匹配超时，使用默认配置:', error.message);
+      
+      // 使用默认的匹配结果（健康型 + 教练型）
+      const fallbackResult: CompleteAIMatchResult = {
+        goalType: { code: 'general', name: '通用型' },
+        difficulty: 3,
+        personaCode: 'coach',
+        personaName: '教练型',
+        confidence: 0.5
+      };
+      
+      setMatchResult(fallbackResult);
+      console.log('🔄 使用 fallback 配置:', fallbackResult);
+      
+      // 继续执行，不中断用户流程
+      setTimeout(() => {
+        setIsMatching(false);
+        setShowChat(true);
+        // 降级方案：使用默认配置
+        generateAIResponse(goalText, daysCount, targetDate, fallbackResult);
+      }, 1000);
     }
   };
 

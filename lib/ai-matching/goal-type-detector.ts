@@ -78,7 +78,7 @@ export async function detectGoalType(
   const language = detectLanguage(goalText);
   console.log('🌐 [detectGoalType] 检测到语言:', language);
 
-  // 2. 检查缓存
+  // 2. 检查缓存（优先使用缓存）
   let goalTypes: any[] | null = null;
   const now = Date.now();
   
@@ -91,39 +91,39 @@ export async function detectGoalType(
     const supabase = createClient();
     
     try {
+      // 增加超时时间到 5 秒，减少超时频率
       const timeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Supabase query timeout')), 3000)
+        setTimeout(() => reject(new Error('Supabase query timeout')), 5000)
       );
       
       const queryPromise = supabase
         .from('goal_types')
         .select('code, name_zh, name_en, keywords_zh, keywords_en, default_persona_code, characteristics')
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true }); // 添加排序，优化查询
       
       const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
       
       if (error || !data || data.length === 0) {
-        console.error('❌ [detectGoalType] 无法获取目标类型数据:', error);
+        console.warn('⚠️ [detectGoalType] 数据库查询失败，使用 fallback:', error?.message);
         goalTypes = null;
       } else {
         goalTypes = data;
         cachedGoalTypes = data;
         cacheTimestamp = now;
-        console.log(`✅ [detectGoalType] 获取到 ${goalTypes.length} 个目标类型`);
+        console.log(`✅ [detectGoalType] 获取到 ${goalTypes.length} 个目标类型，已缓存 5 分钟`);
       }
     } catch (err) {
-      console.error('❌ [detectGoalType] 查询超时或失败:', err);
+      console.warn('⚠️ [detectGoalType] 查询超时，使用离线 fallback:', (err as Error).message);
       goalTypes = null;
     }
   }
   
-  // 4. 如果数据库查询失败，使用内置的简化匹配
+  // 4. 如果数据库查询失败，使用内置的简化匹配（降级处理）
   if (!goalTypes) {
-    console.log('⚠️ [detectGoalType] 使用内置简化匹配逻辑');
+    console.log('🔄 [detectGoalType] 使用内置简化匹配逻辑（离线模式）');
     return detectGoalTypeOffline(goalText, language);
   }
-  
-  console.log(`✅ [detectGoalType] 获取到 ${goalTypes.length} 个目标类型`);
 
   // 3. 对每个目标类型进行关键词匹配
   const results: Array<{
