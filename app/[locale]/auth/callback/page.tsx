@@ -31,36 +31,57 @@ export default function AuthCallback({ params }: AuthCallbackProps) {
         const code = searchParams.get('code');
         const redirect = searchParams.get('redirect') || `/${locale}`;
 
+        console.log('🔐 开始处理 Auth 回调...');
+        console.log('📍 Code:', code?.slice(0, 10) + '...');
+        console.log('📍 Redirect:', redirect);
+        console.log('📍 当前 URL:', window.location.href);
+
         if (!code) {
           throw new Error('Missing auth code');
         }
 
-        console.log('🔐 处理 Auth 回调...');
-        console.log('📍 Code:', code.slice(0, 10) + '...');
-        console.log('📍 Redirect:', redirect);
-
         const supabase = createClient();
 
-        // 交换 code 为 session
+        // 方案 1: 使用 exchangeCodeForSession (PKCE 流程)
+        console.log('🔄 尝试交换 code 为 session...');
         const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
         if (exchangeError) {
-          console.error('❌ 交换 session 失败:', exchangeError);
-          throw exchangeError;
+          console.error('❌ exchangeCodeForSession 失败:', exchangeError);
+          console.error('错误详情:', JSON.stringify(exchangeError, null, 2));
+          
+          // 如果 exchangeCodeForSession 失败，尝试直接检查 session
+          console.log('🔄 尝试直接获取 session...');
+          const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+          
+          if (sessionError || !sessionData.session) {
+            console.error('❌ 获取 session 也失败了:', sessionError);
+            throw exchangeError; // 抛出原始错误
+          }
+          
+          console.log('✅ 直接获取 session 成功（可能 session 已经存在）');
+          console.log('👤 用户:', sessionData.session.user?.email);
+        } else {
+          console.log('✅ exchangeCodeForSession 成功!');
+          console.log('👤 用户:', data.user?.email);
+          console.log('🔑 Session:', data.session ? '已创建' : '未创建');
         }
 
-        console.log('✅ 登录成功!');
-        console.log('👤 用户:', data.user?.email);
+        // 短暂延迟，确保 cookie 已设置
+        console.log('⏳ 等待 cookie 设置...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // 短暂延迟，确保 session 已设置
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // 验证 session 是否真的存在
+        const { data: finalSession } = await supabase.auth.getSession();
+        console.log('🔍 最终 session 检查:', finalSession.session ? '✅ 存在' : '❌ 不存在');
 
         // 重定向到目标页面
-        console.log('🚀 重定向到:', redirect);
+        console.log('🚀 准备重定向到:', redirect);
         router.push(redirect);
         
       } catch (err) {
         console.error('❌ Auth 回调错误:', err);
+        console.error('错误堆栈:', err instanceof Error ? err.stack : 'N/A');
         setError(err instanceof Error ? err.message : 'Authentication failed');
       }
     };
