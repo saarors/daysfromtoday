@@ -51,6 +51,7 @@ function WishlistContent({ locale }: { locale: string }) {
   const [showChat, setShowChat] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiResponse, setAiResponse] = useState('');
+  const [aiThinking, setAiThinking] = useState<string | null>(null); // 新增：AI 思考过程
 
   // 显示状态
   const [wishCards, setWishCards] = useState<any[]>([]);
@@ -229,9 +230,12 @@ function WishlistContent({ locale }: { locale: string }) {
 
       const data = await response.json();
       setAiResponse(data.analysis);
+      setAiThinking(data.thinking); // 保存思考过程
       console.log('✅ AI 生成完成:', {
         tokensUsed: data.tokensUsed,
-        model: data.model
+        model: data.model,
+        hasThinking: !!data.thinking,
+        thinkingLength: data.thinking?.length || 0
       });
 
     } catch (error) {
@@ -498,11 +502,108 @@ function WishlistContent({ locale }: { locale: string }) {
                     <span>正在生成建议...</span>
                   </div>
                 ) : (
-                  <div className="prose prose-blue max-w-none">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {aiResponse}
-                    </ReactMarkdown>
-                  </div>
+                  <>
+                    {/* 思考过程（可展开/收起）*/}
+                    {aiThinking && (
+                      <details className="mb-6 bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <summary className="cursor-pointer font-medium text-gray-700 flex items-center gap-2 hover:text-blue-600 transition-colors">
+                          <span>🧠</span>
+                          <span>AI 的思考过程</span>
+                          <span className="text-xs text-gray-400 ml-auto">（点击展开）</span>
+                        </summary>
+                        <div className="mt-4 text-sm text-gray-600 leading-relaxed whitespace-pre-wrap border-t border-gray-200 pt-4">
+                          {aiThinking}
+                        </div>
+                      </details>
+                    )}
+                    
+                    {/* AI 建议内容 */}
+                    <div className="prose prose-blue max-w-none markdown-content">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {aiResponse}
+                      </ReactMarkdown>
+                    </div>
+                    
+                    {/* Markdown 表格样式 */}
+                    <style jsx>{`
+                      .markdown-content :global(table) {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 1.5rem 0;
+                        font-size: 0.875rem;
+                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                        border-radius: 8px;
+                        overflow: hidden;
+                      }
+                      .markdown-content :global(thead) {
+                        background-color: #f3f4f6;
+                      }
+                      .markdown-content :global(th) {
+                        padding: 0.75rem 1rem;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      }
+                      .markdown-content :global(td) {
+                        padding: 0.75rem 1rem;
+                        border-bottom: 1px solid #e5e7eb;
+                        color: #6b7280;
+                      }
+                      .markdown-content :global(tbody tr:last-child td) {
+                        border-bottom: none;
+                      }
+                      .markdown-content :global(tbody tr:hover) {
+                        background-color: #f9fafb;
+                      }
+                      .markdown-content :global(h2) {
+                        font-size: 1.5rem;
+                        font-weight: 700;
+                        margin-top: 2rem;
+                        margin-bottom: 1rem;
+                        color: #111827;
+                      }
+                      .markdown-content :global(h3) {
+                        font-size: 1.25rem;
+                        font-weight: 600;
+                        margin-top: 1.5rem;
+                        margin-bottom: 0.75rem;
+                        color: #1f2937;
+                      }
+                      .markdown-content :global(p) {
+                        margin-bottom: 1rem;
+                        line-height: 1.75;
+                        color: #374151;
+                      }
+                      .markdown-content :global(ul), .markdown-content :global(ol) {
+                        margin: 1rem 0;
+                        padding-left: 1.5rem;
+                      }
+                      .markdown-content :global(li) {
+                        margin: 0.5rem 0;
+                        line-height: 1.75;
+                        color: #374151;
+                      }
+                      .markdown-content :global(strong) {
+                        font-weight: 600;
+                        color: #111827;
+                      }
+                      .markdown-content :global(code) {
+                        background-color: #f3f4f6;
+                        padding: 0.125rem 0.375rem;
+                        border-radius: 0.25rem;
+                        font-size: 0.875em;
+                        color: #e11d48;
+                      }
+                      .markdown-content :global(blockquote) {
+                        border-left: 4px solid #3b82f6;
+                        padding-left: 1rem;
+                        margin: 1rem 0;
+                        color: #6b7280;
+                        font-style: italic;
+                      }
+                    `}</style>
+                  </>
                 )}
               </div>
 
