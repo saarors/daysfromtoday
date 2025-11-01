@@ -618,53 +618,70 @@ function WishlistContent({ locale }: { locale: string }) {
               </div>
             )}
 
-            {/* AI 对话卡片 */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              {/* 用户输入 */}
-              <div className="mb-8">
-                <h3 className="text-sm font-medium text-gray-500 mb-2">你的目标</h3>
-                <p className="text-lg font-semibold text-gray-900 mb-4">
-                  {goalData.goalText}
-                </p>
-                <div className="flex gap-4 text-sm text-gray-600">
-                  <span>📅 {goalData.targetDate}</span>
-                  <span>⏰ 距今 {goalData.days} 天</span>
+            {/* AI 对话界面 - ChatGPT 风格 */}
+            <div className="space-y-6">
+              {/* 用户消息气泡 */}
+              <div className="flex justify-end">
+                <div className="max-w-[85%] bg-blue-600 text-white rounded-2xl rounded-tr-sm p-4 shadow-md">
+                  <div className="mb-2">
+                    <p className="text-lg font-medium leading-relaxed whitespace-pre-wrap">
+                      {goalData.goalText}
+                    </p>
+                  </div>
+                  <div className="flex gap-3 text-sm text-blue-100 opacity-90">
+                    <span>📅 {goalData.targetDate}</span>
+                    <span>⏰ {goalData.days} 天</span>
+                  </div>
                 </div>
               </div>
 
-              {/* AI 响应 */}
-              <div className="border-t pt-8">
-                <h3 className="text-sm font-medium text-gray-500 mb-4">
-                  {matchResult?.persona.emoji} {matchResult?.persona.name || 'AI'} 的建议
-                </h3>
-                
-                {isGenerating ? (
-                  <div className="flex items-center gap-3 text-gray-600">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                    <span>正在生成建议...</span>
-                  </div>
-                ) : (
-                  <>
-                    {/* 思考过程（可展开/收起）*/}
-                    {aiThinking && (
-                      <details className="mb-6 bg-gray-50 rounded-lg p-4 border border-gray-200">
-                        <summary className="cursor-pointer font-medium text-gray-700 flex items-center gap-2 hover:text-blue-600 transition-colors">
-                          <span>🧠</span>
-                          <span>AI 的思考过程</span>
-                          <span className="text-xs text-gray-400 ml-auto">（点击展开）</span>
-                        </summary>
-                        <div className="mt-4 text-sm text-gray-600 leading-relaxed whitespace-pre-wrap border-t border-gray-200 pt-4">
-                          {aiThinking}
-                        </div>
-                      </details>
-                    )}
-                    
-                    {/* AI 建议内容 */}
-                    <div className="prose prose-blue max-w-none markdown-content">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {aiResponse}
-                      </ReactMarkdown>
+              {/* AI 响应气泡 */}
+              <div className="flex justify-start">
+                <div className="max-w-[85%]">
+                  {/* AI 头像和名称 */}
+                  <div className="flex items-center gap-2 mb-2 ml-4">
+                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-lg shadow-sm">
+                      {matchResult?.persona.emoji || '🤖'}
                     </div>
+                    <span className="text-sm font-medium text-gray-700">
+                      {matchResult?.persona.name || 'AI 助手'}
+                    </span>
+                  </div>
+                  
+                  {/* AI 消息内容 */}
+                  <div className="bg-white rounded-2xl rounded-tl-sm p-5 shadow-md border border-gray-100">
+                    {isGenerating ? (
+                      <div className="flex items-center gap-3 text-gray-600">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                        <span>正在思考和生成建议...</span>
+                      </div>
+                    ) : (
+                      <>
+                        {/* 思考过程（可展开/收起）*/}
+                        {aiThinking && (
+                          <details className="mb-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <summary className="cursor-pointer font-medium text-gray-700 flex items-center gap-2 hover:text-blue-600 transition-colors">
+                              <span>🧠</span>
+                              <span>思考过程</span>
+                              <span className="text-xs text-gray-400 ml-auto">（点击展开）</span>
+                            </summary>
+                            <div className="mt-4 text-sm text-gray-600 leading-relaxed whitespace-pre-wrap border-t border-gray-200 pt-4">
+                              {aiThinking}
+                            </div>
+                          </details>
+                        )}
+                        
+                        {/* AI 建议内容 */}
+                        <div className="prose prose-blue max-w-none markdown-content">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {aiResponse}
+                          </ReactMarkdown>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
                     
                     {/* Markdown 表格样式 */}
                     <style jsx>{`
@@ -748,27 +765,30 @@ function WishlistContent({ locale }: { locale: string }) {
                   </>
                 )}
               </div>
-
-              {/* 完成按钮 */}
-              {!goalData.viewOnly && aiResponse && !isGenerating && (
-                <div className="mt-8 pt-8 border-t">
-                  <button
-                    onClick={() => handleChatComplete(aiResponse, aiResponse.substring(0, 200))}
-                    disabled={isSaving}
-                    className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {isSaving ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        <span>保存中...</span>
-                      </>
-                    ) : (
-                      '完成'
-                    )}
-                  </button>
-                </div>
-              )}
             </div>
+
+            {/* 完成按钮 - 独立在对话框外 */}
+            {!goalData.viewOnly && aiResponse && !isGenerating && (
+              <div className="mt-6">
+                <button
+                  onClick={() => handleChatComplete(aiResponse, aiResponse.substring(0, 200))}
+                  disabled={isSaving}
+                  className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md"
+                >
+                  {isSaving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span>保存中...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>✓</span>
+                      <span>完成并保存到愿望清单</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
