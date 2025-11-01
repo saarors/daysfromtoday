@@ -596,18 +596,71 @@ function WishlistContent({ locale }: { locale: string }) {
   // AI 匹配中
   if (isMatching && goalData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
         <TopNav locale={locale} />
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  🧠 AI 正在分析你的目标...
-                </h3>
-                <p className="text-gray-600">
-                  识别目标类型 → 评估难度 → 匹配最佳 AI 助手
+        <div className="container mx-auto px-4">
+          <div className="max-w-xl mx-auto">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-12 border border-blue-100">
+              <div className="text-center space-y-6">
+                {/* 科技感 AI 动画 */}
+                <div className="relative w-24 h-24 mx-auto">
+                  {/* 外圈旋转 */}
+                  <div className="absolute inset-0 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin"></div>
+                  {/* 中圈反向旋转 */}
+                  <div className="absolute inset-2 rounded-full border-4 border-purple-200 border-t-purple-600 animate-spin-reverse"></div>
+                  {/* 内圈脉动 */}
+                  <div className="absolute inset-4 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 animate-pulse flex items-center justify-center">
+                    <span className="text-2xl">🧠</span>
+                  </div>
+                  {/* 扫描线效果 */}
+                  <div className="absolute inset-0 rounded-full border-2 border-blue-400 animate-ping opacity-20"></div>
+                </div>
+
+                {/* 标题 */}
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    AI 正在分析你的目标
+                  </h3>
+                  <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                    <span className="inline-block w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                    <span>深度学习中</span>
+                  </div>
+                </div>
+
+                {/* 分析步骤 */}
+                <div className="space-y-3 pt-4">
+                  <div className="flex items-center gap-3 text-left bg-blue-50/50 rounded-xl p-3 transform transition-all duration-500 animate-fade-in">
+                    <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
+                    <span className="text-gray-700">识别目标类型</span>
+                    <div className="ml-auto flex gap-1">
+                      <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                      <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                      <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-left bg-purple-50/50 rounded-xl p-3 transform transition-all duration-500 animate-fade-in" style={{animationDelay: '200ms'}}>
+                    <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
+                    <span className="text-gray-700">评估难度等级</span>
+                    <div className="ml-auto flex gap-1">
+                      <div className="w-1.5 h-1.5 bg-purple-600 rounded-full animate-bounce" style={{animationDelay: '100ms'}}></div>
+                      <div className="w-1.5 h-1.5 bg-purple-600 rounded-full animate-bounce" style={{animationDelay: '250ms'}}></div>
+                      <div className="w-1.5 h-1.5 bg-purple-600 rounded-full animate-bounce" style={{animationDelay: '400ms'}}></div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-left bg-indigo-50/50 rounded-xl p-3 transform transition-all duration-500 animate-fade-in" style={{animationDelay: '400ms'}}>
+                    <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
+                    <span className="text-gray-700">匹配最佳 AI 助手</span>
+                    <div className="ml-auto flex gap-1">
+                      <div className="w-1.5 h-1.5 bg-indigo-600 rounded-full animate-bounce" style={{animationDelay: '200ms'}}></div>
+                      <div className="w-1.5 h-1.5 bg-indigo-600 rounded-full animate-bounce" style={{animationDelay: '350ms'}}></div>
+                      <div className="w-1.5 h-1.5 bg-indigo-600 rounded-full animate-bounce" style={{animationDelay: '500ms'}}></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 底部提示 */}
+                <p className="text-xs text-gray-400 pt-4">
+                  基于 DeepSeek-R1 驱动 · 预计 2-5 秒
                 </p>
               </div>
             </div>
