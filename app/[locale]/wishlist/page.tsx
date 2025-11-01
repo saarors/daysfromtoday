@@ -583,69 +583,66 @@ function WishlistContent({ locale }: { locale: string }) {
         <TopNav locale={locale} />
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
-            {/* AI 匹配信息（Phase 3 新增） */}
-            {matchResult && !goalData.viewOnly && (
-              <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <div className="text-sm text-gray-500 mb-1">目标类型</div>
-                    <div className="font-semibold text-gray-900">
-                      {matchResult.goalType.name}
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">
-                      置信度: {(matchResult.goalType.confidence * 100).toFixed(0)}%
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm text-gray-500 mb-1">难度评估</div>
-                    <div className="font-semibold text-gray-900">
-                      {matchResult.difficulty.level.toUpperCase()}
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">
-                      评分: {matchResult.difficulty.score}/100
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm text-gray-500 mb-1">AI 助手</div>
-                    <div className="font-semibold text-gray-900">
-                      {matchResult.persona.emoji} {matchResult.persona.name}
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">
-                      {matchResult.persona.type}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* AI 对话界面 - ChatGPT 风格 */}
             <div className="space-y-6">
               {/* 用户消息气泡 */}
               <div className="flex justify-end">
-                <div className="max-w-[85%] bg-blue-600 text-white rounded-2xl rounded-tr-sm p-4 shadow-md">
-                  <div className="mb-2">
-                    <p className="text-lg font-medium leading-relaxed whitespace-pre-wrap">
+                <div className="max-w-[85%] bg-blue-50 border border-blue-200 rounded-2xl rounded-tr-sm p-4 shadow-sm">
+                  <div className="mb-3">
+                    <p className="text-lg font-medium leading-relaxed whitespace-pre-wrap text-gray-900">
                       {goalData.goalText}
                     </p>
                   </div>
-                  <div className="flex gap-3 text-sm text-blue-100 opacity-90">
-                    <span>📅 {goalData.targetDate}</span>
-                    <span>⏰ {goalData.days} 天</span>
+                  {/* 标签式日期 */}
+                  <div className="flex flex-wrap gap-2">
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-700 border border-blue-200">
+                      <svg className="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      距今 {goalData.days} 天
+                    </span>
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-700 border border-gray-200">
+                      <svg className="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      达成日期 {goalData.targetDate}
+                    </span>
                   </div>
                 </div>
               </div>
+
+              {/* AI 助手介绍环节 */}
+              {matchResult && !goalData.viewOnly && !isMatching && (
+                <div className="flex justify-center">
+                  <div className="max-w-[90%] bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-2xl p-5 border border-purple-200 shadow-sm">
+                    <p className="text-gray-700 leading-relaxed text-center">
+                      <span className="inline-block mr-2">✨</span>
+                      你的目标很棒！经过分析，我为你匹配了一位
+                      <span className="font-bold text-purple-600 mx-1">【{matchResult.persona.type}】</span>
+                      助手来帮你实现目标，他的名字叫
+                      <span className="font-bold text-purple-600 mx-1">{matchResult.persona.name}</span>
+                      <span className="inline-block ml-2">🎯</span>
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* AI 响应气泡 */}
               <div className="flex justify-start">
                 <div className="max-w-[85%]">
                   {/* AI 头像和名称 */}
-                  <div className="flex items-center gap-2 mb-2 ml-4">
-                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-lg shadow-sm">
+                  <div className="flex items-center gap-3 mb-3 ml-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center text-xl shadow-md border-2 border-white">
                       {matchResult?.persona.emoji || '🤖'}
                     </div>
-                    <span className="text-sm font-medium text-gray-700">
-                      {matchResult?.persona.name || 'AI 助手'}
-                    </span>
+                    <div className="flex flex-col">
+                      <span className="text-base font-semibold text-gray-900">
+                        {matchResult?.persona.name || 'AI 助手'}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        （{matchResult?.persona.type || '助手'}）
+                      </span>
+                    </div>
                   </div>
                   
                   {/* AI 消息内容 */}
