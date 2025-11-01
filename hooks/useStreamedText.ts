@@ -1,16 +1,12 @@
 /**
- * 流式文本渲染 Hook（简化版 - 直接显示）
+ * 流式文本渲染 Hook（简化版 + 节流防闪烁）
  * 
- * 问题诊断：
- * - rAF 队列缓释在实际使用中不工作
- * - sourceText 更新但 displayText 不更新
- * 
- * 新策略：
- * - 流式阶段：直接显示 sourceText（让浏览器原生渲染处理）
- * - 完成阶段：切换到 Markdown 渲染
+ * 策略：
+ * - 流式阶段：节流更新（每 50ms 或累积 30 字符）
+ * - 完成阶段：立即显示完整内容
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface UseStreamedTextOptions {
   sourceText: string;
@@ -24,18 +20,63 @@ export function useStreamedText({
   onComplete,
 }: UseStreamedTextOptions) {
   const [displayText, setDisplayText] = useState('');
+  const lastUpdateRef = useRef(0);
+  const lastLengthRef = useRef(0);
+  const pendingUpdateRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 流式阶段：直接同步 sourceText
+  // 流式阶段：节流更新（防止频闪）
   useEffect(() => {
-    if (isStreaming) {
+    if (!isStreaming) return;
+
+    const now = Date.now();
+    const timeSinceLastUpdate = now - lastUpdateRef.current;
+    const lengthDiff = sourceText.length - lastLengthRef.current;
+
+    // 策略：时间超过 50ms 或累积超过 30 字符时更新
+    const shouldUpdate = timeSinceLastUpdate >= 50 || lengthDiff >= 30;
+
+    if (shouldUpdate) {
+      // 立即更新
       setDisplayText(sourceText);
+      lastUpdateRef.current = now;
+      lastLengthRef.current = sourceText.length;
+      
+      // 清除待处理的延迟更新
+      if (pendingUpdateRef.current) {
+        clearTimeout(pendingUpdateRef.current);
+        pendingUpdateRef.current = null;
+      }
+    } else {
+      // 延迟更新（确保最后的内容也能显示）
+      if (pendingUpdateRef.current) {
+        clearTimeout(pendingUpdateRef.current);
+      }
+      pendingUpdateRef.current = setTimeout(() => {
+        setDisplayText(sourceText);
+        lastUpdateRef.current = Date.now();
+        lastLengthRef.current = sourceText.length;
+        pendingUpdateRef.current = null;
+      }, 50);
     }
+
+    return () => {
+      if (pendingUpdateRef.current) {
+        clearTimeout(pendingUpdateRef.current);
+      }
+    };
   }, [sourceText, isStreaming]);
 
-  // 流式结束：确保显示完整内容并触发回调
+  // 流式结束：立即显示完整内容
   useEffect(() => {
     if (!isStreaming && sourceText) {
+      // 清除待处理的更新
+      if (pendingUpdateRef.current) {
+        clearTimeout(pendingUpdateRef.current);
+        pendingUpdateRef.current = null;
+      }
+      
       setDisplayText(sourceText);
+      lastLengthRef.current = sourceText.length;
       onComplete?.();
     }
   }, [isStreaming, sourceText, onComplete]);
