@@ -7,6 +7,9 @@
  * 使用 Server-Sent Events (SSE) 返回流式数据
  */
 
+// ✅ 强制使用 Edge Runtime（防止 Node.js 缓冲）
+export const runtime = 'edge';
+
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -329,12 +332,14 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // 返回流式响应
+    // 返回流式响应（关键响应头）
     return new Response(stream, {
       headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive'
+        'Content-Type': 'text/event-stream; charset=utf-8',
+        'Cache-Control': 'no-cache, no-transform',  // ✅ 禁止转换
+        'Connection': 'keep-alive',
+        'Content-Encoding': 'identity',  // ✅ 禁止压缩（关键！）
+        'X-Accel-Buffering': 'no',  // ✅ Nginx 禁止缓冲
       }
     });
 
