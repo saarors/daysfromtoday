@@ -121,18 +121,31 @@ function WishlistContent({ locale }: { locale: string }) {
     daysCount: number,
     targetDate: string
   ) => {
+    // 防止重复调用
+    if (isMatching) {
+      console.log('⚠️ AI 匹配正在进行中，跳过重复调用');
+      return;
+    }
+    
     setIsMatching(true);
     console.log('🚀 开始 AI 匹配...', { goalText, daysCount });
     
     try {
-      // 1. 调用匹配服务
+      // 1. 调用匹配服务（设置超时）
       console.log('⏱️ 调用 matchGoalToAI...');
       const startTime = Date.now();
       
-      const result = await matchGoalToAI({
+      // 添加超时保护（10秒）
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('匹配超时')), 10000)
+      );
+      
+      const matchPromise = matchGoalToAI({
         goalText,
         daysCount
       });
+      
+      const result = await Promise.race([matchPromise, timeoutPromise]) as CompleteAIMatchResult;
       
       const duration = Date.now() - startTime;
       console.log(`✅ AI 匹配完成！耗时: ${duration}ms`);

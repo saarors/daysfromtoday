@@ -67,19 +67,22 @@ function matchKeywords(
 export async function detectGoalType(
   goalText: string
 ): Promise<GoalTypeDetectionResult> {
+  console.log('🔍 [detectGoalType] 开始检测目标类型...');
   const supabase = createClient();
 
   // 1. 检测语言
   const language = detectLanguage(goalText);
+  console.log('🌐 [detectGoalType] 检测到语言:', language);
 
   // 2. 从数据库获取所有活跃的目标类型
+  console.log('📊 [detectGoalType] 查询 goal_types 表...');
   const { data: goalTypes, error } = await supabase
     .from('goal_types')
     .select('code, name_zh, name_en, keywords_zh, keywords_en, default_persona_code, characteristics')
     .eq('is_active', true);
 
   if (error || !goalTypes || goalTypes.length === 0) {
-    console.error('❌ 无法获取目标类型数据:', error);
+    console.error('❌ [detectGoalType] 无法获取目标类型数据:', error);
     // 返回默认的 'general' 类型
     return {
       goalTypeCode: 'life',
@@ -89,6 +92,8 @@ export async function detectGoalType(
       defaultPersonaCode: 'companion'
     };
   }
+  
+  console.log(`✅ [detectGoalType] 获取到 ${goalTypes.length} 个目标类型`);
 
   // 3. 对每个目标类型进行关键词匹配
   const results: Array<{
@@ -120,6 +125,8 @@ export async function detectGoalType(
   // 5. 选择得分最高的类型
   results.sort((a, b) => b.score - a.score);
   const bestMatch = results[0];
+  
+  console.log(`✅ [detectGoalType] 匹配完成: ${bestMatch.type.code} (置信度: ${(bestMatch.score * 100).toFixed(0)}%)`);
 
   return {
     goalTypeCode: bestMatch.type.code,
