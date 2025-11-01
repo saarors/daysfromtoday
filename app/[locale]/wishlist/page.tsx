@@ -10,7 +10,7 @@
  * - 调用真实 DeepSeek API
  */
 
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import TopNav from '@/components/TopNav';
 import { EmptyWishlist } from '@/components/v3/Wishlist/EmptyWishlist';
@@ -322,7 +322,7 @@ function WishlistContent({ locale }: { locale: string }) {
   };
 
   /**
-   * 调用 DeepSeek API 生成 AI 建议（流式输出）
+   * 调用 DeepSeek API 生成 AI 建议（流式输出，优化版：减少频闪）
    */
   const generateAIResponse = async (
     goalText: string,
@@ -366,10 +366,35 @@ function WishlistContent({ locale }: { locale: string }) {
       let buffer = '';
       let thinkingBuffer = '';
       let contentBuffer = '';
+      
+      // 使用 requestAnimationFrame 批量更新，减少重绘
+      let rafId: number | null = null;
+      let pendingThinkingUpdate = false;
+      let pendingContentUpdate = false;
+
+      const scheduleUpdate = () => {
+        if (rafId !== null) return; // 已有待处理的更新
+        
+        rafId = requestAnimationFrame(() => {
+          if (pendingThinkingUpdate) {
+            setAiThinking(thinkingBuffer);
+            pendingThinkingUpdate = false;
+          }
+          if (pendingContentUpdate) {
+            setAiResponse(contentBuffer);
+            pendingContentUpdate = false;
+          }
+          rafId = null;
+        });
+      };
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) {
+          // 确保最后一次更新
+          if (rafId !== null) cancelAnimationFrame(rafId);
+          setAiThinking(thinkingBuffer);
+          setAiResponse(contentBuffer);
           console.log('✅ 流读取完成');
           break;
         }
@@ -385,18 +410,17 @@ function WishlistContent({ locale }: { locale: string }) {
             try {
               const data = JSON.parse(dataStr);
               
-              console.log('📦 收到数据:', data.type, data.delta?.substring(0, 20));
-              
               if (data.type === 'thinking') {
                 // 思考过程
                 thinkingBuffer += data.delta;
-                setAiThinking(thinkingBuffer);
+                pendingThinkingUpdate = true;
+                scheduleUpdate();
               } else if (data.type === 'content') {
                 // 主要内容
                 contentBuffer += data.delta;
-                setAiResponse(contentBuffer);
+                pendingContentUpdate = true;
+                scheduleUpdate();
               } else if (data.type === 'done') {
-                // 完成
                 console.log('✅ 收到完成信号');
               }
             } catch (e) {
@@ -779,7 +803,7 @@ function WishlistContent({ locale }: { locale: string }) {
                   </div>
                   
                   {/* AI 消息内容 */}
-                  <div className="bg-white rounded-2xl rounded-tl-sm p-5 shadow-md border border-gray-100">
+                  <div className="bg-white rounded-2xl rounded-tl-sm p-5 shadow-md border border-gray-100 will-change-contents">
                     {/* 思考过程（可展开/收起）*/}
                     {aiThinking && (
                       <details className="mb-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
@@ -799,7 +823,7 @@ function WishlistContent({ locale }: { locale: string }) {
                     
                     {/* AI 建议内容 */}
                     {aiResponse ? (
-                      <div className="prose prose-blue max-w-none markdown-content">
+                      <div className="prose prose-blue max-w-none markdown-content min-h-[100px]">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {aiResponse}
                         </ReactMarkdown>
@@ -809,7 +833,7 @@ function WishlistContent({ locale }: { locale: string }) {
                         )}
                       </div>
                     ) : isGenerating ? (
-                      <div className="flex items-center gap-3 text-gray-600">
+                      <div className="flex items-center gap-3 text-gray-600 min-h-[100px]">
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
                         <span>正在思考和生成建议...</span>
                       </div>
