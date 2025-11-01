@@ -13,11 +13,10 @@ interface StreamingTextProps {
 /**
  * 优化的流式文本组件
  * 
- * 核心优化：
- * 1. 使用 memo 防止父组件更新时重渲染
- * 2. 流式阶段使用纯文本（快速渲染）
- * 3. 完成后使用 Markdown（格式化显示）
- * 4. 使用 transform: translateZ(0) 开启 GPU 加速
+ * 核心策略：
+ * 1. 流式阶段和完成阶段都使用纯文本显示
+ * 2. 避免频繁的 Markdown 解析
+ * 3. 使用 CSS 隔离渲染
  */
 export const StreamingText = memo(function StreamingText({ 
   content, 
@@ -31,36 +30,16 @@ export const StreamingText = memo(function StreamingText({
 
   return (
     <div 
-      className={`${className} transform-gpu`}
+      className={`${className}`}
       style={{
-        // GPU 加速，减少重绘
-        transform: 'translateZ(0)',
-        // 防止布局抖动
-        willChange: 'auto',
+        // 使用 contain 隔离布局计算
+        contain: 'layout',
       }}
     >
       {isStreaming ? (
-        // 流式阶段：纯文本显示
-        <div 
-          className="text-gray-700 leading-relaxed"
-          style={{
-            // 使用 contain 属性隔离渲染
-            contain: 'layout style paint',
-            // 固定内容区域
-            contentVisibility: 'auto',
-          }}
-        >
-          <div 
-            className="whitespace-pre-wrap font-sans"
-            dangerouslySetInnerHTML={{ 
-              __html: content
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/\n/g, '<br/>')
-            }}
-          />
-          {/* 光标 */}
+        // 流式阶段：纯文本显示，保持 Markdown 语法可见
+        <div className="text-gray-700 leading-relaxed font-sans whitespace-pre-wrap">
+          {content}
           <span className="inline-block w-0.5 h-4 bg-blue-600 ml-1 animate-pulse" />
         </div>
       ) : (
@@ -74,7 +53,7 @@ export const StreamingText = memo(function StreamingText({
     </div>
   );
 }, (prevProps, nextProps) => {
-  // 自定义比较函数：只有在内容或状态真正改变时才重渲染
+  // 只在内容或状态改变时重渲染
   return prevProps.content === nextProps.content && 
          prevProps.isStreaming === nextProps.isStreaming;
 });

@@ -368,12 +368,12 @@ function WishlistContent({ locale }: { locale: string }) {
       let thinkingBuffer = '';
       let contentBuffer = '';
       
-      // 流式渲染策略：纯文本 + 适度节流
-      // 因为不再解析 Markdown，可以更频繁地更新
+      // 流式渲染策略：大缓冲区 + 低频更新
+      // 核心：减少 React 渲染次数，彻底消除频闪
       let thinkingChunkBuffer = '';
       let contentChunkBuffer = '';
-      const CHUNK_SIZE = 20; // 每 20 个字符更新（约 1 个词组）
-      const UPDATE_INTERVAL = 50; // 最小间隔 50ms（约 20 次/秒，流畅但不频繁）
+      const CHUNK_SIZE = 150; // 每 150 个字符更新（约一句话）
+      const UPDATE_INTERVAL = 200; // 最小间隔 200ms（5 次/秒）
       let lastUpdateTime = 0;
 
       const flushUpdate = (force = false) => {
