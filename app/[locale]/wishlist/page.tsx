@@ -682,9 +682,9 @@ function WishlistContent({ locale }: { locale: string }) {
                   </div>
                 </div>
               </div>
-                    
-                    {/* Markdown 表格样式 */}
-                    <style jsx>{`
+
+              {/* Markdown 表格样式 */}
+              <style jsx>{`
                       .markdown-content :global(table) {
                         width: 100%;
                         border-collapse: collapse;
@@ -761,10 +761,7 @@ function WishlistContent({ locale }: { locale: string }) {
                         color: #6b7280;
                         font-style: italic;
                       }
-                    `}</style>
-                  </>
-                )}
-              </div>
+              `}</style>
             </div>
 
             {/* 完成按钮 - 独立在对话框外 */}
