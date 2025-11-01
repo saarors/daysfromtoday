@@ -322,7 +322,7 @@ function WishlistContent({ locale }: { locale: string }) {
   };
 
   /**
-   * 调用 DeepSeek API 生成 AI 建议
+   * 调用 DeepSeek API 生成 AI 建议（流式输出）
    */
   const generateAIResponse = async (
     goalText: string,
@@ -331,9 +331,11 @@ function WishlistContent({ locale }: { locale: string }) {
     matchResult: CompleteAIMatchResult | null
   ) => {
     setIsGenerating(true);
+    setAiThinking(''); // 清空思考过程
+    setAiResponse(''); // 清空回复内容
 
     try {
-      const response = await fetch('/api/ai/chat', {
+      const response = await fetch('/api/ai/chat/stream', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -353,32 +355,61 @@ function WishlistContent({ locale }: { locale: string }) {
         throw new Error('API 调用失败');
       }
 
-      const data = await response.json();
-      
-      console.log('📦 API 响应数据:', {
-        hasAnalysis: !!data.analysis,
-        hasThinking: !!data.thinking,
-        hasSummary: !!data.summary,
-        thinking: data.thinking,
-        thinkingLength: data.thinking?.length || 0,
-        model: data.model
-      });
-      
-      setAiResponse(data.analysis);
-      setAiThinking(data.thinking); // 保存思考过程
-      
+      // 读取流式响应
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error('无法读取响应流');
+      }
+
+      let buffer = '';
+      let thinkingBuffer = '';
+      let contentBuffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        // 解码数据块
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const dataStr = line.slice(6);
+            try {
+              const data = JSON.parse(dataStr);
+              
+              if (data.type === 'thinking') {
+                // 思考过程
+                thinkingBuffer += data.delta;
+                setAiThinking(thinkingBuffer);
+              } else if (data.type === 'content') {
+                // 主要内容
+                contentBuffer += data.delta;
+                setAiResponse(contentBuffer);
+              } else if (data.type === 'done') {
+                // 完成
+                console.log('✅ 流式输出完成');
+                setIsGenerating(false);
+              }
+            } catch (e) {
+              console.error('解析 SSE 数据失败:', e);
+            }
+          }
+        }
+      }
+
       console.log('✅ AI 生成完成:', {
-        tokensUsed: data.tokensUsed,
-        model: data.model,
-        hasThinking: !!data.thinking,
-        thinkingLength: data.thinking?.length || 0
+        thinkingLength: thinkingBuffer.length,
+        contentLength: contentBuffer.length
       });
 
     } catch (error) {
       console.error('❌ AI 生成失败:', error);
-      // 显示错误信息
       setAiResponse('抱歉，AI 服务暂时不可用。请稍后再试。');
-    } finally {
       setIsGenerating(false);
     }
   };
