@@ -76,6 +76,15 @@ function WishlistContent({ locale }: { locale: string }) {
     const cardId = searchParams.get('cardId');
 
     if (days && targetDate && goalText) {
+      // 🔥 防止重复触发：如果已经有 goalData 且内容相同，跳过
+      if (goalData && 
+          goalData.goalText === goalText && 
+          goalData.targetDate === targetDate && 
+          goalData.days === parseInt(days)) {
+        console.log('⚠️ 检测到相同的 goalData，跳过重复处理');
+        return;
+      }
+
       let existingAnalysis: string | undefined;
       
       // 如果是查看模式，从卡片中读取已有的 AI 分析
@@ -101,6 +110,17 @@ function WishlistContent({ locale }: { locale: string }) {
       } else {
         setShowChat(true);
         setAiResponse(existingAnalysis || '');
+      }
+    } else if (!days && !targetDate && !goalText) {
+      // 🔥 如果 URL 参数为空，确保清空所有状态
+      if (goalData !== null) {
+        console.log('✅ URL 参数为空，清空所有目标相关状态');
+        setGoalData(null);
+        setMatchResult(null);
+        setIsMatching(false);
+        setIsGenerating(false);
+        setAiResponse(null);
+        setShowChat(false);
       }
     }
 
@@ -316,23 +336,30 @@ function WishlistContent({ locale }: { locale: string }) {
 
       console.log('✅ Save complete, resetting state...');
       console.log('📊 当前卡片数量:', cards.length);
-      console.log('🔄 准备跳转到:', `/${locale}/wishlist`);
+      console.log('🔄 准备清空状态并刷新页面...');
 
-      // 延迟重置状态，确保所有异步操作完成
+      // 🔥 关键修复：立即清空所有匹配状态和 goalData
+      setGoalData(null);
+      setMatchResult(null);
+      setIsMatching(false);
+      setIsGenerating(false);
+      setAiResponse(null);
+      savingRef.current = false;
+      setIsSaving(false);
+
+      // 刷新卡片列表
+      const latestCards = useGoalCards.getState().getAllCardsSortedByDate();
+      console.log('📋 最新卡片数量:', latestCards.length);
+      setWishCards(latestCards);
+
+      // 🔥 使用 window.history.replaceState 强制清除 URL 参数
+      console.log('🚀 强制清除 URL 参数并刷新...');
+      window.history.replaceState({}, '', `/${locale}/wishlist`);
+      
+      // 短暂延迟后，再次确保状态已重置
       setTimeout(() => {
-        console.log('⏰ setTimeout 执行');
-        savingRef.current = false;
-        setIsSaving(false);
-        
-        // 刷新卡片列表
-        const latestCards = useGoalCards.getState().getAllCardsSortedByDate();
-        console.log('📋 最新卡片数量:', latestCards.length);
-        setWishCards(latestCards);
-        
-        // 跳转回清单页面（使用 replace 避免返回到匹配页面）
-        console.log('🚀 执行跳转...');
-        router.replace(`/${locale}/wishlist`);
-      }, 500);
+        console.log('✅ 状态重置完成，页面已就绪');
+      }, 100);
 
     } catch (error) {
       console.error('❌ 保存失败:', error);
