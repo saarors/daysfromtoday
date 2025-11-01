@@ -781,16 +781,17 @@ function WishlistContent({ locale }: { locale: string }) {
       <TopNav locale={locale} />
       
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          我的愿望清单
-        </h1>
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">
+            我的愿望清单
+          </h1>
 
-        {wishCards.length === 0 ? (
-          <EmptyWishlist locale={locale} />
-        ) : (
-          <div className="space-y-6">
-            {wishCards.map((card) => (
-              <WishCard
+          {wishCards.length === 0 ? (
+            <EmptyWishlist locale={locale} />
+          ) : (
+            <div className="space-y-6">
+              {wishCards.map((card) => (
+                <WishCard
                 key={card.id}
                 id={card.id}
                 goalText={card.content.goalText}
@@ -805,9 +806,10 @@ function WishlistContent({ locale }: { locale: string }) {
                 onDelete={handleDeleteCard}
                 locale={locale}
               />
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
