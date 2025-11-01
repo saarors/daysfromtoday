@@ -341,7 +341,7 @@ function MarkdownPanel({
       <p className="text-sm text-slate-500 mb-4">
         流式阶段不解析 Markdown，结束后一次性渲染，避免频繁重排。
       </p>
-      <div className="prose prose-slate max-w-none">
+      <div className="markdown-content">
         {isStreaming ? (
           <p className="text-slate-400">流式阶段进行中，等待完成后展示 Markdown...</p>
         ) : content ? (
@@ -350,6 +350,104 @@ function MarkdownPanel({
           <p className="text-slate-400">暂无内容</p>
         )}
       </div>
+      <style jsx>{`
+        .markdown-content {
+          @apply max-w-none text-slate-900;
+        }
+
+        .markdown-content :global(h1) {
+          @apply text-2xl font-bold text-slate-900 mt-6 mb-4;
+        }
+
+        .markdown-content :global(h2) {
+          @apply text-xl font-bold text-slate-900 mt-5 mb-3;
+        }
+
+        .markdown-content :global(h3) {
+          @apply text-lg font-semibold text-slate-900 mt-4 mb-2;
+        }
+
+        .markdown-content :global(h4) {
+          @apply text-base font-semibold text-slate-900 mt-3 mb-2;
+        }
+
+        .markdown-content :global(p) {
+          @apply text-slate-700 leading-7 mb-4;
+        }
+
+        .markdown-content :global(strong) {
+          @apply font-bold text-slate-900;
+        }
+
+        .markdown-content :global(em) {
+          @apply italic text-slate-800;
+        }
+
+        .markdown-content :global(code) {
+          @apply bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded text-sm font-mono;
+        }
+
+        .markdown-content :global(pre) {
+          @apply bg-slate-900 text-slate-100 rounded-lg p-4 overflow-x-auto mb-4;
+        }
+
+        .markdown-content :global(pre code) {
+          @apply bg-transparent text-slate-100 p-0;
+        }
+
+        .markdown-content :global(ul) {
+          @apply list-disc list-outside ml-6 mb-4 space-y-2;
+        }
+
+        .markdown-content :global(ol) {
+          @apply list-decimal list-outside ml-6 mb-4 space-y-2;
+        }
+
+        .markdown-content :global(li) {
+          @apply text-slate-700 leading-7;
+        }
+
+        .markdown-content :global(li > p) {
+          @apply mb-2;
+        }
+
+        .markdown-content :global(blockquote) {
+          @apply border-l-4 border-blue-500 pl-4 py-2 my-4 bg-blue-50 text-slate-700 italic;
+        }
+
+        .markdown-content :global(hr) {
+          @apply border-slate-300 my-6;
+        }
+
+        .markdown-content :global(a) {
+          @apply text-blue-600 hover:text-blue-700 underline;
+        }
+
+        /* 表格样式 - 关键 */
+        .markdown-content :global(table) {
+          @apply w-full border-collapse border border-slate-300 my-6 text-sm;
+        }
+
+        .markdown-content :global(thead) {
+          @apply bg-slate-100;
+        }
+
+        .markdown-content :global(th) {
+          @apply border border-slate-300 px-4 py-2 text-left font-semibold text-slate-900;
+        }
+
+        .markdown-content :global(td) {
+          @apply border border-slate-300 px-4 py-2 text-slate-700;
+        }
+
+        .markdown-content :global(tbody tr:nth-child(even)) {
+          @apply bg-slate-50;
+        }
+
+        .markdown-content :global(tbody tr:hover) {
+          @apply bg-blue-50;
+        }
+      `}</style>
     </section>
   );
 }
