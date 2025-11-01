@@ -40,8 +40,9 @@ const PUBLIC_PATHS = [
 ];
 
 // 受保护路径（必须登录才能访问）
+// Phase 3.5: 暂时允许匿名访问愿望清单（用于测试）
 const PROTECTED_PATHS = [
-  '/wishlist',       // 愿望清单
+  // '/wishlist',       // 愿望清单（暂时关闭保护）
 ];
 
 /**

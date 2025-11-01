@@ -1,13 +1,13 @@
 'use client';
 
 /**
- * 日期+目标大输入框组件（V3优化版）
- * 更紧凑的布局，AI助手集成到输入框内
+ * 日期+目标大输入框组件（V3优化版 + Phase 3.5）
+ * - 更紧凑的布局
+ * - Phase 3.5: 移除 AI 助手手动选择（改为自动智能匹配）
  */
 
 import { useState, useEffect } from 'react';
 import { QuickDateSelector } from './QuickDateSelector';
-import { getAssistant } from '@/lib/ai-assistants';
 import type { AIAssistantType } from '@/types/ai-assistant';
 
 interface DateGoalInputProps {
@@ -39,7 +39,6 @@ export function DateGoalInput({
   const [inputMode, setInputMode] = useState<'days' | 'date'>('days');
   const [daysError, setDaysError] = useState('');
   const [dateError, setDateError] = useState('');
-  const [showAssistantDropdown, setShowAssistantDropdown] = useState(false);
 
   const text = {
     en: {
@@ -147,9 +146,6 @@ export function DateGoalInput({
   const remainingChars = MAX_GOAL_LENGTH - goalText.length;
   const isOverLimit = remainingChars < 0;
 
-  const assistants = ['twinkle', 'labubu', 'jobs'] as AIAssistantType[];
-  const currentAssistant = getAssistant(selectedAssistant);
-
   return (
     <div className="w-full space-y-4 p-6 bg-white rounded-xl shadow-md border border-gray-200">
       {/* 快速选择 */}
@@ -208,7 +204,7 @@ export function DateGoalInput({
         </p>
       )}
 
-      {/* 目标输入大文本框 + AI 助手选择器（左下角） */}
+      {/* 目标输入大文本框（Phase 3.5: AI 助手已改为自动匹配，移除手动选择） */}
       <div className="relative">
         <textarea
           value={goalText}
@@ -224,62 +220,6 @@ export function DateGoalInput({
               : 'border-gray-300 focus:border-blue-500'}
           `}
         />
-        
-        {/* 左下角：AI 助手下拉选择器 */}
-        <div className="absolute bottom-3 left-3">
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowAssistantDropdown(!showAssistantDropdown)}
-              className="
-                flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 
-                rounded-lg text-sm font-medium text-gray-700 transition-colors
-                border border-gray-300
-              "
-            >
-              <span>{currentAssistant.emoji}</span>
-              <span>{currentAssistant.name}</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
-            {/* 下拉菜单 */}
-            {showAssistantDropdown && (
-              <div className="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-10">
-                {assistants.map((id) => {
-                  const assistant = getAssistant(id);
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedAssistant(id);
-                        setShowAssistantDropdown(false);
-                      }}
-                      className={`
-                        w-full flex items-center gap-3 px-4 py-2 text-left text-sm
-                        hover:bg-blue-50 transition-colors
-                        ${selectedAssistant === id ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'}
-                      `}
-                    >
-                      <span className="text-xl">{assistant.emoji}</span>
-                      <div className="flex-1">
-                        <div className="font-medium">{assistant.name}</div>
-                        <div className="text-xs text-gray-500">{assistant.description[locale as 'en' | 'zh']}</div>
-                      </div>
-                      {selectedAssistant === id && (
-                        <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* 右下角：字数统计 */}
         <div className={`
