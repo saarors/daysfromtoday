@@ -9,6 +9,8 @@
 
 // ✅ 强制使用 Edge Runtime（防止 Node.js 缓冲）
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
