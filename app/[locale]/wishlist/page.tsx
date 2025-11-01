@@ -368,11 +368,11 @@ function WishlistContent({ locale }: { locale: string }) {
       let thinkingBuffer = '';
       let contentBuffer = '';
       
-      // 流式渲染策略：适度节流更新
+      // 流式渲染策略：适度节流 + 渐显动画
       let thinkingChunkBuffer = '';
       let contentChunkBuffer = '';
-      const CHUNK_SIZE = 30; // 每 30 个字符更新一次
-      const UPDATE_INTERVAL = 100; // 最小间隔 100ms
+      const CHUNK_SIZE = 15; // 每 15 个字符更新一次（更频繁）
+      const UPDATE_INTERVAL = 60; // 最小间隔 60ms（约 16 次/秒）
       let lastUpdateTime = 0;
 
       const flushUpdate = (force = false) => {
