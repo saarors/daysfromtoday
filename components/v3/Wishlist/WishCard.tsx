@@ -1,8 +1,15 @@
 'use client';
 
 /**
- * 愿望卡片组件 - 单行大卡片版本
- * 显示完整的用户输入和 AI 分析
+ * 愿望卡片组件 - 卡片式展示版本
+ * 保持原有的卡片式布局,优化数据展现和视觉效果
+ * 
+ * 核心功能:
+ * - 显示目标日期和设定时间
+ * - 显示距今天数
+ * - 显示用户原始输入
+ * - 显示匹配的AI助手及其建议
+ * - 支持查看详情(跳转chat页面)
  */
 
 import { useState } from 'react';
@@ -41,27 +48,22 @@ export function WishCard({
   onDelete,
   locale,
 }: WishCardProps) {
-  const [showFullContent, setShowFullContent] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false); // AI 建议展开状态
   const router = useRouter();
   const currentAssistant = getAssistant(assistant);
 
   const text = {
     en: {
-      targetDate: 'Target',
-      createdDate: 'Created',
+      targetDate: 'Target Date',
+      createdDate: 'Created On',
       remaining: 'Remaining',
       elapsed: 'Elapsed',
       days: 'days',
       workingDays: 'working days',
+      userGoal: 'Your Goal',
       aiSuggestion: '\'s Analysis & Suggestions',
       viewDetail: 'View Details',
       delete: 'Delete',
       confirmDelete: 'Are you sure you want to delete this wish? This action cannot be undone.',
-      cancel: 'Cancel',
-      confirm: 'Delete',
-      expand: 'Show More',
-      collapse: 'Show Less',
     },
     zh: {
       targetDate: '目标日期',
@@ -70,25 +72,21 @@ export function WishCard({
       elapsed: '已过',
       days: '天',
       workingDays: '工作日',
+      userGoal: '你的目标',
       aiSuggestion: '的分析与建议',
       viewDetail: '查看详情',
       delete: '删除',
       confirmDelete: '确定要删除这个愿望吗？此操作无法撤销。',
-      cancel: '取消',
-      confirm: '删除',
-      expand: '展开全部',
-      collapse: '收起',
     },
   };
 
   const t = text[locale as keyof typeof text] || text.en;
 
-  // 计算已过天数（添加防御性检查）
+  // 计算已过天数
   const today = new Date();
-  const target = new Date(targetDate);
   const created = new Date(createdAt);
   const elapsedDays = Math.floor((today.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
-  const safeDays = days || 0; // 防止 undefined 导致 NaN
+  const safeDays = days || 0;
   const remainingDays = Math.max(0, safeDays - elapsedDays);
   
   // 格式化创建日期
@@ -99,14 +97,13 @@ export function WishCard({
   });
 
   const handleViewDetail = () => {
-    // 跳转回对话页面，传递完整数据
     const params = new URLSearchParams({
       days: days.toString(),
       targetDate,
       goalText,
       assistant,
-      viewOnly: 'true',  // 标记为查看模式
-      cardId: id,  // 传递卡片 ID
+      viewOnly: 'true',
+      cardId: id,
     });
     router.push(`/${locale}/wishlist?${params.toString()}`);
   };
@@ -129,19 +126,21 @@ export function WishCard({
               <div className="text-xl font-bold text-gray-900">{targetDate}</div>
             </div>
             <div className="text-right">
-              <div className="text-sm text-gray-500">
-                {t.remaining} <span className="text-2xl font-bold text-blue-600">{remainingDays}</span> {t.days}
-                <span className="text-gray-400 ml-2">·</span>
-                <span className="text-gray-400 ml-2">{t.elapsed} {elapsedDays} {t.days}</span>
-              </div>
+              <div className="text-sm text-gray-500 mb-1">{t.remaining}</div>
+              <div className="text-2xl font-bold text-blue-600">{remainingDays} {t.days}</div>
             </div>
           </div>
           
-          {/* 第二行：设定时间 */}
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <span>📅</span>
-            <span>{t.createdDate}:</span>
-            <span className="text-gray-700 font-medium">{formattedCreatedDate}</span>
+          {/* 第二行：设定时间和已过天数 */}
+          <div className="flex items-center justify-between text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <span>📅</span>
+              <span>{t.createdDate}:</span>
+              <span className="text-gray-700 font-medium">{formattedCreatedDate}</span>
+            </div>
+            <div>
+              <span>{t.elapsed} {elapsedDays} {t.days}</span>
+            </div>
           </div>
         </div>
 
@@ -149,7 +148,7 @@ export function WishCard({
         <div>
           <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
             <span className="text-lg">🎯</span>
-            {locale === 'zh' ? '你的目标' : 'Your Goal'}
+            {t.userGoal}
           </h3>
           <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
             <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
@@ -158,7 +157,7 @@ export function WishCard({
           </div>
         </div>
 
-        {/* AI 分析与建议 */}
+        {/* AI 分析与建议 - 预览版本(不展开) */}
         <div>
           <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
             <span 
@@ -170,63 +169,26 @@ export function WishCard({
             {currentAssistant.name}{t.aiSuggestion}
           </h3>
           <div className="bg-blue-50 rounded-lg border border-blue-100 overflow-hidden">
-            {/* AI 建议内容区域 - 带折叠 */}
-            <div 
-              className={`p-4 transition-all duration-300 ease-in-out ${
-                isExpanded ? 'max-h-none' : 'max-h-[200px] overflow-hidden relative'
-              }`}
-            >
+            {/* AI 建议内容区域 - 增加高度预览 */}
+            <div className="p-4 max-h-[300px] overflow-hidden relative">
               <div className="prose prose-sm max-w-none text-gray-800 leading-relaxed">
                 <ReactMarkdown 
                   remarkPlugins={[remarkGfm]}
                   components={{
-                    h3: ({node, ...props}) => <h3 className="text-base font-bold text-gray-900 mt-3 mb-2" {...props} />,
-                    p: ({node, ...props}) => <p className="mb-2 text-gray-800" {...props} />,
+                    h2: ({node, ...props}) => <h2 className="text-base font-bold text-gray-900 mt-2 mb-1" {...props} />,
+                    h3: ({node, ...props}) => <h3 className="text-sm font-semibold text-gray-900 mt-2 mb-1" {...props} />,
+                    p: ({node, ...props}) => <p className="mb-2 text-sm text-gray-800" {...props} />,
                     strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />,
-                    ul: ({node, ...props}) => <ul className="list-disc list-inside mb-2 space-y-1" {...props} />,
-                    ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-2 space-y-1" {...props} />,
-                    table: ({node, ...props}) => (
-                      <div className="overflow-x-auto my-3">
-                        <table className="min-w-full border-collapse border border-gray-300 text-sm" {...props} />
-                      </div>
-                    ),
-                    thead: ({node, ...props}) => <thead className="bg-gray-100" {...props} />,
-                    th: ({node, ...props}) => <th className="border border-gray-300 px-3 py-2 text-left font-semibold" {...props} />,
-                    td: ({node, ...props}) => <td className="border border-gray-300 px-3 py-2" {...props} />,
+                    ul: ({node, ...props}) => <ul className="list-disc list-inside mb-2 space-y-1 text-sm" {...props} />,
+                    ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-2 space-y-1 text-sm" {...props} />,
                   }}
                 >
                   {aiAnalysis}
                 </ReactMarkdown>
               </div>
               
-              {/* 渐变遮罩（仅在折叠状态显示） */}
-              {!isExpanded && (
-                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-blue-50 to-transparent pointer-events-none"></div>
-              )}
-            </div>
-            
-            {/* 展开/收起按钮 */}
-            <div className="border-t border-blue-100 px-4 py-2 bg-blue-50/50">
-              <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors flex items-center gap-1"
-              >
-                {isExpanded ? (
-                  <>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                    </svg>
-                    {t.collapse}
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                    {t.expand}
-                  </>
-                )}
-              </button>
+              {/* 渐变遮罩 */}
+              <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-blue-50 to-transparent pointer-events-none"></div>
             </div>
           </div>
         </div>
@@ -249,6 +211,49 @@ export function WishCard({
           )}
         </div>
       </div>
+
+      {/* Markdown样式 - 简化版 */}
+      <style jsx global>{`
+        .prose h2 {
+          font-size: 1rem !important;
+          font-weight: 700 !important;
+          color: #111827 !important;
+          margin-top: 0.5rem !important;
+          margin-bottom: 0.25rem !important;
+        }
+
+        .prose h3 {
+          font-size: 0.875rem !important;
+          font-weight: 600 !important;
+          color: #374151 !important;
+          margin-top: 0.5rem !important;
+          margin-bottom: 0.25rem !important;
+        }
+
+        .prose p {
+          margin-bottom: 0.5rem !important;
+          line-height: 1.6 !important;
+          color: #4b5563 !important;
+          font-size: 0.875rem !important;
+        }
+
+        .prose ul, .prose ol {
+          margin-bottom: 0.5rem !important;
+          padding-left: 1.5rem !important;
+        }
+
+        .prose li {
+          margin-bottom: 0.25rem !important;
+          line-height: 1.6 !important;
+          color: #4b5563 !important;
+          font-size: 0.875rem !important;
+        }
+
+        .prose strong {
+          font-weight: 700 !important;
+          color: #111827 !important;
+        }
+      `}</style>
     </div>
   );
 }

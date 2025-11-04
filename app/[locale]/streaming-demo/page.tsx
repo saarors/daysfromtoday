@@ -13,6 +13,12 @@ export default function StreamingDemoPage() {
   const params = useParams();
   const locale = typeof params?.locale === 'string' ? params.locale : 'en';
   const streaming = useStreamingBuffer();
+  const [mounted, setMounted] = useState(false);
+
+  // 避免 hydration 错误:只在客户端渲染
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const controllerRef = useRef<AbortController | null>(null);
   const insideThinkingRef = useRef(false);
   const pendingTextRef = useRef('');
@@ -202,20 +208,17 @@ export default function StreamingDemoPage() {
         pendingTextRef.current = '';
       }
       
-      // 再调用 finishStreaming，确保所有 pending chunks 都被 flush
+      // 调用 finishStreaming，确保所有 pending chunks 都被 flush
       streaming.finishStreaming();
       
-      console.log('[streaming-demo] finishStreaming 后 - streaming.content:', streaming.content.substring(0, 100));
-      console.log('[streaming-demo] finishStreaming 后 - 内容长度:', streaming.content.length);
+      // ✅ 使用 snapshotContent() 立即从 ref 读取最新内容（不依赖 React state）
+      const finalContent = streaming.snapshotContent();
       
-      // 使用 setTimeout 确保 React 状态更新完成后再获取最终内容
-      setTimeout(() => {
-        const finalContent = streaming.content || '';
-        console.log('[streaming-demo] setTimeout 后 - finalContent:', finalContent.substring(0, 100));
-        console.log('[streaming-demo] setTimeout 后 - 最终内容长度:', finalContent.length);
-        setFinalMarkdown(finalContent);
-        setStatus('done');
-      }, 100);
+      console.log('[streaming-demo] finishStreaming 后 - finalContent 长度:', finalContent.length);
+      console.log('[streaming-demo] finalContent 前 200 字符:', finalContent.substring(0, 200));
+      
+      setFinalMarkdown(finalContent);
+      setStatus('done');
     } catch (error: any) {
       if (error?.name === 'AbortError') {
         setStatus('idle');
@@ -228,6 +231,18 @@ export default function StreamingDemoPage() {
       setErrorMessage(error?.message || '流式输出失败');
     }
   };
+
+  // 避免 hydration 错误:等待客户端挂载
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-100">
@@ -315,11 +330,25 @@ function StreamingPanel({
   isStreaming: boolean;
   content: string;
 }) {
-  const textRef = useRef<HTMLPreElement>(null);
+  // 使用 React 状态而不是直接 DOM 操作,避免 hydration 错误
+  const [displayChars, setDisplayChars] = useState<string[]>([]);
+  const prevLengthRef = useRef(0);
 
   useEffect(() => {
-    if (isStreaming && textRef.current) {
-      textRef.current.textContent = content;
+    if (!isStreaming) {
+      setDisplayChars([]);
+      prevLengthRef.current = 0;
+      return;
+    }
+
+    const prevLength = prevLengthRef.current;
+    const newLength = content.length;
+
+    // 只处理新增的字符
+    if (newLength > prevLength) {
+      const newChars = content.slice(prevLength).split('');
+      setDisplayChars(prev => [...prev, ...newChars]);
+      prevLengthRef.current = newLength;
     }
   }, [content, isStreaming]);
 
@@ -329,10 +358,11 @@ function StreamingPanel({
       <p className="text-sm text-slate-500 mb-4">{description}</p>
       <div className="relative rounded-xl border border-slate-200 bg-slate-50 p-4 min-h-[220px]">
         {isStreaming ? (
-          <pre
-            ref={textRef}
-            className="whitespace-pre-wrap text-slate-800 font-sans text-sm leading-6"
-          />
+          <div className="whitespace-pre-wrap text-slate-800 font-sans text-sm leading-6">
+            {displayChars.map((char, i) => (
+              <span key={i} className="fade-in-char">{char}</span>
+            ))}
+          </div>
         ) : (
           <pre className="whitespace-pre-wrap text-slate-800 font-sans text-sm leading-6">
             {content || '（等待生成...）'}
@@ -345,6 +375,24 @@ function StreamingPanel({
           </span>
         )}
       </div>
+      
+      <style jsx>{`
+        :global(.fade-in-char) {
+          display: inline;
+          animation: fadeIn 0.4s ease-in;
+        }
+        
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            filter: blur(1px);
+          }
+          to {
+            opacity: 1;
+            filter: blur(0);
+          }
+        }
+      `}</style>
     </section>
   );
 }
@@ -356,6 +404,28 @@ function ThinkingPanel({
   thinking: string;
   isStreaming: boolean;
 }) {
+  // 使用 React 状态而不是直接 DOM 操作,避免 hydration 错误
+  const [displayChars, setDisplayChars] = useState<string[]>([]);
+  const prevLengthRef = useRef(0);
+
+  useEffect(() => {
+    if (!isStreaming || !thinking) {
+      setDisplayChars([]);
+      prevLengthRef.current = 0;
+      return;
+    }
+
+    const prevLength = prevLengthRef.current;
+    const newLength = thinking.length;
+
+    // 只处理新增的字符
+    if (newLength > prevLength) {
+      const newChars = thinking.slice(prevLength).split('');
+      setDisplayChars(prev => [...prev, ...newChars]);
+      prevLengthRef.current = newLength;
+    }
+  }, [thinking, isStreaming]);
+
   return (
     <section className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 h-full">
       <h2 className="text-lg font-semibold text-slate-900 mb-1">AI 思考链</h2>
@@ -363,16 +433,117 @@ function ThinkingPanel({
         展示模型返回的 <code className="bg-slate-100 px-2 py-0.5 rounded">&lt;think&gt;</code> 内容。
       </p>
       <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 min-h-[220px]">
-        <pre className="whitespace-pre-wrap text-slate-700 font-sans text-sm leading-6">
-          {thinking
-            ? thinking
-            : isStreaming
-            ? 'AI 正在思考中...'
-            : '（暂无思考过程，可能模型未返回 <think> 标签）'}
-        </pre>
+        {isStreaming && thinking ? (
+          <div className="whitespace-pre-wrap text-slate-700 font-sans text-sm leading-6">
+            {displayChars.map((char, i) => (
+              <span key={i} className="fade-in-char-thinking">{char}</span>
+            ))}
+          </div>
+        ) : (
+          <pre className="whitespace-pre-wrap text-slate-700 font-sans text-sm leading-6">
+            {thinking
+              ? thinking
+              : isStreaming
+              ? 'AI 正在思考中...'
+              : '（暂无思考过程，可能模型未返回 <think> 标签）'}
+          </pre>
+        )}
       </div>
+      
+      <style jsx>{`
+        :global(.fade-in-char-thinking) {
+          display: inline;
+          animation: fadeInThinking 0.5s ease-in;
+        }
+        
+        @keyframes fadeInThinking {
+          from {
+            opacity: 0;
+            color: #cbd5e1;
+          }
+          to {
+            opacity: 1;
+            color: #64748b;
+          }
+        }
+      `}</style>
     </section>
   );
+}
+
+/**
+ * 智能表格识别与转换
+ * 将类似 "列1  列2  列3" 的空格分隔文本转换为 Markdown 表格
+ */
+function enhanceMarkdownTables(markdown: string): string {
+  const lines = markdown.split('\n');
+  const result: string[] = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i].trim();
+    
+    // 检测潜在的表格行（包含中文和多个空格分隔）
+    // 如果一行中有2个及以上的连续空格，可能是表格
+    if (line && /\s{2,}/.test(line) && !/^[#\-*>|]/.test(line)) {
+      // 尝试找到连续的类表格行
+      const tableLines: string[] = [line];
+      let j = i + 1;
+      
+      while (j < lines.length) {
+        const nextLine = lines[j].trim();
+        if (nextLine && /\s{2,}/.test(nextLine) && !/^[#\-*>|]/.test(nextLine)) {
+          tableLines.push(nextLine);
+          j++;
+        } else {
+          break;
+        }
+      }
+      
+      // 如果找到了至少2行，转换为表格
+      if (tableLines.length >= 2) {
+        const converted = convertToMarkdownTable(tableLines);
+        result.push(converted);
+        i = j;
+        continue;
+      }
+    }
+    
+    result.push(lines[i]);
+    i++;
+  }
+  
+  return result.join('\n');
+}
+
+/**
+ * 将多行文本转换为 Markdown 表格
+ */
+function convertToMarkdownTable(lines: string[]): string {
+  // 将每行按多个空格分割为列
+  const rows = lines.map(line => 
+    line.split(/\s{2,}/).map(cell => cell.trim()).filter(Boolean)
+  );
+  
+  // 找出最大列数
+  const maxCols = Math.max(...rows.map(r => r.length));
+  
+  // 补齐列数
+  const normalizedRows = rows.map(row => {
+    while (row.length < maxCols) {
+      row.push('');
+    }
+    return row;
+  });
+  
+  // 生成表头分隔行
+  const separator = Array(maxCols).fill('---').join('|');
+  
+  // 生成 Markdown 表格
+  const headerRow = normalizedRows[0].join(' | ');
+  const dataRows = normalizedRows.slice(1).map(row => row.join(' | '));
+  
+  return `\n| ${headerRow} |\n|${separator}|\n${dataRows.map(r => `| ${r} |`).join('\n')}\n`;
 }
 
 function MarkdownPanel({
@@ -382,21 +553,147 @@ function MarkdownPanel({
   isStreaming: boolean;
   content: string;
 }) {
+  // 增强 Markdown 内容，自动转换表格
+  const enhancedContent = content ? enhanceMarkdownTables(content) : '';
+  
+  // 调试：输出原始内容和增强后的内容对比
+  useEffect(() => {
+    if (content && !isStreaming) {
+      console.log('\n========== Markdown 内容调试 ==========');
+      console.log('原始内容长度:', content.length);
+      console.log('增强后内容长度:', enhancedContent.length);
+      
+      // 查找包含多个空格的行
+      const linesWithSpaces = content.split('\n').filter(line => /\s{2,}/.test(line));
+      console.log('\n包含多空格的行数:', linesWithSpaces.length);
+      if (linesWithSpaces.length > 0) {
+        console.log('示例行:');
+        linesWithSpaces.slice(0, 5).forEach((line, idx) => {
+          console.log(`  ${idx + 1}. "${line}"`);
+        });
+      }
+      
+      // 检测 Markdown 表格
+      const tableLines = content.split('\n').filter(line => line.trim().startsWith('|'));
+      console.log('\n包含表格标记的行数:', tableLines.length);
+      if (tableLines.length > 0) {
+        console.log('✅ 检测到标准 Markdown 表格!');
+        console.log('表格内容预览:');
+        tableLines.slice(0, 6).forEach((line, idx) => {
+          console.log(`  ${idx + 1}. ${line}`);
+        });
+      }
+      
+      // 显示转换差异
+      if (content !== enhancedContent) {
+        console.log('\n✅ 内容已增强（检测到表格并转换）');
+        console.log('\n增强后内容片段:');
+        const enhancedLines = enhancedContent.split('\n');
+        const tableStart = enhancedLines.findIndex(line => line.startsWith('|'));
+        if (tableStart >= 0) {
+          console.log(enhancedLines.slice(tableStart, tableStart + 5).join('\n'));
+        }
+      } else {
+        console.log('\n⚠️ 内容未增强（未检测到可转换的表格或已是标准格式）');
+      }
+      
+      console.log('\n原始内容完整输出:');
+      console.log(content);
+      
+      // 延迟检查渲染后的 HTML
+      setTimeout(() => {
+        const markdownDiv = document.querySelector('.markdown-content');
+        const tables = markdownDiv?.querySelectorAll('table');
+        console.log('\n========== 渲染结果检查 ==========');
+        console.log('在 DOM 中找到的 <table> 元素数量:', tables?.length || 0);
+        if (tables && tables.length > 0) {
+          console.log('✅ 表格已渲染!');
+          tables.forEach((table, idx) => {
+            console.log(`表格 ${idx + 1}:`, table);
+            console.log('  行数:', table.querySelectorAll('tr').length);
+            console.log('  列数:', table.querySelectorAll('th').length);
+          });
+        } else {
+          console.log('❌ 未找到渲染的表格元素');
+          console.log('markdown-content 的 HTML:', markdownDiv?.innerHTML.substring(0, 500));
+        }
+        console.log('========================================\n');
+      }, 500);
+      
+      console.log('========================================\n');
+    }
+  }, [content, enhancedContent, isStreaming]);
+  
   return (
     <section className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 lg:col-span-2">
       <h2 className="text-lg font-semibold text-slate-900 mb-1">Markdown 渲染（流式结束后）</h2>
       <p className="text-sm text-slate-500 mb-4">
         流式阶段不解析 Markdown，结束后一次性渲染，避免频繁重排。
       </p>
+      
+      {/* 详细调试信息面板 */}
+      {!isStreaming && content && (
+        <details className="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
+          <summary className="cursor-pointer text-sm font-medium text-slate-700 hover:text-blue-600">
+            🔍 详细调试信息（点击展开查看原始内容）
+          </summary>
+          <div className="mt-3 space-y-3 text-xs">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="p-2 bg-white rounded border">
+                <div className="font-semibold text-slate-600 mb-1">原始长度</div>
+                <div className="text-lg font-mono">{content.length} 字符</div>
+              </div>
+              <div className="p-2 bg-white rounded border">
+                <div className="font-semibold text-slate-600 mb-1">增强后长度</div>
+                <div className="text-lg font-mono">{enhancedContent.length} 字符</div>
+              </div>
+              <div className="p-2 bg-white rounded border">
+                <div className="font-semibold text-slate-600 mb-1">多空格行</div>
+                <div className="text-lg font-mono">
+                  {content.split('\n').filter(line => /\s{2,}/.test(line)).length} 行
+                </div>
+              </div>
+              <div className="p-2 bg-white rounded border">
+                <div className="font-semibold text-slate-600 mb-1">内容变化</div>
+                <div className="text-lg font-mono">
+                  {content === enhancedContent ? '❌ 未变化' : '✅ 已增强'}
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <div className="font-semibold mb-1 text-slate-700">原始内容（完整）:</div>
+              <pre className="bg-white p-3 rounded border border-slate-300 overflow-x-auto text-xs max-h-64 overflow-y-auto whitespace-pre-wrap">
+                {content}
+              </pre>
+            </div>
+            
+            {content !== enhancedContent && (
+              <div>
+                <div className="font-semibold mb-1 text-slate-700">增强后内容（完整）:</div>
+                <pre className="bg-white p-3 rounded border border-slate-300 overflow-x-auto text-xs max-h-64 overflow-y-auto whitespace-pre-wrap">
+                  {enhancedContent}
+                </pre>
+              </div>
+            )}
+          </div>
+        </details>
+      )}
+      
       <div className="markdown-content">
         {isStreaming ? (
           <p className="text-slate-400">流式阶段进行中，等待完成后展示 Markdown...</p>
-        ) : content ? (
+        ) : enhancedContent ? (
           <>
-            <div className="mb-4 text-xs text-slate-500 bg-slate-100 p-2 rounded">
-              调试信息：内容长度 {content.length} 字符，前 100 字符: {content.substring(0, 100)}...
-            </div>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+            {/* 检测表格 */}
+            {enhancedContent.includes('|') && (
+              <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
+                <strong>✅ 检测到 Markdown 表格</strong> (包含 | 字符)
+                <br />
+                表格行数: {enhancedContent.split('\n').filter(line => line.includes('|')).length}
+              </div>
+            )}
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{enhancedContent}</ReactMarkdown>
           </>
         ) : (
           <p className="text-slate-400">
@@ -481,27 +778,44 @@ function MarkdownPanel({
 
         /* 表格样式 - 关键 */
         .markdown-content :global(table) {
-          @apply w-full border-collapse border border-slate-300 my-6 text-sm;
+          width: 100%;
+          border-collapse: collapse;
+          border: 1px solid #cbd5e1;
+          margin: 1.5rem 0;
+          font-size: 0.875rem;
+          display: table !important;
+          visibility: visible !important;
         }
 
         .markdown-content :global(thead) {
-          @apply bg-slate-100;
+          background-color: #f1f5f9;
         }
 
         .markdown-content :global(th) {
-          @apply border border-slate-300 px-4 py-2 text-left font-semibold text-slate-900;
+          border: 1px solid #cbd5e1;
+          padding: 0.75rem 1rem;
+          text-align: left;
+          font-weight: 600;
+          color: #0f172a;
+          background-color: #f1f5f9;
         }
 
         .markdown-content :global(td) {
-          @apply border border-slate-300 px-4 py-2 text-slate-700;
+          border: 1px solid #cbd5e1;
+          padding: 0.75rem 1rem;
+          color: #334155;
         }
 
         .markdown-content :global(tbody tr:nth-child(even)) {
-          @apply bg-slate-50;
+          background-color: #f8fafc;
         }
 
         .markdown-content :global(tbody tr:hover) {
-          @apply bg-blue-50;
+          background-color: #dbeafe;
+        }
+        
+        .markdown-content :global(tbody tr) {
+          border-bottom: 1px solid #cbd5e1;
         }
       `}</style>
     </section>

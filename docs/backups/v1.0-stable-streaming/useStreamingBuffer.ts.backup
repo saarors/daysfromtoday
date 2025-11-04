@@ -165,14 +165,13 @@ export function useStreamingBuffer(): StreamingBufferState {
     thinkingBufferRef.current = '';
     contentBufferRef.current = '';
     
-    // 第三步: 立即更新ref(同步),然后更新state(异步)
+    // 第三步: 同步更新state
     thinkingStateRef.current = finalThinking;
     contentStateRef.current = finalContent;
     setThinking(finalThinking);
     setContent(finalContent);
     
     console.log('🏁 finishStreaming 完成');
-    console.log('   ✅ contentStateRef 已同步更新:', contentStateRef.current.length);
     
     // 停止动画
     if (animationTimerRef.current !== null) {

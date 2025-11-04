@@ -22,29 +22,8 @@
  * - 可访问性（WCAG 标准）
  */
 import type { Metadata } from "next";
-import { GoogleAnalytics } from '@next/third-parties/google';
-// Phase 3.5: 临时禁用 next-intl
-// import { NextIntlClientProvider } from 'next-intl';
-// import { getMessages } from 'next-intl/server';
-import { Inter, JetBrains_Mono } from "next/font/google";
-import GATracker from '@/app/ga-tracker';
-// Phase 3.5: 已迁移到纯 Supabase，不再需要 localStorage 同步
-// import { AutoSync } from '@/components/v3/AutoSync';
-import "../globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-  preload: true,
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  display: "swap",
-  preload: true,
-});
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
 
 
 /**
@@ -58,9 +37,9 @@ const jetbrainsMono = JetBrains_Mono({
 export async function generateMetadata({ 
   params 
 }: { 
-  params: { locale: string } 
+  params: Promise<{ locale: string }> 
 }): Promise<Metadata> {
-  const { locale } = params;
+  const { locale } = await params;
   const baseUrl = 'https://www.daysfromtoday.ai';
   
   return {
@@ -106,39 +85,15 @@ export default async function LocaleLayout({
   params
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  // Next.js 14: params 直接使用
-  const { locale } = params;
-  
-  // Phase 3.5: 临时禁用 next-intl，直接加载消息文件
-  // const messages = await getMessages();
-  let messages = {};
-  try {
-    messages = await import(`@/messages/${locale}.json`).then(m => m.default);
-  } catch (error) {
-    console.error(`Failed to load messages for locale: ${locale}`, error);
-  }
-  
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.daysfromtoday.ai';
+  const { locale } = await params;
+  const messages = await getMessages();
   
   return (
-    <>
-      <main id="main-content" role="main">
-        {children}
-      </main>
-
-      {/* Google Analytics（性能监控与用户分析）*/}
-      {process.env.NEXT_PUBLIC_GA_ID && (
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
-      )}
-
-      {/* GA 路由追踪（追踪 SPA 导航）*/}
-      <GATracker />
-
-      {/* Phase 3.5: 已迁移到纯 Supabase，不再需要 localStorage 同步 */}
-      {/* <AutoSync /> */}
-    </>
+    <NextIntlClientProvider messages={messages}>
+      {children}
+    </NextIntlClientProvider>
   );
 }
 
