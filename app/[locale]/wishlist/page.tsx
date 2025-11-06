@@ -305,6 +305,12 @@ function WishlistContent({ locale }: { locale: string }) {
         
         setMatchResult(restoredMatchResult);
         
+        // 🔥 V3.2.1 修复: 恢复动态任务列表
+        if (card.matchingMetadata?.task_list && Array.isArray(card.matchingMetadata.task_list)) {
+          console.log('📋 viewOnly模式(useEffect): 恢复任务列表', card.matchingMetadata.task_list);
+          setDynamicTasks(card.matchingMetadata.task_list);
+        }
+        
         // 🔥 同时设置 viewOnlyContent
         const aiAnalysis = (card.content as any).aiAnalysis;
         if (aiAnalysis) {
