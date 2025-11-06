@@ -221,6 +221,12 @@ function WishlistContent({ locale }: { locale: string }) {
             };
             
             setMatchResult(restoredMatchResult);
+            
+            // V3.1.1: 恢复动态任务列表
+            if (card.matchingMetadata?.task_list && Array.isArray(card.matchingMetadata.task_list)) {
+              console.log('📋 viewOnly模式: 恢复任务列表', card.matchingMetadata.task_list);
+              setDynamicTasks(card.matchingMetadata.task_list);
+            }
           }
         }
         
@@ -232,7 +238,9 @@ function WishlistContent({ locale }: { locale: string }) {
         if (existingAnalysis) {
           console.log('📄 viewOnly模式: 设置静态内容', {
             length: existingAnalysis.length,
-            end: existingAnalysis.slice(-50)
+            end: existingAnalysis.slice(-50),
+            hasThinkTag: existingAnalysis.includes('<think>'),
+            thinkContent: existingAnalysis.match(/<think>([\s\S]*?)<\/think>/)?.[1]?.slice(0, 100)
           });
           setViewOnlyContent(existingAnalysis);
         }
@@ -744,8 +752,15 @@ function WishlistContent({ locale }: { locale: string }) {
     }
 
     // 🔥 直接从流式缓冲区获取内容(不再调用finishStreaming,因为AI生成完成时已经调用过了)
-    // 直接使用 streaming.content 或 streaming.snapshotContent()
-    const aiAnalysis = streaming.content || streaming.snapshotContent();
+    // V3.1.1: 合并 thinking 和 content，保留 <think> 标签
+    const thinkingContent = streaming.thinking || streaming.snapshotThinking();
+    const mainContent = streaming.content || streaming.snapshotContent();
+    
+    // 如果有推理过程，用 <think> 标签包裹并合并
+    const aiAnalysis = thinkingContent 
+      ? `<think>\n${thinkingContent}\n</think>\n\n${mainContent}`
+      : mainContent;
+    
     const aiSummary = ''; // TODO: 从 AI 响应中提取摘要
 
     console.log('🔔 handleChatComplete called', {
@@ -831,7 +846,11 @@ function WishlistContent({ locale }: { locale: string }) {
           ai_summary: aiSummary,
           ai_model_used: 'deepseek-chat',
           input_language: matchResult?.metadata.language || 'zh',
-          matching_metadata: cardData.matchingMetadata
+          matching_metadata: {
+            ...cardData.matchingMetadata,
+            // V3.1.1: 添加动态任务列表
+            task_list: dynamicTasks.length > 0 ? dynamicTasks : null,
+          }
         });
 
       if (insertError) {
@@ -913,10 +932,6 @@ function WishlistContent({ locale }: { locale: string }) {
   };
 
   const handleDeleteCard = async (id: string) => {
-    if (!confirm('确定要删除这个愿望吗？')) {
-      return;
-    }
-
     // Phase 3.5: 直接从 Supabase 删除（不再使用 localStorage）
     const supabase = createClient();
     const { data: { session } } = await supabase.auth.getSession();
@@ -1023,17 +1038,17 @@ function WishlistContent({ locale }: { locale: string }) {
                     {/* AI 消息内容 - 高度自适应 */}
                     <div className="bg-white rounded-2xl rounded-tl-sm shadow-md border border-gray-100">
                       <div className="p-5">
-                        {/* 任务列表 - 常驻显示在顶部(仅非viewOnly模式) */}
-                        {!goalData?.viewOnly && (streaming.isStreaming || streaming.thinking || streaming.snapshotThinking() || streaming.content || streaming.snapshotContent()) && (
+                        {/* 任务列表 - viewOnly 和非 viewOnly 模式都显示 */}
+                        {((goalData?.viewOnly && dynamicTasks.length > 0) || (!goalData?.viewOnly && (streaming.isStreaming || streaming.thinking || streaming.snapshotThinking() || streaming.content || streaming.snapshotContent()))) && (
                           <ThinkingTaskList 
-                            hasContent={!!(streaming.thinking || streaming.content)}
+                            hasContent={!!(streaming.thinking || streaming.content || goalData?.viewOnly)}
                             dynamicTasks={dynamicTasks}
                             isLoading={tasksLoading}
                           />
                         )}
                         
-                        {/* AI 思考过程（折叠显示在任务列表下方）- 仅非viewOnly模式显示 */}
-                        {!goalData?.viewOnly && (streaming.thinking || streaming.snapshotThinking()) && (
+                        {/* AI 思考过程（折叠显示在任务列表下方）- viewOnly 和非 viewOnly 模式都显示 */}
+                        {((goalData?.viewOnly && viewOnlyContent) || (!goalData?.viewOnly && (streaming.thinking || streaming.snapshotThinking()))) && (
                           <div className="bg-purple-50/30 rounded-xl p-4 mb-3 border border-purple-200/50">
                             <div className="flex items-center gap-2 mb-1.5">
                               {/* V3.1 优化: 灯泡图标（建议思路） */}
@@ -1045,7 +1060,10 @@ function WishlistContent({ locale }: { locale: string }) {
                               </span>
                             </div>
                             <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
-                              {streaming.thinking || streaming.snapshotThinking()}
+                              {goalData?.viewOnly 
+                                ? viewOnlyContent.match(/<think>([\s\S]*?)<\/think>/)?.[1]?.trim() || '暂无推理过程'
+                                : (streaming.thinking || streaming.snapshotThinking())
+                              }
                             </div>
                           </div>
                         )}
@@ -1058,7 +1076,7 @@ function WishlistContent({ locale }: { locale: string }) {
                               title=""
                               description=""
                               isStreaming={false}
-                              content={viewOnlyContent}
+                              content={viewOnlyContent.replace(/<think>[\s\S]*?<\/think>\s*/g, '')}
                             />
                           </div>
                         )}

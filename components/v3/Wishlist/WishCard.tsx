@@ -183,7 +183,7 @@ export function WishCard({
                     ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-2 space-y-1 text-sm" {...props} />,
                   }}
                 >
-                  {aiAnalysis}
+                  {aiAnalysis.replace(/<think>[\s\S]*?<\/think>\s*/g, '')}
                 </ReactMarkdown>
               </div>
               
