@@ -14,6 +14,7 @@
     "diagnose": "bash scripts/diagnose.sh",
     "fix": "bash scripts/fix-common-issues.sh",
     "reset": "bash scripts/full-reset.sh",
+    "restart": "bash scripts/restart-dev.sh",
     "build": "contentlayer build && next build",
     "start": "next start",
     "lint": "eslint",

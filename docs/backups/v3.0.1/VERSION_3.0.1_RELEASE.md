@@ -249,3 +249,12 @@ console.log('🔔 handleChatComplete called', {
 
 
 
+
+
+
+
+
+
+
+
+

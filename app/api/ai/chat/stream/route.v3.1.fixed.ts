@@ -58,7 +58,7 @@ async function getPromptV3(
       goal_type: goalTypeCode || 'general',
       difficulty: difficultyLevel || 'medium',
       language: language || 'zh',
-      stage: 'goal-analysis', // 🔥 修复：主 AI 分析阶段
+      stage: 'task-decomposition', // 当前阶段是任务分解
     };
 
     const composedPrompt = await composePrompt(criteria, variables);
@@ -133,16 +133,12 @@ function getDefaultSystemPrompt(language: 'zh' | 'en'): string {
 3. 展示你的推理过程
 4. 根据目标类型调整语气
 
-📝 回复格式（严格遵守）:
-
-**第一部分：思考过程（在 <think> 标签内）**
+📝 回复格式:
 
 <think>
 [在这里展示你的思考过程，100-200字]
 分析用户目标的可行性、挑战点、时间规划等。
 </think>
-
-**第二部分：主要输出（在 <think> 标签外）**
 
 ## 💬 我的理解
 
@@ -165,13 +161,7 @@ function getDefaultSystemPrompt(language: 'zh' | 'en'): string {
 
 ## 💪 给你的鼓励
 
-用1-2句真诚的话鼓励用户。
-
-❗ 关键约束:
-- **<think> 标签只包含思考过程，标签外才是主要输出**
-- **必须生成 <think> 标签外的所有四个部分（我的理解、我的建议、实战技巧、给你的鼓励）**
-- **禁止在 <think> 标签内嵌套 <think> 标签**
-- **整个响应只有一对 <think></think> 标签**`;
+写一句鼓励的话。`;
   }
 
   return `You are a professional goal planning assistant using the DeepSeek Reasoner model.
@@ -182,16 +172,12 @@ function getDefaultSystemPrompt(language: 'zh' | 'en'): string {
 3. Show your reasoning process
 4. Adjust tone based on goal type
 
-📝 Response format (strictly follow):
-
-**Part 1: Thinking Process (inside <think> tags)**
+📝 Response format:
 
 <think>
 [Show your thinking process here, 100-200 words]
 Analyze the feasibility, challenges, and time planning of the user's goal.
 </think>
-
-**Part 2: Main Output (outside <think> tags)**
 
 ## 💬 My Understanding
 
@@ -207,13 +193,7 @@ Give 3-5 actionable tips.
 
 ## 💪 Encouragement
 
-Write 1-2 sincere encouraging sentences.
-
-❗ Critical Constraints:
-- **<think> tags contain ONLY the thinking process, main output MUST be outside**
-- **You MUST generate all four sections outside <think> tags (My Understanding, My Advice, Practical Tips, Encouragement)**
-- **Never nest <think> tags inside <think> tags**
-- **Only one pair of <think></think> tags in the entire response**`;
+Write an encouraging sentence.`;
 }
 
 function getDefaultUserPrompt(

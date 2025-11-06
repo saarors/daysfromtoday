@@ -48,6 +48,10 @@ function WishlistContent({ locale }: { locale: string }) {
   const [showChat, setShowChat] = useState(false);
   const [aiIntroText, setAiIntroText] = useState<string>(''); // AI 介绍文案
   
+  // V3.1 新增: 动态任务列表
+  const [dynamicTasks, setDynamicTasks] = useState<string[]>([]);
+  const [tasksLoading, setTasksLoading] = useState(false);
+  
   // 渐次显示状态控制
   const [showUserGoal, setShowUserGoal] = useState(false); // 用户目标卡
   const [showMatchingIntro, setShowMatchingIntro] = useState(false); // AI匹配介绍
@@ -349,15 +353,18 @@ function WishlistContent({ locale }: { locale: string }) {
       // 2. 生成 AI 介绍文案
       await generateAIIntro(goalText, result);
 
-      // 3. 直接显示对话界面,不再跳转独立页面
+      // 3. V3.1 新增: 生成动态任务列表
+      await generateTaskList(goalText, daysCount, result);
+
+      // 4. 直接显示对话界面,不再跳转独立页面
       setIsMatching(false);
       setShowChat(true);
       
-      // 4. 渐次显示效果
+      // 5. 渐次显示效果
       setTimeout(() => setShowUserGoal(true), 100); // 先显示用户目标卡
       setTimeout(() => {
         setShowMatchingIntro(true); // 再显示AI匹配介绍
-        // 5. 立即调用 AI API 生成建议
+        // 6. 立即调用 AI API 生成建议
         generateAIResponse(goalText, daysCount, targetDate, result);
       }, 800);
 
@@ -414,6 +421,73 @@ function WishlistContent({ locale }: { locale: string }) {
         generateAIResponse(goalText, daysCount, targetDate, fallbackResult);
       }, 800);
     }
+  };
+
+  /**
+   * V3.1 新增: 生成动态任务列表
+   */
+  const generateTaskList = async (
+    goalText: string,
+    daysCount: number,
+    matchResult: CompleteAIMatchResult
+  ) => {
+    if (tasksLoading) {
+      console.log('⚠️ 任务列表正在生成中，跳过重复调用');
+      return;
+    }
+    
+    setTasksLoading(true);
+    console.log('🎯 开始生成动态任务列表...');
+    
+    try {
+      const response = await fetch('/api/ai/task-decomposition', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          goalText,
+          goalType: matchResult.goalType.code || 'general',
+          difficulty: matchResult.difficulty.level || 'medium',
+          days: daysCount,
+          language: locale
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success && data.data.tasks && data.data.tasks.length > 0) {
+        console.log('✅ 动态任务列表生成成功:', data.data.tasks);
+        setDynamicTasks(data.data.tasks);
+        
+        // 可选：显示方法论信息
+        if (data.data.methodology) {
+          console.log('📚 匹配方法论:', data.data.methodology.name);
+        }
+      } else {
+        // 降级：使用通用任务
+        console.warn('⚠️ 任务生成失败，使用默认任务');
+        setDynamicTasks(getDefaultTasks());
+      }
+      
+    } catch (error) {
+      console.error('❌ 任务生成错误:', error);
+      // 降级到默认任务
+      setDynamicTasks(getDefaultTasks());
+    } finally {
+      setTasksLoading(false);
+    }
+  };
+
+  /**
+   * 获取默认任务列表（降级方案）
+   */
+  const getDefaultTasks = (): string[] => {
+    return [
+      '理解目标背景与动机',
+      '评估时间与资源约束',
+      '构建推理链与策略',
+      '生成个性化建议',
+      '提炼实战技巧'
+    ];
   };
 
   /**
@@ -951,16 +1025,23 @@ function WishlistContent({ locale }: { locale: string }) {
                       <div className="p-5">
                         {/* 任务列表 - 常驻显示在顶部(仅非viewOnly模式) */}
                         {!goalData?.viewOnly && (streaming.isStreaming || streaming.thinking || streaming.snapshotThinking() || streaming.content || streaming.snapshotContent()) && (
-                          <ThinkingTaskList hasContent={!!(streaming.thinking || streaming.content)} />
+                          <ThinkingTaskList 
+                            hasContent={!!(streaming.thinking || streaming.content)}
+                            dynamicTasks={dynamicTasks}
+                            isLoading={tasksLoading}
+                          />
                         )}
                         
                         {/* AI 思考过程（折叠显示在任务列表下方）- 仅非viewOnly模式显示 */}
                         {!goalData?.viewOnly && (streaming.thinking || streaming.snapshotThinking()) && (
-                          <div className="bg-purple-50/30 rounded-xl p-4 mb-4 border border-purple-200/50">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="text-base">🧠</span>
-                              <span className="text-sm font-semibold text-purple-900">
-                                {streaming.isStreaming ? 'AI 推理过程' : 'AI 推理过程'}
+                          <div className="bg-purple-50/30 rounded-xl p-4 mb-3 border border-purple-200/50">
+                            <div className="flex items-center gap-2 mb-1.5">
+                              {/* V3.1 优化: 灯泡图标（建议思路） */}
+                              <svg className="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                              </svg>
+                              <span className="text-sm font-medium text-purple-900">
+                                AI 的建议思路
                               </span>
                             </div>
                             <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
@@ -1177,8 +1258,18 @@ function WishlistContent({ locale }: { locale: string }) {
 /**
  * 任务列表式推理进度组件 - 常驻显示版
  * @param hasContent - 是否有AI内容输出(用于加速任务完成)
+ * @param dynamicTasks - V3.1 新增: 动态任务列表
+ * @param isLoading - V3.1 新增: 任务是否正在加载
  */
-function ThinkingTaskList({ hasContent = false }: { hasContent?: boolean }) {
+function ThinkingTaskList({ 
+  hasContent = false,
+  dynamicTasks,
+  isLoading = false
+}: { 
+  hasContent?: boolean;
+  dynamicTasks?: string[];
+  isLoading?: boolean;
+}) {
   const [currentStep, setCurrentStep] = React.useState(0);
   const hasCompletedRef = React.useRef(false); // 防止重复完成
 
@@ -1217,7 +1308,8 @@ function ThinkingTaskList({ hasContent = false }: { hasContent?: boolean }) {
     return () => timers.forEach(timer => clearTimeout(timer));
   }, []); // 🔥 仅初始化时执行一次
 
-  const tasks = [
+  // V3.1: 使用动态任务或默认任务
+  const defaultTasks = [
     { id: 1, label: '理解目标背景与动机', desc: '分析目标类型、难度、用户意图' },
     { id: 2, label: '评估时间与资源约束', desc: '计算可用天数、识别关键挑战点' },
     { id: 3, label: '构建推理链与策略', desc: '设计分阶段计划、优先级排序' },
@@ -1225,22 +1317,37 @@ function ThinkingTaskList({ hasContent = false }: { hasContent?: boolean }) {
     { id: 5, label: '提炼实战技巧', desc: '总结关键行动点与注意事项' },
   ];
 
+  // 如果有动态任务，使用动态任务；否则使用默认任务
+  const tasks = (dynamicTasks && dynamicTasks.length > 0)
+    ? dynamicTasks.map((task, index) => ({
+        id: index + 1,
+        label: task,
+        desc: '' // 动态任务不需要描述
+      }))
+    : defaultTasks;
+
   return (
     <div className="bg-gradient-to-r from-purple-50/30 via-blue-50/30 to-indigo-50/30 rounded-xl p-4 mb-4 border border-purple-100/50">
-      {/* 标题 */}
+      {/* 标题 - V3.1 优化 */}
       <div className="flex items-center gap-2 mb-3 pb-2 border-b border-purple-200/30">
         <div className="w-1 h-4 bg-gradient-to-b from-purple-500 to-blue-500 rounded-full"></div>
         <span className="text-sm font-semibold text-purple-900">
-          {currentStep >= 5 && !hasContent ? 'AI 正在深度推理中' : 'AI 深度思考'}
+          {isLoading 
+            ? 'AI 助手正在规划你的任务…'
+            : dynamicTasks && dynamicTasks.length > 0
+            ? `你的任务可以分为 ${dynamicTasks.length} 个步骤`
+            : currentStep >= 5 && !hasContent 
+            ? 'AI 正在深度推理中' 
+            : 'AI 深度思考'}
         </span>
-        {currentStep < 5 && (
+        {(isLoading || currentStep < 5) && (
           <div className="ml-auto flex gap-1">
             <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
             <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
           </div>
         )}
-        {currentStep >= 5 && !hasContent && (
+        {currentStep >= 5 && !hasContent && !isLoading && (
           <div className="ml-auto text-xs text-gray-500">
             AI 深度推理中,预计 30-60 秒
           </div>
@@ -1282,48 +1389,55 @@ function ThinkingTaskList({ hasContent = false }: { hasContent?: boolean }) {
                 )}
               </div>
 
-              {/* 任务内容 */}
+              {/* 任务内容 - V3.1 优化 */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className={`text-sm font-medium ${
+                <div className="flex items-start gap-2">
+                  <span className={`text-sm font-normal flex-1 ${
                     isCompleted ? 'text-gray-900' : 
                     isInProgress ? 'text-orange-700' : 
                     'text-gray-500'
                   }`}>
+                    {/* V3.1: 显示完整任务文本（Prompt已限制40字） */}
                     {task.label}
                   </span>
                   {isInProgress && (
-                    <span className="text-orange-600 text-xs px-1.5 py-0.5 bg-orange-50 rounded">进行中</span>
+                    <span className="text-orange-600 text-xs px-2 py-0.5 bg-orange-50 rounded whitespace-nowrap flex-shrink-0 min-w-[52px] text-center">进行中</span>
                   )}
                   {isCompleted && (
-                    <span className="text-teal-700 text-xs px-1.5 py-0.5 bg-teal-50 rounded">已完成</span>
+                    <span className="text-teal-700 text-xs px-2 py-0.5 bg-teal-50 rounded whitespace-nowrap flex-shrink-0 min-w-[52px] text-center">已完成</span>
                   )}
                 </div>
-                <p className={`text-xs mt-0.5 ${
-                  isCompleted ? 'text-gray-600' : 
-                  isInProgress ? 'text-orange-600/80' : 
-                  'text-gray-400'
-                }`}>
-                  {task.desc}
-                </p>
+                {task.desc && (
+                  <p className={`text-xs mt-0.5 ${
+                    isCompleted ? 'text-gray-600' : 
+                    isInProgress ? 'text-orange-600/80' : 
+                    'text-gray-400'
+                  }`}>
+                    {task.desc}
+                  </p>
+                )}
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* 当所有任务完成但还没有内容时,显示等待提示 */}
+      {/* 当所有任务完成但还没有内容时,显示等待提示 - V3.1 优化 */}
       {currentStep >= 5 && !hasContent && (
-        <div className="mt-4 pt-4 border-t border-purple-200/30">
-          <div className="flex items-start gap-3 text-xs text-gray-600">
+        <div className="mt-3 pt-3 border-t border-purple-200/30 animate-pulse">
+          <div className="flex items-start gap-2.5">
+            {/* 转圈动画图标 */}
             <div className="flex-shrink-0 mt-0.5">
-              <div className="w-4 h-4 rounded-full border-2 border-orange-400 border-t-transparent animate-spin"></div>
+              <svg className="w-4 h-4 text-orange-500 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
             </div>
-            <div>
-              <p className="font-medium text-orange-700 mb-1">AI 助手深度推理中</p>
-              <p className="text-gray-500 leading-relaxed">
-                AI 正在进行深度思考和多层推理,生成高质量建议通常需要 30-60 秒。
-                请稍候,内容即将呈现...
+            {/* 文字内容 - 增加行间距 */}
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-orange-700">AI 的建议思路</p>
+              <p className="text-xs text-gray-600 leading-loose">
+                AI 正在进行深度思考和多层推理,生成高质量建议通常需要 30-60 秒。请稍候,内容即将呈现...
               </p>
             </div>
           </div>
