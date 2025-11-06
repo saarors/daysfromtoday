@@ -335,6 +335,10 @@ function WishlistContent({ locale }: { locale: string }) {
     setIsMatching(true);
     console.log('🚀 开始 AI 匹配...', { goalText, daysCount });
     
+    // ✅ V3.2 优化: 立即显示 Chat 界面，不再等待匹配完成
+    setShowChat(true);
+    setTimeout(() => setShowUserGoal(true), 100);
+    
     try {
       // 1. 调用匹配服务（设置超时）
       console.log('⏱️ 调用 matchGoalToAI...');
@@ -358,23 +362,29 @@ function WishlistContent({ locale }: { locale: string }) {
       setMatchResult(result);
       console.log('🎯 AI 匹配结果:', result);
 
-      // 2. 生成 AI 介绍文案
-      await generateAIIntro(goalText, result);
+      // ✅ V3.2 优化: 显示 AI 介绍区域（带加载动画）
+      setTimeout(() => setShowMatchingIntro(true), 100);
 
-      // 3. V3.1 新增: 生成动态任务列表
-      await generateTaskList(goalText, daysCount, result);
+      // ✅ V3.2 优化: 并行执行 AI 介绍和任务列表（而不是串行）
+      Promise.all([
+        generateAIIntro(goalText, result),
+        generateTaskList(goalText, daysCount, result),
+      ]).then(() => {
+        console.log('✅ AI 介绍和任务列表生成完成');
+        
+        // 所有准备工作完成后，开始生成 AI 建议
+        setTimeout(() => {
+          generateAIResponse(goalText, daysCount, targetDate, result);
+        }, 500);
+      }).catch(error => {
+        console.error('❌ 生成 AI 介绍或任务列表失败:', error);
+        // 即使失败，也继续生成 AI 建议
+        setTimeout(() => {
+          generateAIResponse(goalText, daysCount, targetDate, result);
+        }, 500);
+      });
 
-      // 4. 直接显示对话界面,不再跳转独立页面
       setIsMatching(false);
-      setShowChat(true);
-      
-      // 5. 渐次显示效果
-      setTimeout(() => setShowUserGoal(true), 100); // 先显示用户目标卡
-      setTimeout(() => {
-        setShowMatchingIntro(true); // 再显示AI匹配介绍
-        // 6. 立即调用 AI API 生成建议
-        generateAIResponse(goalText, daysCount, targetDate, result);
-      }, 800);
 
     } catch (error: any) {
       // 降级处理：如果超时，使用默认配置继续
@@ -417,17 +427,16 @@ function WishlistContent({ locale }: { locale: string }) {
       setMatchResult(fallbackResult);
       console.log('🔄 使用 fallback 配置:', fallbackResult);
       
-      // 继续执行，不中断用户流程
+      // ✅ V3.2 优化: 界面已经显示了，只需更新内容
       setIsMatching(false);
-      setShowChat(true);
       
-      // 渐次显示效果（降级方案）
-      setTimeout(() => setShowUserGoal(true), 100);
+      // 显示降级提示
+      setTimeout(() => setShowMatchingIntro(true), 100);
+      
+      // 继续执行
       setTimeout(() => {
-        setShowMatchingIntro(true);
-        // 降级方案：使用默认配置
         generateAIResponse(goalText, daysCount, targetDate, fallbackResult);
-      }, 800);
+      }, 500);
     }
   };
 
@@ -1002,7 +1011,8 @@ function WishlistContent({ locale }: { locale: string }) {
               )}
 
               {/* AI 助手介绍环节 - 渐次显示 */}
-              {showMatchingIntro && matchResult && !goalData.viewOnly && aiIntroText && (
+              {/* V3.2.1 优化: 只有当 aiIntroText 有内容时才显示，避免空框 */}
+              {aiIntroText && matchResult && !goalData.viewOnly && (
                 <div className="flex justify-start animate-[slideUp_0.5s_ease-out]">
                   <div className="max-w-[85%] w-full bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-2xl p-5 border border-purple-200 shadow-sm">
                     <p className="text-gray-700 leading-relaxed">
@@ -1015,7 +1025,8 @@ function WishlistContent({ locale }: { locale: string }) {
               )}
 
               {/* AI 响应气泡 - 合并思考和建议 */}
-              {showMatchingIntro && (
+              {/* V3.2.1 优化: 只有当有任务列表或内容时才显示对话框，避免空框 */}
+              {showMatchingIntro && (dynamicTasks.length > 0 || streaming.thinking || streaming.content || streaming.snapshotThinking() || streaming.snapshotContent() || goalData?.viewOnly) && (
                 <div className="flex justify-start animate-[slideUp_0.5s_ease-out]">
                   <div className="max-w-[85%] w-full">
                     {/* AI 头像和名称 */}
