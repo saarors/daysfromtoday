@@ -27,14 +27,14 @@ export default function TopNav({ locale }: TopNavProps) {
     en: {
       home: 'Home',
       wishlist: 'Wishlist',
-      calculator: 'Date Calculator',
+      wishBooks: 'Wish Books',
       holidays: 'Holidays',
       blog: 'Blog'
     },
     zh: {
       home: '首页',
       wishlist: '愿望清单',
-      calculator: '日期计算',
+      wishBooks: '愿望宝典',
       holidays: '节假日',
       blog: '博客'
     }
@@ -96,14 +96,14 @@ export default function TopNav({ locale }: TopNavProps) {
               </Link>
               <span className="text-gray-300">|</span>
               <Link 
-                href={`/${locale}/calculator`}
+                href={`/${locale}/wish-books`}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  isActive(`/${locale}/calculator`)
+                  isActive(`/${locale}/wish-books`)
                     ? 'text-blue-600 bg-blue-50'
                     : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                 }`}
               >
-                {t.calculator}
+                {t.wishBooks}
               </Link>
               <span className="text-gray-300">|</span>
               <Link 
