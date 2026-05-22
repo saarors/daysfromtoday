@@ -7,6 +7,6 @@ import { twMerge } from 'tailwind-merge';
  * @returns 合并后的 className
  */
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(...inputs));
 }
 
